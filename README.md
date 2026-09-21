@@ -5,9 +5,12 @@ Telegram bot jo kisi bhi anime ki **Hindi / English / Japanese dub status**, ava
 ## 📋 Kya karta hai
 
 - 🎬 Anime search — full info card (status, platforms, dub episodes, next episode date)
+- 📚 **Multi-season support** — 1 se zyada season ho to season-wise detail (year + ongoing + per-season Hindi dub)
+- 🎥 **Movie support** — anime movies ke liye movie card (release date, duration, dub available/upcoming)
+- 🔍 **Smart search** — typos bhi chalega ("mushoko tensai" → Mushoku Tensei mil jayega)
 - 📺 Platforms: Crunchyroll, Netflix, Amazon Prime Video, Anime Times, JioHotstar, MX Player, ZEE5, Muse India, Ani-One, Crunchyroll Channel...
 - ✅ **Follow** button → choose karo Japanese / English / Hindi audio
-- 🔔 Naya episode aate hi notification: *"Black Torch — Episode 4 (Hindi dub) aa chuka hai! Platform: Crunchyroll (India)"*
+- 🔔 Naya episode aate hi notification: *"Black Torch — Episode 4 (Hindi dub) aa chuka hai! Platform: Crunchyroll (India)"* + Watch button
 - ❌ **Unfollow** → notification band
 
 ## 🤖 Bot commands
