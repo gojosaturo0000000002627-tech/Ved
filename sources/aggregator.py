@@ -69,7 +69,12 @@ async def search(query: str) -> list:
     if results:
         return results
 
-    corrected = _fuzzy_correct(query)
+    corrected = None
+    try:
+        corrected = await asyncio.wait_for(
+            asyncio.to_thread(_fuzzy_correct, query), timeout=12)
+    except Exception:
+        corrected = None
     if corrected and corrected.lower() != query.lower():
         print(f"[search] typo corrected: '{query}' -> '{corrected}'")
         try:
@@ -99,7 +104,7 @@ def _fuzzy_correct(query: str) -> Optional[str]:
     """
     try:
         import aninidhi
-        records = aninidhi.list_all()
+        records = aninidhi_src.list_all_cached()
     except Exception:
         return None
     qw = re.sub(r"[^a-z0-9\s]", " ", query.lower()).split()
@@ -274,11 +279,43 @@ def franchise_pick(results: list, query: str):
     return results[0]["anilist_id"]
 
 
+def best_match_pick(results: list, query: str):
+    """Query ke SAB words kisi result ke title me hain? Seedha card.
+
+    AniList search 'dark gathering' pe bhi 8 alag 'dark' anime de deta
+    hai (Darker than Black waghera) — jab query ka poora naam hi kisi
+    ek title me baita hai to pick-list ki zaroorat nahi.
+    EXACT match (query == title, e.g. 'one piece') ko sabse zyada
+    priority. Multiple non-exact perfect matches -> None (pick list).
+    """
+    q = set(re.sub(r"[^a-z0-9\s]", " ", (query or "").lower()).split())
+    q = {w for w in q if len(w) > 2} or q
+    if not q:
+        return None
+
+    def _toks(t):
+        return set(re.sub(r"[^a-z0-9\s]", " ", (t or "").lower()).split())
+
+    perfect, exact = [], []
+    for r in results[:8]:
+        toks = _toks(r.get("title")) | _toks(r.get("romaji"))
+        if q <= toks:
+            perfect.append(r)
+            if toks == q:
+                exact.append(r)
+    if len(exact) == 1:
+        return exact[0]["anilist_id"]
+    if len(perfect) == 1:
+        return perfect[0]["anilist_id"]
+    return None
+
+
 async def _anidhi_lookup(entry: dict) -> dict:
     """AniNidhi lookup — primary title se na mile to romaji/native bhi try.
 
     Kuch records English naam se hain (Sparks of Tomorrow), kuch romaji
     se (Dan Da Dan) — teeno try karke dekh lo, koi miss nahi honi chahiye.
+    TIMEOUT: aninidhi API slow/unka ho to card atko na rahe (25s cap).
     """
     eps = entry.get("episodes")
     tried, result = [], {}
@@ -288,8 +325,9 @@ async def _anidhi_lookup(entry: dict) -> dict:
             continue
         tried.append(t)
         try:
-            result = await asyncio.to_thread(
-                aninidhi_src.hindi_dub_status, t, eps)
+            result = await asyncio.wait_for(
+                asyncio.to_thread(aninidhi_src.hindi_dub_status, t, eps),
+                timeout=25)
         except Exception:
             continue
         if result and result.get("found"):
@@ -524,7 +562,7 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         _t(dubinfo.get_dub_info(title, config.DUB_INFO_API), 20, None),
         _t(youtube.find_episodes(title), 20, []),
         _t(anischedule.search_anime(title, config.ANIMESCHEDULE_TOKEN), 15, []),
-        _anidhi_lookup(base),
+        _t(_anidhi_lookup(base), 40, {}),
     ]
     try:
         dub_data, yt_data, as_results, anidhi = await asyncio.gather(*tasks)

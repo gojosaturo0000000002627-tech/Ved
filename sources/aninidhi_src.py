@@ -13,7 +13,29 @@ season-suffix hata kar multiple variants try karte hain (e.g.
 "Jujutsu Kaisen 2nd Season" -> base "Jujutsu Kaisen" -> season-aware match).
 """
 import re
+import time
 from datetime import date, timedelta
+
+# list_all() ka cache — 488 records ka network call har baar nahi karna
+# chahiye. Not-found fallback isse bahut baar chalta hai (e.g. Dark Gathering).
+_LIST_TTL = 6 * 3600  # 6 ghante
+_list_cache: dict = {"ts": 0.0, "data": None}
+
+
+def list_all_cached() -> list:
+    """aninidhi.list_all() — 6 ghante cache ke saath."""
+    try:
+        import aninidhi
+    except ImportError:
+        return []
+    now = time.time()
+    if _list_cache["data"] is None or now - _list_cache["ts"] > _LIST_TTL:
+        try:
+            _list_cache["data"] = aninidhi.list_all() or []
+            _list_cache["ts"] = now
+        except Exception:
+            pass
+    return _list_cache["data"] or []
 
 
 def _norm(s: str) -> str:
@@ -143,7 +165,7 @@ def hindi_dub_status(query: str, total: int | None = None) -> dict | None:
         # Fallback: poore dataset me khud match karo
         # (aninidhi ka search kabhi-kabhi lambe naam pe miss kar deta hai)
         try:
-            rec = _best_match(aninidhi.list_all() or [], query)
+            rec = _best_match(list_all_cached(), query)
         except Exception:
             rec = None
     if not rec or not rec.get("hindi_available"):
