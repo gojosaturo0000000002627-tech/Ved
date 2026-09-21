@@ -57,6 +57,36 @@ async def mock_get_anime(anilist_id):
     return dict(MOCK_ANILIST)
 
 
+# ---- Multi-season mock (real AniNidhi titles se — DDD S1/S2 finished, Black Torch airing) ----
+MOCK_S1 = {"anilist_id": 30, "mal_id": None, "title": "Dan Da Dan", "romaji": "Dan Da Dan",
+           "native": "", "status": "FINISHED", "status_display": "Completed ✅",
+           "episodes": 12, "format": "TV", "season": "FALL", "year": 2024,
+           "next_episode": None, "next_airing_at": None, "links": [], "relations": []}
+MOCK_S2 = {"anilist_id": 31, "mal_id": None, "title": "Dan Da Dan 2nd Season", "romaji": None,
+           "native": "", "status": "FINISHED", "status_display": "Completed ✅",
+           "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2025,
+           "next_episode": None, "next_airing_at": None, "links": [],
+           "relations": [{"relation": "PREQUEL", "anilist_id": 30, "format": "TV"}]}
+MOCK_S3 = {"anilist_id": 32, "mal_id": None, "title": "Black Torch", "romaji": None,
+           "native": "", "status": "RELEASING", "status_display": "Ongoing",
+           "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2026,
+           "next_episode": 12, "next_airing_at": None, "links": [],
+           "relations": [{"relation": "PREQUEL", "anilist_id": 31, "format": "TV"}]}
+
+MOCK_MOVIE = {"anilist_id": 50, "mal_id": None, "title": "Suzume", "romaji": "Suzume no Tojimari",
+             "native": "", "status": "FINISHED", "status_display": "Released ✅",
+             "episodes": None, "format": "MOVIE", "duration": 122,
+             "release_date": "2022-11-11",
+             "season": None, "year": 2022,
+             "next_episode": None, "next_airing_at": None, "links": [], "relations": []}
+
+MOCK_DB = {123456: MOCK_ANILIST, 30: MOCK_S1, 31: MOCK_S2, 32: MOCK_S3, 50: MOCK_MOVIE}
+
+
+async def mock_get_anime_db(anilist_id):
+    return dict(MOCK_DB[anilist_id])
+
+
 async def mock_get_dub_info(query, base_url):
     return dict(MOCK_DUBINFO)
 
@@ -70,7 +100,7 @@ async def mock_yt_find(query):
 
 
 async def main():
-    anilist.get_anime = mock_get_anime
+    anilist.get_anime = mock_get_anime_db
     dubinfo.get_dub_info = mock_get_dub_info
     anischedule.search_anime = mock_as_search
     youtube.find_episodes = mock_yt_find
@@ -191,6 +221,52 @@ async def main():
     st = db.get_lang_states(123456)
     assert st["hi"]["last_ep"] == counts["hi"]
     print("[OK] database + lang_state")
+
+    # ---- 10. Multi-season card (user ka naya format) ----
+    info_ms = await aggregator.get_anime_info(32, db=db, force=True)
+    card_ms = formatter.format_card(info_ms)
+    print("---------- MULTI-SEASON CARD ----------")
+    print(card_ms)
+    print("---------------------------------------")
+    assert "• Season 1 (2024)" in card_ms, "S1 label + year"
+    assert "• Season 2 (2025)" in card_ms
+    assert "• Season 3 (ongoing)" in card_ms, "airing season ke liye (ongoing)"
+    assert card_ms.count("me complete)") >= 1, "finished dubs ka complete note"
+    assert "Hindi dub: 4 episodes" in card_ms, "current (S3=Black Torch) ka hi=4"
+    assert "Japanese audio: 11 episodes" in card_ms, "S3 ka jp=11 (next=12)"
+    assert "Season 3: 12 episodes planned" in card_ms, "top line me current season num"
+    print("[OK] multi-season card format")
+
+    # ---- 11. Fuzzy search (typo) ----
+    async def mock_search_anime(q):
+        if "mushoko" in q.lower():
+            return []  # typo wala direct search fail
+        if "mushoku" in q.lower():
+            return [{"anilist_id": 77, "title": "Mushoku Tensei: Jobless Reincarnation"}]
+        return []
+
+    anilist.search_anime = mock_search_anime
+    res = await aggregator.search("mushoko tensai")
+    assert res, "typo correction ke baad search kaam karna chahiye"
+    assert res[0]["title"].startswith("Mushoku Tensei")
+    print("[OK] fuzzy search — 'mushoko tensai' -> Mushoku Tensei mil gaya")
+
+    # ---- 12. Movie card ----
+    info_mv = await aggregator.get_anime_info(50, db=db, force=True)
+    card_mv = formatter.format_card(info_mv)
+    print("---------- MOVIE CARD ----------")
+    print(card_mv)
+    print("--------------------------------")
+    assert "🎞 Movie details:" in card_mv
+    assert "• Movie (2022)" in card_mv
+    assert "Released: 11 Nov 2022" in card_mv
+    assert "Hindi dub: Available ✅" in card_mv, "Suzume ka real anidhi record — dub available"
+    assert "Japanese audio: Available ✅" in card_mv
+    assert "Season" not in card_mv, "movie me Season lines nahi"
+    assert "Next episode" not in card_mv, "movie me next episode section nahi"
+    note_mv = formatter.format_notification(info_mv, "hi", 1, None)
+    assert "Hindi Dub Aa Gayi" in note_mv
+    print("[OK] movie card — Suzume")
 
     print("\n✅ SAB TESTS PASS HO GAYE!")
 
