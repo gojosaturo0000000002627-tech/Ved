@@ -61,12 +61,14 @@ async def mock_get_anime(anilist_id):
 MOCK_S1 = {"anilist_id": 30, "mal_id": None, "title": "Dan Da Dan", "romaji": "Dan Da Dan",
            "native": "", "status": "FINISHED", "status_display": "Completed ✅",
            "episodes": 12, "format": "TV", "season": "FALL", "year": 2024,
-           "next_episode": None, "next_airing_at": None, "links": [], "relations": []}
+           "next_episode": None, "next_airing_at": None, "links": [],
+           "relations": [{"relation": "SEQUEL", "anilist_id": 31, "format": "TV"}]}
 MOCK_S2 = {"anilist_id": 31, "mal_id": None, "title": "Dan Da Dan 2nd Season", "romaji": None,
            "native": "", "status": "FINISHED", "status_display": "Completed ✅",
            "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2025,
            "next_episode": None, "next_airing_at": None, "links": [],
-           "relations": [{"relation": "PREQUEL", "anilist_id": 30, "format": "TV"}]}
+           "relations": [{"relation": "PREQUEL", "anilist_id": 30, "format": "TV"},
+                        {"relation": "SEQUEL", "anilist_id": 32, "format": "TV"}]}
 MOCK_S3 = {"anilist_id": 32, "mal_id": None, "title": "Black Torch", "romaji": None,
            "native": "", "status": "RELEASING", "status_display": "Ongoing",
            "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2026,
@@ -121,6 +123,10 @@ async def mock_get_anime_db(anilist_id):
     return dict(MOCK_DB[anilist_id])
 
 
+async def mock_get_anime_many_db(ids):
+    return [dict(MOCK_DB[i]) for i in ids if i in MOCK_DB]
+
+
 async def mock_get_dub_info(query, base_url):
     return dict(MOCK_DUBINFO)
 
@@ -135,6 +141,7 @@ async def mock_yt_find(query):
 
 async def main():
     anilist.get_anime = mock_get_anime_db
+    anilist.get_anime_many = mock_get_anime_many_db
     dubinfo.get_dub_info = mock_get_dub_info
     anischedule.search_anime = mock_as_search
     youtube.find_episodes = mock_yt_find
@@ -358,6 +365,36 @@ async def main():
     assert aggregator.franchise_pick(diff, "one") is None, \
         "alag franchise -> pick list"
     print("[OK] franchise pick — direct card (spinoff-tolerant) logic")
+
+    # ---- 15. Grand Blue scenario: base S1 pe card, S3 ongoing ----
+    # Real bug: S1 pe card banta hai to next-episode S1 (complete) ka
+    # aata tha — ab latest ongoing season (S3) ka aana chahiye
+    orig32 = MOCK_DB[32]
+    MOCK_DB[32] = dict(orig32)
+    MOCK_DB[32]["next_airing_at"] = int(datetime(
+        2026, 9, 27, 15, 0, tzinfo=timezone.utc).timestamp())
+    try:
+        info_gb = await aggregator.get_anime_info(30, db=db, force=True)
+        assert info_gb["hi_aired"] == 4, "top-level hi = S3 ka count (notifier)"
+        assert info_gb["status"] == "RELEASING", "franchise ongoing hai"
+        assert info_gb["current_season_num"] == 3
+        assert info_gb["next_by_lang"]["jp"] \
+            and "27 Sep 2026" in info_gb["next_by_lang"]["jp"], \
+            "S3 ka JP next episode"
+        assert info_gb["next_by_lang"]["hi"] \
+            and "26 Sep 2026" in info_gb["next_by_lang"]["hi"], \
+            "S3 ka Hindi next (REAL anidhi se)"
+        card_gb = formatter.format_card(info_gb)
+        assert "Status: Ongoing" in card_gb, "S3 ongoing -> Ongoing"
+        assert "Season 3: 12 episodes planned" in card_gb, "top line S3"
+        assert "Japanese audio: 27 Sep 2026" in card_gb
+        assert "Hindi dub: 26 Sep 2026" in card_gb
+        assert not all(v == "All episodes released"
+                       for v in info_gb["next_by_lang"].values()), \
+            "S3 ongoing me 'All released' nahi"
+    finally:
+        MOCK_DB[32] = orig32
+    print("[OK] grand blue fix — S1 base pe bhi S3 ka next episode/date")
 
     print("\n✅ SAB TESTS PASS HO GAYE!")
 
