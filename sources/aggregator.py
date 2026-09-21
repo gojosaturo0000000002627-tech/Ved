@@ -201,6 +201,105 @@ async def _build_season_chain(base: dict, max_seasons: int = 5) -> list:
     return seasons
 
 
+def _season_base(title: str) -> str:
+    """Title se saare season/part/cour markers hata kar normalized base.
+
+    'Mushoku Tensei: Jobless Reincarnation Season 2 Part 2' ->
+    'mushokutenseijoblessreincarnation'
+    """
+    t = re.sub(r"\([^)]*\)", " ", title or "")
+    t = re.sub(r"\b\d+(?:st|nd|rd|th)\s+(?:season|part|cour)\b", " ", t,
+               flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:season|part|cour)\s*\d+\b", " ", t, flags=re.IGNORECASE)
+    return re.sub(r"[^a-z0-9]", "", t.lower())
+
+
+MOVIE_FORMATS = ("MOVIE", "OVA", "SPECIAL")
+
+
+def _franchise_key(title: str) -> str:
+    """Franchise pehchanne wala key — cours/seasons/movies sab same key denge.
+
+    'Mushoku Tensei: Jobless Reincarnation Cour 2 - Eris the Goblin Slayer'
+      -> 'mushokutensei'
+    """
+    t = title or ""
+    if ":" in t:
+        t = t.split(":")[0]
+    t = re.sub(r"\([^)]*\)", " ", t)
+    t = re.sub(r"\b\d+(?:st|nd|rd|th)\s+(?:season|part|cour)\b", " ", t,
+               flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:season|part|cour)\s*\d+\b", " ", t, flags=re.IGNORECASE)
+    t = re.sub(r"\s*[-–—].*$", "", t)
+    return re.sub(r"[^a-z0-9]", "", t.lower())
+
+
+def franchise_pick(results: list, query: str):
+    """Same franchise ke multiple results? Seedha full card bhejo.
+
+    AniList har cour/movie/spinoff ko alag entry rakhta hai. Pehle result
+    ka franchise key agar 2+ results me milta hai (seasons, parts, movies)
+    to pick-list ki jagah seedha full card bhejo — usme sab aa jaata hai.
+    Genuinely alag anime (Naruto vs Blue Lock) me first ka group akela
+    hota hai -> None -> pick list dikhegi.
+    """
+    if not results or len(results) < 2:
+        return None
+    top = results[:6]
+    keys = [_franchise_key(r.get("title") or "") for r in top]
+    first = keys[0]
+    if not first:
+        return None
+    if sum(1 for k in keys if k == first) < 2:
+        return None
+    # Query me season/part/cour number hai to wahi entry lo
+    for kind in ("season", "part", "cour"):
+        qn = _marker_num(query, kind)
+        if qn:
+            for r in top:
+                if _marker_num(r.get("title") or "", kind) == qn:
+                    return r["anilist_id"]
+    # Default: pehla result (AniList relevance order — usually S1)
+    return results[0]["anilist_id"]
+
+
+def _marker_num(title: str, kind: str) -> Optional[int]:
+    """'Season 2' / 'Part 3' / '2nd Season' -> number."""
+    t = title or ""
+    m = re.search(rf"\b{kind}\s*(\d+)\b", t, re.IGNORECASE)
+    if m:
+        return int(m.group(1))
+    m = re.search(rf"\b(\d+)(?:st|nd|rd|th)\s+{kind}\b", t, re.IGNORECASE)
+    if m:
+        return int(m.group(1))
+    return None
+
+
+def _group_seasons(seasons: list) -> list:
+    """Cours ko merge karke asli season groups.
+
+    AniList har cour ko alag entry rakhta hai (jaise 'Part 2',
+    'Season 2 Part 2') — ye sab continuation hain, naya season nahi.
+    Rule: same base naam + part/cour marker (aur same season number)
+    = pichle season ka hi cour.
+    """
+    groups = []
+    for s in seasons:
+        t = s.get("title") or ""
+        b = _season_base(t)
+        part = _marker_num(t, "part") or _marker_num(t, "cour")
+        season = _marker_num(t, "season")
+        if groups and part and b == groups[-1]["base"]:
+            prev_season = _marker_num(
+                groups[-1]["entries"][-1].get("title") or "", "season")
+            if season is None or (prev_season is not None
+                                  and season == prev_season):
+                groups[-1]["entries"].append(s)
+                continue
+        groups.append({"base": b, "entries": [s]})
+    return groups
+
+
 def _season_complete_note(anidhi: dict, total: Optional[int]) -> str:
     """Finished Hindi dub ka note: '(Apr 2026 me complete)' ya '(complete)'."""
     rd = None
@@ -217,18 +316,77 @@ def _season_complete_note(anidhi: dict, total: Optional[int]) -> str:
     return "(complete)"
 
 
-async def _season_details(base: dict) -> list:
-    """Multi-season blocks — user format mein:
+async def _movie_details(base: dict, chain: list) -> list:
+    """Franchise ki movies/OVAs — card me dikhane ke liye.
 
-    • Season 1 (2018)
-    Released: 12/12 episodes
-    Hindi dub: 12 episodes (Apr 2026 me complete)
-    Japanese audio: 12 episodes
+    Chain ke har entry ke relations me MOVIE/OVA/SPECIAL format wale
+    links uthata hai (max 3), unki detail + Hindi dub status laata hai.
     """
-    seasons = await _build_season_chain(base)
+    seen, ids = set(), []
+    for e in chain:
+        for r in e.get("relations") or []:
+            fmt = r.get("format")
+            rid = r.get("anilist_id")
+            if fmt in MOVIE_FORMATS and rid and rid not in seen:
+                seen.add(rid)
+                ids.append(rid)
+    if not ids:
+        return []
+    ids = ids[:3]
+
+    details = await asyncio.gather(*[anilist.get_anime(i) for i in ids],
+                                   return_exceptions=True)
+    valid = [d for d in details if isinstance(d, dict)]
+    if not valid:
+        return []
+    try:
+        anidhis = await asyncio.gather(*[
+            asyncio.to_thread(aninidhi_src.hindi_dub_status,
+                              d.get("title") or "", None)
+            for d in valid])
+    except Exception:
+        anidhis = [None] * len(valid)
+
+    out = []
+    for i, d in enumerate(valid):
+        a = anidhis[i] if i < len(anidhis) else None
+        a = a if isinstance(a, dict) else None
+        found = bool(a and a.get("found"))
+        hi = found and bool(a.get("finished") or a.get("eps"))
+        note = None
+        if not hi and found:
+            if a.get("upcoming"):
+                note = (f"Starts "
+                        f"{a['upcoming'].strftime('%d %b %Y')} (announced)")
+            elif a.get("announced"):
+                note = "Announced — date TBA"
+        out.append({
+            "title": d.get("title"),
+            "year": d.get("year"),
+            "format": d.get("format"),
+            "hi": hi,
+            "hi_note": note,
+        })
+    return out
+
+
+async def _season_details(base: dict, seasons: list | None = None) -> list:
+    """Season-wise blocks — cours merge karke asli seasons:
+
+    • Season 1 (2021)
+    Released: 23/23 episodes
+    Hindi dub: 23 episodes (Jun 2021 me complete)
+    Japanese audio: 23 episodes
+    """
+    seasons = seasons if seasons is not None else await _build_season_chain(base)
     if len(seasons) < 2:
         return []
 
+    groups = _group_seasons(seasons)
+    if len(groups) < 2:
+        return []
+
+    # Har entry ka AniNidhi status (parallel)
     anidhi_list = []
     try:
         anidhi_list = await asyncio.gather(*[
@@ -237,37 +395,63 @@ async def _season_details(base: dict) -> list:
             for s in seasons])
     except Exception as e:
         print(f"[seasons] aninidhi fail: {e}")
+    anidhi_map = {id(s): anidhi_list[i] for i, s in enumerate(seasons)
+                  if i < len(anidhi_list)}
 
     out = []
-    for i, s in enumerate(seasons, 1):
-        total_s = s.get("episodes")
-        ongoing_s = s.get("status") == "RELEASING"
-        if s.get("status") == "FINISHED":
-            jp_s = total_s
-        else:
-            jp_s = _airing_from_next(s.get("next_episode"))
+    for gi, g in enumerate(groups, 1):
+        entries = g["entries"]
+        total = sum(e.get("episodes") or 0 for e in entries) or None
+        ongoing_s = any(e.get("status") == "RELEASING" for e in entries)
+        jp = 0
+        for e in entries:
+            if e.get("status") == "FINISHED":
+                jp += e.get("episodes") or 0
+            else:
+                jp += _airing_from_next(e.get("next_episode")) or 0
+        jp = jp or None
 
+        # ---- Hindi dub aggregation (cour-wise records ko jodo) ----
         hi_s, hi_note = None, None
-        a = anidhi_list[i - 1] if i - 1 < len(anidhi_list) else None
-        if a and a.get("found"):
+        found_any, finished_all, eps_sum = False, True, 0
+        last_finished_a, last_finished_total = None, 0
+        for e in entries:
+            a = anidhi_map.get(id(e))
+            if not (a and a.get("found")):
+                continue
+            found_any = True
+            e_total = e.get("episodes")
             if a.get("finished"):
-                hi_s = total_s  # finished dub = poori season dubbed (approx)
-                hi_note = _season_complete_note(a, total_s)
+                eps_sum += e_total or 0
+                last_finished_a, last_finished_total = a, e_total
             elif a.get("eps"):
-                hi_s = a["eps"]
-            elif a.get("upcoming"):
-                hi_note = f"Starts {a['upcoming'].strftime('%d %b %Y')} (announced)"
-            elif a.get("announced"):
-                hi_note = "Announced — date TBA"
+                finished_all = False
+                eps_sum += a["eps"]
+            else:
+                finished_all = False
+                if a.get("upcoming"):
+                    hi_note = (f"Starts "
+                               f"{a['upcoming'].strftime('%d %b %Y')} "
+                               f"(announced)")
+                elif a.get("announced"):
+                    hi_note = "Announced — date TBA"
+        if found_any and finished_all and total:
+            hi_s = total
+            hi_note = _season_complete_note(last_finished_a,
+                                            last_finished_total)
+        elif eps_sum:
+            hi_s = eps_sum
+
         out.append({
-            "num": i,
-            "year": s.get("year"),
+            "num": gi,
+            "year": entries[0].get("year"),
             "ongoing": ongoing_s,
-            "total": total_s,
-            "jp_aired": jp_s,
+            "total": total,
+            "jp_aired": jp,
             "hi_aired": hi_s,
             "hi_note": hi_note,
-            "is_current": s.get("anilist_id") == base.get("anilist_id"),
+            "is_current": any(e.get("anilist_id") == base.get("anilist_id")
+                               for e in entries),
         })
     return out
 
@@ -481,10 +665,12 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         elif base.get("status") == "NOT_YET_RELEASED":
             status_display = "Upcoming movie (abhi release nahi hui)"
 
-    # Multi-season blocks (2+ seasons ho to season-wise detail; movies ke liye nahi)
-    seasons_blocks = [] if is_movie else await _season_details(base)
+    # Chain ek hi baar banao — seasons + movies dono ke liye
+    chain = [base] if is_movie else await _build_season_chain(base)
+    seasons_blocks = [] if is_movie else await _season_details(base, seasons=chain)
     current_season_num = next((s["num"] for s in seasons_blocks
                                if s.get("is_current")), None)
+    movies_out = await _movie_details(base, chain)
 
     info = {
         "anilist_id": anilist_id,
@@ -508,6 +694,7 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         "next_by_lang": next_by_lang,
         "seasons": seasons_blocks,
         "current_season_num": current_season_num,
+        "movies": movies_out,
         "is_movie": is_movie,
         "release_date": base.get("release_date"),
         "duration": base.get("duration"),

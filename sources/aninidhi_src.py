@@ -45,8 +45,14 @@ def _season_num(title: str) -> int | None:
 
 
 def _title_variants(title: str) -> list:
-    """'Jujutsu Kaisen 2nd Season' -> ['Jujutsu Kaisen 2nd Season',
-    'Jujutsu Kaisen']. Base naam aninidhi.search ke liye zaroori hai."""
+    """'Mushoku Tensei: Jobless Reincarnation Season 3' ->
+    ['...Season 3', '...Reincarnation', 'Mushoku Tensei']
+
+    1. Original naam
+    2. Season/part/cour suffix hata kar
+    3. Colon se pehle wala hissa (subtitle hata kar) — aninidhi ka
+       search lambe official naam pe fail hota hai, chhota naam chahiye
+    """
     v = [title]
     for pat in (r"\s*[\(\[]?\s*(?:season|part|cour)\s*\d+[^\)\]]*[\)\]]?\s*$",
                 r"\s*[-–—:]\s*(?:season|part|cour)\s*\d+.*$",
@@ -54,6 +60,14 @@ def _title_variants(title: str) -> list:
         s = re.sub(pat, "", title, flags=re.IGNORECASE).strip(" -–—:")
         if s and s.lower() != title.lower() and s not in v:
             v.append(s)
+    # Colon-prefix: "Mushoku Tensei: Jobless Reincarnation" -> "Mushoku Tensei"
+    extra = []
+    for t in v:
+        if ":" in t:
+            pre = t.split(":")[0].strip(" -–—")
+            if len(pre) >= 3 and pre not in v and pre not in extra:
+                extra.append(pre)
+    v.extend(extra)
     return v
 
 
@@ -125,7 +139,13 @@ def hindi_dub_status(query: str, total: int | None = None) -> dict | None:
                 break
     except Exception as e:
         print(f"[aninidhi] search fail: {e}")
-        return None
+    if not rec:
+        # Fallback: poore dataset me khud match karo
+        # (aninidhi ka search kabhi-kabhi lambe naam pe miss kar deta hai)
+        try:
+            rec = _best_match(aninidhi.list_all() or [], query)
+        except Exception:
+            rec = None
     if not rec or not rec.get("hindi_available"):
         return {"found": False}
 
