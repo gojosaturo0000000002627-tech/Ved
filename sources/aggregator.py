@@ -263,6 +263,29 @@ def franchise_pick(results: list, query: str):
     return results[0]["anilist_id"]
 
 
+async def _anidhi_lookup(entry: dict) -> dict:
+    """AniNidhi lookup — primary title se na mile to romaji/native bhi try.
+
+    Kuch records English naam se hain (Sparks of Tomorrow), kuch romaji
+    se (Dan Da Dan) — teeno try karke dekh lo, koi miss nahi honi chahiye.
+    """
+    eps = entry.get("episodes")
+    tried, result = [], {}
+    for t in (entry.get("title"), entry.get("romaji"),
+              entry.get("native")):
+        if not t or t in tried:
+            continue
+        tried.append(t)
+        try:
+            result = await asyncio.to_thread(
+                aninidhi_src.hindi_dub_status, t, eps)
+        except Exception:
+            continue
+        if result and result.get("found"):
+            return result
+    return result or {}
+
+
 def _marker_num(title: str, kind: str) -> Optional[int]:
     """'Season 2' / 'Part 3' / '2nd Season' -> number."""
     t = title or ""
@@ -340,10 +363,8 @@ async def _movie_details(base: dict, chain: list) -> list:
     if not valid:
         return []
     try:
-        anidhis = await asyncio.gather(*[
-            asyncio.to_thread(aninidhi_src.hindi_dub_status,
-                              d.get("title") or "", None)
-            for d in valid])
+        anidhis = await asyncio.gather(*[_anidhi_lookup(d)
+                                         for d in valid])
     except Exception:
         anidhis = [None] * len(valid)
 
@@ -389,10 +410,8 @@ async def _season_details(base: dict, seasons: list | None = None) -> list:
     # Har entry ka AniNidhi status (parallel)
     anidhi_list = []
     try:
-        anidhi_list = await asyncio.gather(*[
-            asyncio.to_thread(aninidhi_src.hindi_dub_status,
-                              s.get("title") or "", s.get("episodes"))
-            for s in seasons])
+        anidhi_list = await asyncio.gather(*[_anidhi_lookup(s)
+                                             for s in seasons])
     except Exception as e:
         print(f"[seasons] aninidhi fail: {e}")
     anidhi_map = {id(s): anidhi_list[i] for i, s in enumerate(seasons)
@@ -475,8 +494,7 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         dubinfo.get_dub_info(title, config.DUB_INFO_API),
         youtube.find_episodes(title),
         anischedule.search_anime(title, config.ANIMESCHEDULE_TOKEN),
-        asyncio.to_thread(aninidhi_src.hindi_dub_status, title,
-                          base.get("episodes")),
+        _anidhi_lookup(base),
     ]
     try:
         dub_data, yt_data, as_results, anidhi = await asyncio.gather(*tasks)
