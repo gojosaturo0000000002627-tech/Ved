@@ -1,3 +1,6 @@
-python-telegram-bot[job-queue]==21.6
-requests==2.32.3
-beautifulsoup4==4.12.3
+python-telegram-bot~=21.11
+httpx~=0.28
+fastapi~=0.115
+uvicorn~=0.34
+python-dotenv~=1.0
+aninidhi~=0.2

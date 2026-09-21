@@ -1,8 +1,21 @@
+# Render.com deployment config
+# Docs: https://render.com/docs/blueprint-spec
 services:
   - type: web
-    name: anime-info-bot
+    name: anime-dub-bot
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
-    healthCheckPath: /
+    startCommand: python main.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: BOT_TOKEN
+        sync: false          # Telegram bot token (BotFather se)
+      - key: ANIMESCHEDULE_TOKEN
+        sync: false          # optional — animeschedule.net free API token
+      - key: DUB_INFO_API
+        sync: false          # optional — self-hosted anime-dub-info URL
+      - key: POLL_MINUTES
+        value: 20            # kitne minute mein episode check ho
+      - key: PYTHON_VERSION
+        value: 3.12.4
