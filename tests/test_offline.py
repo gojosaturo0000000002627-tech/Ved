@@ -80,7 +80,41 @@ MOCK_MOVIE = {"anilist_id": 50, "mal_id": None, "title": "Suzume", "romaji": "Su
              "season": None, "year": 2022,
              "next_episode": None, "next_airing_at": None, "links": [], "relations": []}
 
-MOCK_DB = {123456: MOCK_ANILIST, 30: MOCK_S1, 31: MOCK_S2, 32: MOCK_S3, 50: MOCK_MOVIE}
+# ---- Mushoku Tensei style chain: cours alag entries (AniList) — merge hone chahiye ----
+MOCK_MOVIE_MT = {"anilist_id": 45, "mal_id": None,
+                 "title": "Mushoku Tensei: Jobless Reincarnation - Eris the Goblin Slayer",
+                 "romaji": None, "native": "", "status": "FINISHED",
+                 "status_display": "Released ✅", "episodes": None, "format": "MOVIE",
+                 "duration": 95, "release_date": "2022-12-16", "season": None,
+                 "year": 2022, "next_episode": None, "next_airing_at": None,
+                 "links": [], "relations": []}
+
+MOCK_MT = [
+    {"anilist_id": 40, "title": "Mushoku Tensei: Jobless Reincarnation",
+     "status": "FINISHED", "episodes": 11, "year": 2021, "format": "TV",
+     "next_episode": None,
+     "relations": [{"relation": "SIDE_STORY", "anilist_id": 45, "format": "MOVIE"}]},
+    {"anilist_id": 41, "title": "Mushoku Tensei: Jobless Reincarnation Part 2",
+     "status": "FINISHED", "episodes": 12, "year": 2021, "format": "TV",
+     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 40, "format": "TV"}]},
+    {"anilist_id": 42, "title": "Mushoku Tensei: Jobless Reincarnation Season 2",
+     "status": "FINISHED", "episodes": 13, "year": 2023, "format": "TV",
+     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 41, "format": "TV"}]},
+    {"anilist_id": 43, "title": "Mushoku Tensei: Jobless Reincarnation Season 2 Part 2",
+     "status": "FINISHED", "episodes": 12, "year": 2024, "format": "TV",
+     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 42, "format": "TV"}]},
+    {"anilist_id": 44, "title": "Mushoku Tensei: Jobless Reincarnation Season 3",
+     "status": "RELEASING", "episodes": 14, "year": 2026, "format": "TV",
+     "next_episode": 14, "relations": [{"relation": "PREQUEL", "anilist_id": 43, "format": "TV"}]},
+]
+for _m in MOCK_MT:
+    _m.update({"mal_id": None, "romaji": None, "native": "",
+               "status_display": "x", "season": None, "next_airing_at": None,
+               "links": []})
+
+MOCK_DB = {123456: MOCK_ANILIST, 30: MOCK_S1, 31: MOCK_S2, 32: MOCK_S3, 50: MOCK_MOVIE,
+           45: MOCK_MOVIE_MT,
+           **{m["anilist_id"]: m for m in MOCK_MT}}
 
 
 async def mock_get_anime_db(anilist_id):
@@ -267,6 +301,63 @@ async def main():
     note_mv = formatter.format_notification(info_mv, "hi", 1, None)
     assert "Hindi Dub Aa Gayi" in note_mv
     print("[OK] movie card — Suzume")
+
+    # ---- 13. Mushoku-style: cours merge ho kar 3 season dikhne chahiye ----
+    r_mt = aninidhi_src.hindi_dub_status("Mushoku Tensei: Jobless Reincarnation Season 3")
+    assert r_mt and r_mt["found"], "colon-variant matching kaam karni chahiye"
+    assert r_mt["eps"] and r_mt["eps"] >= 3, "S3 dub airing hai — eps milne chahiye"
+    print(f"[OK] aninidhi long-title fix — S3 hi eps={r_mt['eps']}")
+
+    info_mt = await aggregator.get_anime_info(44, db=db, force=True)
+    card_mt = formatter.format_card(info_mt)
+    print("---------- MUSHOKU CARD ----------")
+    print(card_mt)
+    print("----------------------------------")
+    # 3 season hone chahiye — 5 nahi (cours merge)
+    assert "• Season 1 (2021)" in card_mt
+    assert "• Season 2 (2023)" in card_mt
+    assert "• Season 3 (ongoing)" in card_mt
+    assert "Season 4" not in card_mt and "Season 5" not in card_mt, \
+        "cours merge nahi hue — 5 season aa gaye"
+    assert "Released: 23/23 episodes" in card_mt, "S1 = 11+12"
+    assert "Released: 25/25 episodes" in card_mt, "S2 = 13+12"
+    assert "Released: 13/14 episodes" in card_mt, "S3 ongoing"
+    assert "Season 3: 14 episodes planned" in card_mt
+    assert f"Hindi dub: {r_mt['eps']} episodes" in card_mt, "S3 ka real dub count"
+    # Movies section — franchise ki movie bhi isi card me
+    assert "🎥 Movies / Specials:" in card_mt
+    assert "Eris the Goblin Slayer" in card_mt
+    assert "Hindi dub: Available ✅" in card_mt
+    print("[OK] mushoku cours-merge — 3 seasons, Hindi dub + movie section")
+
+    # ---- 14. Franchise pick — same franchise to seedha card ----
+    mt_results = [
+        {"anilist_id": 40, "title": "Mushoku Tensei: Jobless Reincarnation"},
+        {"anilist_id": 41, "title": "Mushoku Tensei: Jobless Reincarnation Cour 2"},
+        {"anilist_id": 42, "title": "Mushoku Tensei: Jobless Reincarnation Season 2"},
+        {"anilist_id": 45, "title": "Mushoku Tensei: Jobless Reincarnation Cour 2 - Eris the Goblin Slayer"},
+    ]
+    assert aggregator.franchise_pick(mt_results, "mushoku tensei") == 40, \
+        "default pehla (S1) chahiye"
+    assert aggregator.franchise_pick(mt_results, "mushoku tensei season 2") == 42, \
+        "season 2 query -> S2 entry"
+    # Grand Blue case — spinoff ('Grand Blues!') alag key hai, par majority
+    # ek hi franchise -> phir bhi seedha card
+    gb_results = [
+        {"anilist_id": 70, "title": "Grand Blue Dreaming"},
+        {"anilist_id": 71, "title": "Grand Blue Dreaming Season 3"},
+        {"anilist_id": 72, "title": "Grand Blue Dreaming Season 2"},
+        {"anilist_id": 73, "title": "Grand Blues!"},
+    ]
+    assert aggregator.franchise_pick(gb_results, "grand blue") == 70, \
+        "spinoff ke bawajood direct card"
+    # Genuinely alag anime — pick list dikhni chahiye
+    diff = [{"anilist_id": 80, "title": "One Piece"},
+            {"anilist_id": 81, "title": "One Punch Man"},
+            {"anilist_id": 82, "title": "One Room"}]
+    assert aggregator.franchise_pick(diff, "one") is None, \
+        "alag franchise -> pick list"
+    print("[OK] franchise pick — direct card (spinoff-tolerant) logic")
 
     print("\n✅ SAB TESTS PASS HO GAYE!")
 
