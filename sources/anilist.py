@@ -33,11 +33,28 @@ query ($id: Int) {
     status
     episodes
     format
+    duration
+    startDate { year month day }
     season
     seasonYear
     nextAiringEpisode { episode airingAt }
     externalLinks { site url type language }
     streamingEpisodes { site title }
+    relations {
+      edges {
+        relationType(version: 2)
+        node {
+          id
+          type
+          format
+          title { romaji english }
+          status
+          episodes
+          seasonYear
+          nextAiringEpisode { episode airingAt }
+        }
+      }
+    }
   }
 }
 """
@@ -49,6 +66,18 @@ STATUS_MAP = {
     "CANCELLED": "Cancelled",
     "HIATUS": "On Hiatus (rukka hua)",
 }
+
+
+def _parse_start_date(sd: dict | None) -> str | None:
+    """AniList startDate -> 'YYYY-MM-DD' / 'YYYY-MM' / 'YYYY'."""
+    sd = sd or {}
+    if not sd.get("year"):
+        return None
+    if sd.get("month") and sd.get("day"):
+        return f"{sd['year']:04d}-{sd['month']:02d}-{sd['day']:02d}"
+    if sd.get("month"):
+        return f"{sd['year']:04d}-{sd['month']:02d}"
+    return f"{sd['year']:04d}"
 
 
 async def _gql(client: httpx.AsyncClient, query: str, variables: dict):
@@ -103,6 +132,23 @@ async def get_anime(anilist_id: int) -> dict:
     ext = m.get("externalLinks") or []
     streaming = [l for l in ext if (l.get("type") or "").upper() == "STREAMING"]
     next_airing = m.get("nextAiringEpisode") or {}
+    relations = []
+    for e in ((m.get("relations") or {}).get("edges") or []):
+        node = e.get("node") or {}
+        if node.get("type") != "ANIME":
+            continue
+        t = node.get("title") or {}
+        relations.append({
+            "relation": e.get("relationType"),
+            "anilist_id": node.get("id"),
+            "title": t.get("english") or t.get("romaji"),
+            "format": node.get("format"),
+            "status": node.get("status"),
+            "episodes": node.get("episodes"),
+            "year": node.get("seasonYear"),
+            "next_episode": (node.get("nextAiringEpisode") or {}).get("episode"),
+            "next_airing_at": (node.get("nextAiringEpisode") or {}).get("airingAt"),
+        })
     return {
         "anilist_id": m["id"],
         "mal_id": m.get("idMal"),
@@ -113,6 +159,8 @@ async def get_anime(anilist_id: int) -> dict:
         "status_display": STATUS_MAP.get(m.get("status", ""), m.get("status", "?")),
         "episodes": m.get("episodes"),
         "format": m.get("format"),
+        "duration": m.get("duration"),
+        "release_date": _parse_start_date(m.get("startDate")),
         "season": m.get("season"),
         "year": m.get("seasonYear"),
         "next_episode": next_airing.get("episode"),
@@ -121,4 +169,5 @@ async def get_anime(anilist_id: int) -> dict:
             {"site": l.get("site"), "url": l.get("url")}
             for l in streaming
         ],
+        "relations": relations,
     }

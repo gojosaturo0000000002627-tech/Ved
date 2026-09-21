@@ -9,9 +9,11 @@ Sources (priority order):
 6. overrides.json     — server-side manual corrections
 """
 import asyncio
+import difflib
 import json
 import os
-from datetime import datetime, timedelta, timezone
+import re
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 
 import config
@@ -53,8 +55,71 @@ def _merge_overrides(info: dict):
 
 
 async def search(query: str) -> list:
-    """AniList search — card dikhane ke liye list."""
-    return await anilist.search_anime(query)
+    """Smart search — layered:
+
+    1. Direct AniList search
+    2. Typo correction (AniNidhi titles se difflib — 'mushoko tensai' -> 'Mushoku Tensei')
+    3. Word-subset (pehle 2 words, phir 1 word)
+    """
+    try:
+        results = await anilist.search_anime(query)
+    except Exception as e:
+        print(f"[search] anilist fail: {e}")
+        results = []
+    if results:
+        return results
+
+    corrected = _fuzzy_correct(query)
+    if corrected and corrected.lower() != query.lower():
+        print(f"[search] typo corrected: '{query}' -> '{corrected}'")
+        try:
+            results = await anilist.search_anime(corrected)
+        except Exception:
+            results = []
+        if results:
+            return results
+
+    words = [w for w in query.split() if len(w) > 2]
+    for n in (2, 1):
+        if len(words) > n:
+            try:
+                results = await anilist.search_anime(" ".join(words[:n]))
+            except Exception:
+                results = []
+            if results:
+                return results
+    return []
+
+
+def _fuzzy_correct(query: str) -> Optional[str]:
+    """AniNidhi ke titles se typo correction.
+
+    'mushoko tensai' -> 'Mushoku Tensei' (har word ~80% similar ho)
+    Sirf tab jab saare query words kisi title se match karein.
+    """
+    try:
+        import aninidhi
+        records = aninidhi.list_all()
+    except Exception:
+        return None
+    qw = re.sub(r"[^a-z0-9\s]", " ", query.lower()).split()
+    if not qw:
+        return None
+    candidates = []
+    for rec in records:
+        title = rec.get("title") or ""
+        tw = re.sub(r"[^a-z0-9\s]", " ", title.lower()).split()
+        if not tw:
+            continue
+        if all(difflib.get_close_matches(w, tw, n=1, cutoff=0.8) for w in qw):
+            candidates.append(title)
+    if not candidates:
+        return None
+    # sabse chhota/seedha title best hai
+    best = min(candidates, key=len)
+    s = re.sub(r"\([^)]*\)", " ", best)
+    words = [w for w in s.split() if len(w) > 2][:3]
+    return " ".join(words) if words else None
 
 
 def _airing_from_next(next_episode: Optional[int]) -> Optional[int]:
@@ -92,6 +157,121 @@ def _est_next(latest: Optional[datetime]) -> Optional[str]:
     return nxt.astimezone(tz).strftime("%d %b %Y, %I:%M %p IST (estimated)")
 
 
+async def _build_season_chain(base: dict, max_seasons: int = 5) -> list:
+    """base + prequels + sequels — TV format chain (season-wise card ke liye).
+
+    AniList entry ke relations se PREQUEL/SEQUEL follow karta hai.
+    """
+    def _linked(entry, relation):
+        for r in entry.get("relations") or []:
+            if r.get("relation") == relation and r.get("format") == "TV":
+                return r
+        return None
+
+    chain_ids = {base.get("anilist_id")}
+    seasons = [base]
+
+    cur = base
+    while len(seasons) < max_seasons:
+        pre = _linked(cur, "PREQUEL")
+        if not pre or pre.get("anilist_id") in chain_ids:
+            break
+        try:
+            node = await anilist.get_anime(pre["anilist_id"])
+        except Exception as e:
+            print(f"[seasons] prequel fetch fail: {e}")
+            break
+        seasons.insert(0, node)
+        chain_ids.add(node["anilist_id"])
+        cur = node
+
+    cur = base
+    while len(seasons) < max_seasons:
+        seq = _linked(cur, "SEQUEL")
+        if not seq or seq.get("anilist_id") in chain_ids:
+            break
+        try:
+            node = await anilist.get_anime(seq["anilist_id"])
+        except Exception as e:
+            print(f"[seasons] sequel fetch fail: {e}")
+            break
+        seasons.append(node)
+        chain_ids.add(node["anilist_id"])
+        cur = node
+    return seasons
+
+
+def _season_complete_note(anidhi: dict, total: Optional[int]) -> str:
+    """Finished Hindi dub ka note: '(Apr 2026 me complete)' ya '(complete)'."""
+    rd = None
+    for p in anidhi.get("platforms") or []:
+        try:
+            rd = date.fromisoformat(str(p.get("release_date")))
+            if rd:
+                break
+        except (TypeError, ValueError):
+            continue
+    if rd and total:
+        last = rd + timedelta(days=7 * max(total - 1, 0))
+        return f"({last.strftime('%b %Y')} me complete)"
+    return "(complete)"
+
+
+async def _season_details(base: dict) -> list:
+    """Multi-season blocks — user format mein:
+
+    • Season 1 (2018)
+    Released: 12/12 episodes
+    Hindi dub: 12 episodes (Apr 2026 me complete)
+    Japanese audio: 12 episodes
+    """
+    seasons = await _build_season_chain(base)
+    if len(seasons) < 2:
+        return []
+
+    anidhi_list = []
+    try:
+        anidhi_list = await asyncio.gather(*[
+            asyncio.to_thread(aninidhi_src.hindi_dub_status,
+                              s.get("title") or "", s.get("episodes"))
+            for s in seasons])
+    except Exception as e:
+        print(f"[seasons] aninidhi fail: {e}")
+
+    out = []
+    for i, s in enumerate(seasons, 1):
+        total_s = s.get("episodes")
+        ongoing_s = s.get("status") == "RELEASING"
+        if s.get("status") == "FINISHED":
+            jp_s = total_s
+        else:
+            jp_s = _airing_from_next(s.get("next_episode"))
+
+        hi_s, hi_note = None, None
+        a = anidhi_list[i - 1] if i - 1 < len(anidhi_list) else None
+        if a and a.get("found"):
+            if a.get("finished"):
+                hi_s = total_s  # finished dub = poori season dubbed (approx)
+                hi_note = _season_complete_note(a, total_s)
+            elif a.get("eps"):
+                hi_s = a["eps"]
+            elif a.get("upcoming"):
+                hi_note = f"Starts {a['upcoming'].strftime('%d %b %Y')} (announced)"
+            elif a.get("announced"):
+                hi_note = "Announced — date TBA"
+        out.append({
+            "num": i,
+            "year": s.get("year"),
+            "ongoing": ongoing_s,
+            "total": total_s,
+            "jp_aired": jp_s,
+            "hi_aired": hi_s,
+            "hi_note": hi_note,
+            "is_current": s.get("anilist_id") == base.get("anilist_id"),
+        })
+    return out
+
+
 async def get_anime_info(anilist_id: int, title_hint: str = "",
                           force: bool = False, db=None) -> dict:
     """Unified info. Cache + multi-source merge + overrides."""
@@ -104,6 +284,7 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
     base = await anilist.get_anime(anilist_id)
     title = base["title"] or title_hint or base.get("romaji") or "?"
     ongoing = base.get("status") == "RELEASING"
+    is_movie = (base.get("format") == "MOVIE")
 
     # Parallel mein sab optional sources
     tasks = [
@@ -134,6 +315,8 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
     jp_aired = None
     if base.get("status") == "FINISHED":
         jp_aired = base.get("episodes")
+        if is_movie:
+            jp_aired = 1  # movie = ek hi "episode"
     else:
         jp_aired = _airing_from_next(base.get("next_episode"))
         if jp_aired is None and dub_data:
@@ -167,6 +350,10 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         anidhi_finished = bool(anidhi.get("finished"))
         anidhi_upcoming = anidhi.get("upcoming")
         anidhi_announced = bool(anidhi.get("announced"))
+        # Movie: finished dub = available (count 1)
+        if is_movie and anidhi_finished:
+            hi_aired = 1
+            hi_source = hi_source or "aninidhi"
     # YouTube se Hindi dub — live count (Muse India / Ani-One uploads)
     if yt_data and yt_data.get("ep"):
         if (yt_data["ep"] or 0) > (hi_aired or 0):
@@ -288,6 +475,16 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
     status_display = base.get("status_display")
     if as_data and status_display in ("Ongoing", None):
         status_display = as_data.get("status_display") or status_display
+    if is_movie:
+        if base.get("status") == "FINISHED":
+            status_display = "Released ✅"
+        elif base.get("status") == "NOT_YET_RELEASED":
+            status_display = "Upcoming movie (abhi release nahi hui)"
+
+    # Multi-season blocks (2+ seasons ho to season-wise detail; movies ke liye nahi)
+    seasons_blocks = [] if is_movie else await _season_details(base)
+    current_season_num = next((s["num"] for s in seasons_blocks
+                               if s.get("is_current")), None)
 
     info = {
         "anilist_id": anilist_id,
@@ -309,6 +506,11 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         "hi_last_release": hi_latest_dt.isoformat() if hi_latest_dt else None,
         "platforms": platforms,
         "next_by_lang": next_by_lang,
+        "seasons": seasons_blocks,
+        "current_season_num": current_season_num,
+        "is_movie": is_movie,
+        "release_date": base.get("release_date"),
+        "duration": base.get("duration"),
         "checked_at": datetime.now(tz).strftime("%d %b %Y, %I:%M %p IST"),
     }
     _merge_overrides(info)
