@@ -10,6 +10,7 @@ Handle se channel ID runtime pe resolve hota hai (channel page scrape karke).
 """
 import asyncio
 import re
+import time
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 
@@ -17,8 +18,10 @@ import httpx
 
 import config
 
-# In-memory cache: handle -> channel_id
+# In-memory cache: handle -> channel_id (+ fail hone wale 1 ghante tak skip)
 _resolved: dict[str, str] = {}
+_failed: dict[str, float] = {}
+_FAIL_RETRY = 3600.0  # 1 ghante baad dobara try karenge
 
 
 def _norm(s: str) -> str:
@@ -78,6 +81,8 @@ async def _resolve_handle(client: httpx.AsyncClient, entry: str) -> str | None:
             return m.group(1)
     except httpx.HTTPError:
         pass
+    # Fail negative-cache — har card pe 15s waste na ho
+    _failed[entry] = time.time()
     return None
 
 
@@ -115,6 +120,8 @@ async def find_episodes(query: str) -> dict | None:
         for entry in channels:
             if entry in _resolved:
                 cid = _resolved[entry]
+            elif _failed.get(entry, 0) and time.time() - _failed[entry] < _FAIL_RETRY:
+                continue  # recently fail hua tha — skip, 15s bachao
             else:
                 cid = await _resolve_handle(client, entry)
                 if not cid:

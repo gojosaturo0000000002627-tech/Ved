@@ -3,6 +3,7 @@
 Docs: https://docs.anilist.co  (no API key needed, 90 req/min limit)
 """
 import asyncio
+import time
 
 import httpx
 
@@ -52,6 +53,43 @@ query ($id: Int) {
           episodes
           seasonYear
           nextAiringEpisode { episode airingAt }
+        }
+      }
+    }
+  }
+}
+"""
+
+MANY_QUERY = """
+query ($ids: [Int]) {
+  Page(perPage: 50) {
+    media(id_in: $ids, type: ANIME) {
+      id
+      idMal
+      title { romaji english native }
+      status
+      episodes
+      format
+      duration
+      startDate { year month day }
+      season
+      seasonYear
+      nextAiringEpisode { episode airingAt }
+      externalLinks { site url type language }
+      streamingEpisodes { site title }
+      relations {
+        edges {
+          relationType(version: 2)
+          node {
+            id
+            type
+            format
+            title { romaji english }
+            status
+            episodes
+            seasonYear
+            nextAiringEpisode { episode airingAt }
+          }
         }
       }
     }
@@ -124,11 +162,8 @@ async def search_anime(query: str) -> list:
     return out
 
 
-async def get_anime(anilist_id: int) -> dict:
-    """Ek anime ki full detail — unified dict."""
-    async with httpx.AsyncClient() as client:
-        data = await _gql(client, DETAIL_QUERY, {"id": anilist_id})
-    m = data["Media"]
+def _parse_media(m: dict) -> dict:
+    """AniList Media node -> unified entry (get_anime / get_anime_many dono)."""
     ext = m.get("externalLinks") or []
     streaming = [l for l in ext if (l.get("type") or "").upper() == "STREAMING"]
     next_airing = m.get("nextAiringEpisode") or {}
@@ -171,3 +206,49 @@ async def get_anime(anilist_id: int) -> dict:
         ],
         "relations": relations,
     }
+
+
+# In-memory TTL cache — same anime baar-baar network se nahi aayega
+_entry_cache: dict[int, tuple[float, dict]] = {}
+_ENTRY_TTL = 900.0  # 15 min
+
+
+async def get_anime(anilist_id: int) -> dict:
+    """Ek anime ki full detail — 15 min cache ke saath."""
+    hit = _entry_cache.get(anilist_id)
+    if hit and (time.time() - hit[0]) < _ENTRY_TTL:
+        return dict(hit[1])
+    async with httpx.AsyncClient() as client:
+        data = await _gql(client, DETAIL_QUERY, {"id": anilist_id})
+    entry = _parse_media(data["Media"])
+    _entry_cache[anilist_id] = (time.time(), entry)
+    return dict(entry)
+
+
+async def get_anime_many(ids: list) -> list:
+    """Ek hi request me multiple anime ki detail — Page(id_in) query.
+
+    Season chain banana 5-8 sequential calls ki jagah 2-3 calls me ho
+    jata hai. Data bilkul wahi rehta hai — sirf network roundtrip kam.
+    """
+    ids = [i for i in dict.fromkeys(ids) if i][:50]
+    if not ids:
+        return []
+    need = [i for i in ids
+            if i not in _entry_cache
+            or (time.time() - _entry_cache[i][0]) >= _ENTRY_TTL]
+    if need:
+        try:
+            async with httpx.AsyncClient() as client:
+                data = await _gql(client, MANY_QUERY, {"ids": need})
+            for m in (data.get("Page") or {}).get("media") or []:
+                entry = _parse_media(m)
+                _entry_cache[entry["anilist_id"]] = (time.time(), entry)
+        except Exception as e:
+            print(f"[anilist] batch fetch fail: {e}")
+    out = []
+    for i in ids:
+        hit = _entry_cache.get(i)
+        if hit and (time.time() - hit[0]) < _ENTRY_TTL:
+            out.append(dict(hit[1]))
+    return out

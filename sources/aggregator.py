@@ -160,7 +160,9 @@ def _est_next(latest: Optional[datetime]) -> Optional[str]:
 async def _build_season_chain(base: dict, max_seasons: int = 5) -> list:
     """base + prequels + sequels — TV format chain (season-wise card ke liye).
 
-    AniList entry ke relations se PREQUEL/SEQUEL follow karta hai.
+    SPEED: level-wise batch fetch — har round ke saare seasons EK hi
+    AniList request me aate hain (get_anime_many). Purane 5-8 sequential
+    calls ki jagah 2-3 calls — data bilkul wahi.
     """
     def _linked(entry, relation):
         for r in entry.get("relations") or []:
@@ -169,36 +171,45 @@ async def _build_season_chain(base: dict, max_seasons: int = 5) -> list:
         return None
 
     chain_ids = {base.get("anilist_id")}
-    seasons = [base]
+    entries: dict[int, dict] = {}  # id -> full entry (fetch-phir-order)
 
-    cur = base
-    while len(seasons) < max_seasons:
-        pre = _linked(cur, "PREQUEL")
-        if not pre or pre.get("anilist_id") in chain_ids:
+    # BFS sirf FETCH ke liye — har level ke saare nodes EK batch call me
+    front = [base]
+    while front and len(entries) < max_seasons + 4:
+        nxt = []
+        for e in front:
+            for rel in ("PREQUEL", "SEQUEL"):
+                r = _linked(e, rel)
+                if r and r.get("anilist_id") not in chain_ids:
+                    nxt.append(r["anilist_id"])
+                    chain_ids.add(r["anilist_id"])
+        if not nxt:
             break
-        try:
-            node = await anilist.get_anime(pre["anilist_id"])
-        except Exception as e:
-            print(f"[seasons] prequel fetch fail: {e}")
+        got = await anilist.get_anime_many(nxt[:max_seasons + 4])
+        if not got:
             break
-        seasons.insert(0, node)
-        chain_ids.add(node["anilist_id"])
-        cur = node
+        for g in got:
+            entries[g["anilist_id"]] = g
+        front = got
 
-    cur = base
-    while len(seasons) < max_seasons:
-        seq = _linked(cur, "SEQUEL")
-        if not seq or seq.get("anilist_id") in chain_ids:
-            break
-        try:
-            node = await anilist.get_anime(seq["anilist_id"])
-        except Exception as e:
-            print(f"[seasons] sequel fetch fail: {e}")
-            break
-        seasons.append(node)
-        chain_ids.add(node["anilist_id"])
-        cur = node
-    return seasons
+    # Ordering — original linear walk, par sab local (koi network nahi)
+    def _walk(start, relation, limit):
+        out, seen, cur = [], {base.get("anilist_id")}, start
+        while len(out) < limit:
+            r = _linked(cur, relation)
+            if not r or r.get("anilist_id") in seen:
+                break
+            nxt_e = entries.get(r.get("anilist_id"))
+            if not nxt_e:
+                break
+            out.append(nxt_e)
+            seen.add(r["anilist_id"])
+            cur = nxt_e
+        return out
+
+    prequels = _walk(base, "PREQUEL", max_seasons)
+    sequels = _walk(base, "SEQUEL", max_seasons)
+    return (list(reversed(prequels)) + [base] + sequels)[:max_seasons]
 
 
 def _season_base(title: str) -> str:
@@ -357,8 +368,11 @@ async def _movie_details(base: dict, chain: list) -> list:
         return []
     ids = ids[:3]
 
-    details = await asyncio.gather(*[anilist.get_anime(i) for i in ids],
-                                   return_exceptions=True)
+    # Ek hi batch call — 3 alag calls ki jagah (speed)
+    try:
+        details = await anilist.get_anime_many(ids)
+    except Exception:
+        details = []
     valid = [d for d in details if isinstance(d, dict)]
     if not valid:
         return []
@@ -434,11 +448,13 @@ async def _season_details(base: dict, seasons: list | None = None) -> list:
         hi_s, hi_note = None, None
         found_any, finished_all, eps_sum = False, True, 0
         last_finished_a, last_finished_total = None, 0
+        a_ref = None  # group ka last found AniNidhi record (next-ep ke liye)
         for e in entries:
             a = anidhi_map.get(id(e))
             if not (a and a.get("found")):
                 continue
             found_any = True
+            a_ref = a
             e_total = e.get("episodes")
             if a.get("finished"):
                 eps_sum += e_total or 0
@@ -469,6 +485,13 @@ async def _season_details(base: dict, seasons: list | None = None) -> list:
             "jp_aired": jp,
             "hi_aired": hi_s,
             "hi_note": hi_note,
+            "anidhi": a_ref,
+            "next_airing_at": next((e.get("next_airing_at")
+                                     for e in reversed(entries)
+                                     if e.get("next_airing_at")), None),
+            "next_episode": next((e.get("next_episode")
+                                    for e in reversed(entries)
+                                    if e.get("next_episode")), None),
             "is_current": any(e.get("anilist_id") == base.get("anilist_id")
                                for e in entries),
         })
@@ -489,11 +512,18 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
     ongoing = base.get("status") == "RELEASING"
     is_movie = (base.get("format") == "MOVIE")
 
-    # Parallel mein sab optional sources
+    # Parallel mein sab optional sources — har ek pe timeout taaki ek
+    # slow source pura card na roke (data promise intact, sirf speed)
+    async def _t(coro, timeout, default):
+        try:
+            return await asyncio.wait_for(coro, timeout)
+        except Exception:
+            return default
+
     tasks = [
-        dubinfo.get_dub_info(title, config.DUB_INFO_API),
-        youtube.find_episodes(title),
-        anischedule.search_anime(title, config.ANIMESCHEDULE_TOKEN),
+        _t(dubinfo.get_dub_info(title, config.DUB_INFO_API), 20, None),
+        _t(youtube.find_episodes(title), 20, []),
+        _t(anischedule.search_anime(title, config.ANIMESCHEDULE_TOKEN), 15, []),
         _anidhi_lookup(base),
     ]
     try:
@@ -566,6 +596,33 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
             hi_latest_dt = ydt
     if en_aired is None and as_data and as_data.get("dub_premier"):
         en_aired = 1
+
+    # ---- Season chain abhi banao — counts isi pe adjust honge ----
+    chain = [base] if is_movie else await _build_season_chain(base)
+    seasons_blocks = [] if is_movie else await _season_details(base, seasons=chain)
+    # Current/latest season — base purana ho sakta hai (Grand Blue: S1 pe
+    # card banta hai par S3 ongoing). Counts + next episode isi ke hisaab se.
+    cur = None
+    if seasons_blocks:
+        cur = next((s for s in seasons_blocks if s.get("ongoing")), None) \
+            or seasons_blocks[-1]
+    if cur:
+        if cur.get("jp_aired") is not None:
+            jp_aired = cur["jp_aired"]
+        if cur.get("hi_aired") is not None and hi_source != "manual":
+            hi_aired = cur["hi_aired"]
+            hi_source = hi_source or "aninidhi"
+        a_cur = cur.get("anidhi") or {}
+        if a_cur.get("found"):
+            anidhi_next_date = a_cur.get("next")
+            anidhi_finished = bool(a_cur.get("finished"))
+            anidhi_upcoming = a_cur.get("upcoming")
+            anidhi_announced = bool(a_cur.get("announced"))
+        # Base ka EN data purane season ka tha, naya season chal raha hai
+        # -> per-season EN nahi hai, honest "To be announced"
+        if cur.get("ongoing") and not cur.get("is_current"):
+            en_aired = None
+            en_latest_dt = None
 
     # Release tracking (bot khud dekhta raha hai kab kya aaya) — estimate behtar
     lang_state = {}
@@ -641,16 +698,23 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
 
     # ---- Next episode ----
     next_by_lang: dict[str, Optional[str]] = {"jp": None, "en": None, "hi": None}
-    if base.get("next_airing_at"):
-        dt = datetime.fromtimestamp(base["next_airing_at"], tz=tz)
+    # S3 jaisa ongoing season ka airing time (base S1 ka nahi)
+    nxt_airing = (cur or {}).get("next_airing_at") or base.get("next_airing_at")
+    if nxt_airing:
+        dt = datetime.fromtimestamp(nxt_airing, tz=tz)
         next_by_lang["jp"] = dt.strftime("%d %b %Y, %I:%M %p IST")
+
+    # Estimates bhi current season ke total/status pe
+    est_total = ((cur or {}).get("total") or total) if cur else total
+    est_status = "RELEASING" if (cur and cur.get("ongoing")) \
+        else base.get("status")
 
     def _set_est(lang: str, latest: Optional[datetime], done: Optional[int]):
         # Anime abhi start hi nahi hua -> koi estimate nahi.
         # NOTE: JP season finish ho chuka ho tab bhi dub chal sakta hai!
-        if base.get("status") == "NOT_YET_RELEASED" or next_by_lang.get(lang):
+        if est_status == "NOT_YET_RELEASED" or next_by_lang.get(lang):
             return
-        if total and (done or 0) >= total:
+        if est_total and (done or 0) >= est_total:
             next_by_lang[lang] = "All episodes released"
         elif latest:
             next_by_lang[lang] = _est_next(latest)
@@ -658,12 +722,12 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
     _set_est("en", en_latest_dt, en_aired)
     # AniNidhi ki structured next-date sabse pehle (weekly math se)
     # (JP complete hone ke baad bhi Hindi dub chalta rehta hai)
-    if base.get("status") != "NOT_YET_RELEASED" and not next_by_lang.get("hi"):
+    if est_status != "NOT_YET_RELEASED" and not next_by_lang.get("hi"):
         if anidhi_upcoming:
             next_by_lang["hi"] = f"Starts {anidhi_upcoming.strftime('%d %b %Y')} (announced)"
         elif anidhi_announced:
             next_by_lang["hi"] = "Announced — date TBA"
-        elif anidhi_finished or (total and (hi_aired or 0) >= total):
+        elif anidhi_finished or (est_total and (hi_aired or 0) >= est_total):
             next_by_lang["hi"] = "All episodes released"
         elif anidhi_next_date:
             next_by_lang["hi"] = anidhi_next_date.strftime("%d %b %Y (estimated)")
@@ -683,11 +747,17 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         elif base.get("status") == "NOT_YET_RELEASED":
             status_display = "Upcoming movie (abhi release nahi hui)"
 
-    # Chain ek hi baar banao — seasons + movies dono ke liye
-    chain = [base] if is_movie else await _build_season_chain(base)
-    seasons_blocks = [] if is_movie else await _season_details(base, seasons=chain)
+    # Multi-season ongoing: franchise abhi chal raha hai (base purana ho to)
+    eff_status = base.get("status")
+    if cur and cur.get("ongoing"):
+        eff_status = "RELEASING"
+        status_display = "Ongoing"
+
     current_season_num = next((s["num"] for s in seasons_blocks
                                if s.get("is_current")), None)
+    # Top line ongoing season dikhaye (base S1 ho to bhi "Season 3: ...")
+    if cur and cur.get("ongoing"):
+        current_season_num = cur["num"]
     movies_out = await _movie_details(base, chain)
 
     info = {
@@ -695,7 +765,7 @@ async def get_anime_info(anilist_id: int, title_hint: str = "",
         "title": title,
         "romaji": base.get("romaji"),
         "native": base.get("native"),
-        "status": base.get("status"),
+        "status": eff_status,
         "status_display": status_display or "?",
         "total_episodes": total,
         "format": base.get("format"),
