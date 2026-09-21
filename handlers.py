@@ -133,11 +133,23 @@ async def do_search(update: Update, context: ContextTypes.DEFAULT_TYPE,
     if len(results) == 1:
         await send_card(update, context, results[0]["anilist_id"], force=force)
         return
+    # Sab results ek hi franchise ke hain (courses/seasons/movies alag
+    # AniList entries)? To seedha full card bhejo — pick list nahi
+    pick_id = aggregator.franchise_pick(results, query)
+    if pick_id:
+        await send_card(update, context, pick_id, force=force)
+        return
     # Multiple results — choose karne do
-    kb = [[InlineKeyboardButton(
-        f"{r['title']} ({r.get('year') or ''})"[:60],
-        callback_data=f"pick:{r['anilist_id']}")]
-        for r in results[:8]]
+    kb = []
+    for r in results[:8]:
+        # Year ke bracket ko poora dikhana hai — title truncate hota hai
+        y = f" ({r['year']})" if r.get("year") else ""
+        label = r["title"] or "?"
+        if len(label) + len(y) > 60:
+            label = label[:59 - len(y)] + "…"
+        kb.append([InlineKeyboardButton(
+            label + y,
+            callback_data=f"pick:{r['anilist_id']}")])
     if update.message:
         await update.message.reply_text(
             "Ye mile — ek chun lo:", reply_markup=InlineKeyboardMarkup(kb))

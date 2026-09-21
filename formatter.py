@@ -127,11 +127,18 @@ def format_card(info: dict) -> str:
             L.append(f"• {nb['hi']}")
     else:
         # ================= SERIES CARD =================
-        if total:
+        # Top line — multi-season me current group ka total (cours merged)
+        seasons = info.get("seasons") or []
+        top_total = total
+        top_num = info.get("current_season_num") or 1
+        if len(seasons) > 1:
+            cur = next((s for s in seasons if s.get("is_current")), None)
+            if cur and cur.get("total"):
+                top_total = cur["total"]
+        if top_total:
             status = info.get("status") or ""
             word = "planned" if status != "FINISHED" else "total"
-            season_num = info.get("current_season_num") or 1
-            L.append(f"Season {season_num}: {total} episodes {word}")
+            L.append(f"Season {top_num}: {top_total} episodes {word}")
 
         seasons = info.get("seasons") or []
         if len(seasons) > 1:
@@ -182,6 +189,21 @@ def format_card(info: dict) -> str:
             L.append(f"Hindi dub: {_hi_line(info)}")
             L.append(f"English dub: {_lang_eps(info.get('en_aired'))}")
             L.append(f"Japanese audio: {_lang_eps(info.get('jp_aired'))}")
+
+        # Movies / Specials — franchise ki movies bhi isi card me
+        movies = info.get("movies") or []
+        if movies:
+            L.append("")
+            L.append("🎥 Movies / Specials:")
+            for mv in movies:
+                y = f" ({mv['year']})" if mv.get("year") else ""
+                L.append(f"• {mv['title'] or '?'}{y}")
+                if mv.get("hi"):
+                    L.append("  Hindi dub: Available ✅")
+                elif mv.get("hi_note"):
+                    L.append(f"  Hindi dub: {mv['hi_note']}")
+                else:
+                    L.append("  Hindi dub: No official Hindi dub found")
 
         # Next episode (series ke liye)
         L.append("")
