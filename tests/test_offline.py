@@ -396,6 +396,35 @@ async def main():
         MOCK_DB[32] = orig32
     print("[OK] grand blue fix — S1 base pe bhi S3 ka next episode/date")
 
+    # ---- 16. Dark Gathering scenario — noisy list me bhi seedha card ----
+    dg_results = [
+        {"anilist_id": 90, "title": "Dark Gathering", "romaji": None},
+        {"anilist_id": 91, "title": "Darker than Black", "romaji": None},
+        {"anilist_id": 92, "title": "The Dark Maid", "romaji": None},
+        {"anilist_id": 93, "title": "Black Butler", "romaji": None},
+    ]
+    assert aggregator.franchise_pick(dg_results, "dark gathering") is None
+    assert aggregator.best_match_pick(dg_results, "dark gathering") == 90, \
+        "poora naam match -> seedha Dark Gathering card"
+    # Ambiguous bina exact ke: 'one' -> One Piece/One Punch Man -> list
+    one_results = [{"anilist_id": 94, "title": "One Piece", "romaji": None},
+                   {"anilist_id": 95, "title": "One Punch Man", "romaji": None},
+                   {"anilist_id": 96, "title": "One Room", "romaji": None}]
+    assert aggregator.best_match_pick(one_results, "one") is None
+    # Exact match priority: 'one piece' -> seedha One Piece (Film: Red nahi)
+    op_results = [{"anilist_id": 97, "title": "One Piece", "romaji": None},
+                  {"anilist_id": 98, "title": "One Piece Film: Red", "romaji": None}]
+    assert aggregator.best_match_pick(op_results, "one piece") == 97
+    # 'naruto' -> exact Naruto card (Shippuden chain me aa jayega)
+    n_results = [{"anilist_id": 99, "title": "Naruto", "romaji": None},
+                 {"anilist_id": 100, "title": "Naruto Shippuden", "romaji": None}]
+    assert aggregator.best_match_pick(n_results, "naruto") == 99
+    # list_all cache kaam kar raha hai
+    la = aninidhi_src.list_all_cached()
+    assert la, "list_all_cached khali nahi"
+    assert aninidhi_src.list_all_cached() is la, "cache se wahi object"
+    print("[OK] dark gathering fix — noisy list me bhi seedha card")
+
     print("\n✅ SAB TESTS PASS HO GAYE!")
 
 
