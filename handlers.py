@@ -139,6 +139,12 @@ async def do_search(update: Update, context: ContextTypes.DEFAULT_TYPE,
     if pick_id:
         await send_card(update, context, pick_id, force=force)
         return
+    # Query ka POORA naam kisi ek result ke title me hai? (e.g. "dark
+    # gathering" — AniList ki noisy 'dark' list me bhi seedha wahi card)
+    exact_id = aggregator.best_match_pick(results, query)
+    if exact_id:
+        await send_card(update, context, exact_id, force=force)
+        return
     # Multiple results — choose karne do
     kb = []
     for r in results[:8]:
