@@ -30,7 +30,7 @@ YOUTUBE_CHANNELS = [
 # Har itne minute mein followed anime check hoga (Render free tier pe 15+ rakho)
 POLL_MINUTES = int(os.getenv("POLL_MINUTES", "20"))
 # Card cache TTL seconds (Ek hi anime baar baar fetch na ho)
-CACHE_TTL = int(os.getenv("CACHE_TTL", "600"))
+CACHE_TTL = int(os.getenv("CACHE_TTL", "1800"))  # 30 min — repeat search instant
 # Database file
 DB_PATH = os.getenv("DB_PATH", os.path.join("data", "bot.db"))
 # Manual overrides file (galat data theek karne ke liye)

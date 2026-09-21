@@ -132,7 +132,9 @@ def format_card(info: dict) -> str:
         top_total = total
         top_num = info.get("current_season_num") or 1
         if len(seasons) > 1:
-            cur = next((s for s in seasons if s.get("is_current")), None)
+            cur = next((s for s in seasons
+                        if s.get("num") == top_num), None) \
+                or next((s for s in seasons if s.get("is_current")), None)
             if cur and cur.get("total"):
                 top_total = cur["total"]
         if top_total:
