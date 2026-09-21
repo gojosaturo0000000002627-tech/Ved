@@ -40,10 +40,23 @@ def _pending_key(user_id: int, anilist_id: int) -> tuple:
     return (user_id, anilist_id)
 
 
+def _user_id(update_or_query):
+    """Update ya CallbackQuery — dono se user id nikaalo.
+
+    Update.effective_user / CallbackQuery.from_user — ye fix hai
+    'CallbackQuery' object has no attribute 'effective_user' bug ka.
+    """
+    if isinstance(update_or_query, Update):
+        u = update_or_query.effective_user
+    else:
+        u = getattr(update_or_query, "from_user", None)
+    return u.id if u else None
+
+
 async def send_card(update_or_query, context, anilist_id: int, force=False):
     """Anime card + follow/unfollow buttons bhejo."""
     db: Database = context.bot_data["db"]
-    user_id = update_or_query.effective_user.id
+    user_id = _user_id(update_or_query)
     try:
         info = await aggregator.get_anime_info(anilist_id, db=db, force=force)
         text = formatter.format_card(info)
@@ -54,9 +67,16 @@ async def send_card(update_or_query, context, anilist_id: int, force=False):
         else:
             await update_or_query.edit_message_text(text, reply_markup=kb)
     except Exception as e:
+        import traceback
         print(f"[send_card] error: {e}")
-        if isinstance(update_or_query, Update) and update_or_query.message:
-            await update_or_query.message.reply_text(texts.ERROR_MSG)
+        traceback.print_exc()
+        try:
+            if isinstance(update_or_query, Update) and update_or_query.message:
+                await update_or_query.message.reply_text(texts.ERROR_MSG)
+            else:
+                await update_or_query.edit_message_text(texts.ERROR_MSG)
+        except Exception:
+            pass
 
 
 # ---------- Commands ----------
@@ -259,6 +279,18 @@ async def on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await q.edit_message_text("Theek hai, cancel 🙌")
 
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+    """Global error handler — crash ke bajaye log + user ko message."""
+    import traceback
+    print(f"[bot error] {context.error}")
+    traceback.print_exc()
+    try:
+        if isinstance(update, Update) and update.effective_message:
+            await update.effective_message.reply_text(texts.ERROR_MSG)
+    except Exception:
+        pass
+
+
 def register_handlers(app: Application, db: Database):
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))
@@ -272,3 +304,4 @@ def register_handlers(app: Application, db: Database):
     app.add_handler(MessageHandler(
         filters.TEXT & ~filters.COMMAND, on_text))
     app.add_handler(CallbackQueryHandler(on_callback))
+    app.add_error_handler(error_handler)
