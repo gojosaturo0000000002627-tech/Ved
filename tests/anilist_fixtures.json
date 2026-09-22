@@ -1,0 +1,3760 @@
+[
+ {
+  "id": 21,
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": null,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 1999,
+  "popularity": 752679,
+  "startDate": {
+   "year": 1999,
+   "month": 10,
+   "day": 20
+  },
+  "title": {
+   "english": "ONE PIECE",
+   "romaji": "ONE PIECE",
+   "native": "ONE PIECE"
+  },
+  "synonyms": [
+   "ワンピース",
+   "海贼王",
+   "וואן פיס",
+   "ون بيس",
+   "วันพีซ",
+   "Vua Hải Tặc",
+   "All'arrembaggio!",
+   "Tutti all'arrembaggio!",
+   "Ντρέηκ, το Κυνήγι του Θησαυρού",
+   "OP",
+   "Ван-Пис"
+  ],
+  "nextAiringEpisode": {
+   "episode": 1180,
+   "airingAt": 1790518560,
+   "timeUntilAiring": 434302
+  },
+  "externalLinks": [
+   {
+    "url": "http://www.crunchyroll.com/one-piece",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "http://www.hulu.com/one-piece",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80107103",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/media/37976",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/1bk9icvr331",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://wetv.vip/en/play/tnfk3rniubz3m8o",
+    "site": "WeTV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/@onepieceofficial",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hoopladigital.com/series/one-piece/14153295320",
+    "site": "Hoopla",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/@OnePieceOfficialENG",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 466,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 1998,
+      "title": {
+       "english": "One Piece: Defeat the Pirate Ganzack!",
+       "romaji": "ONE PIECE: Taose! Kaizoku Ganzack"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 1094,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2000,
+      "title": {
+       "english": "One Piece: Umi no Heso no Daibouken-hen",
+       "romaji": "ONE PIECE TV Special: Umi no Heso no Daibouken-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 1237,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2003,
+      "title": {
+       "english": "One Piece Special: Open Upon the Great Sea! A Father's Huge, HUGE Dream!",
+       "romaji": "ONE PIECE: Oounabara ni Hirake! Dekkai Dekkai Chichi no Yume!"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 1238,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2003,
+      "title": {
+       "english": "One Piece Special: Protect! The Last Great Performance",
+       "romaji": "ONE PIECE: Mamore! Saigo no Oobutai"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 2020,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2005,
+      "title": {
+       "english": "One Piece Special: The Detective Memoirs of Chief Straw Hat Luffy",
+       "romaji": "ONE PIECE: Nenmatsu Tokubetsu Kikaku! Mugiwara no Luffy Oyabun Torimonochou"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 2386,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2002,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Yume no Soccer Ou!"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 2490,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2004,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Mezase! Kaizoku Yakyuu Ou"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 12001,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2011,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE 3D: Gekisou! Trap Coaster"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 16239,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2012,
+      "title": {
+       "english": "One Piece: Episode of Luffy - Hand Island Adventure",
+       "romaji": "ONE PIECE: Episode of Luffy - Hand Island no Bouken"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 16468,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 2,
+      "seasonYear": 2012,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE FILM: Z - GLORIOUS ISLAND"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 15323,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2012,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Episode of Nami - Koukaishi no Namida to Nakama no Kizuna"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 19123,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2013,
+      "title": {
+       "english": "One Piece: Episode of Merry - The Tale of One More Friend",
+       "romaji": "ONE PIECE: Episode of Merry - Mou Hitori no Nakama no Monogatari"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 20835,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2014,
+      "title": {
+       "english": "One Piece 3D2Y: Overcome Ace’s Death! Luffy’s Vow to his Friends",
+       "romaji": "ONE PIECE \"3D2Y\": Ace no shi wo Koete! Luffy Nakama to no Chikai"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 21230,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2015,
+      "title": {
+       "english": "One Piece - Episode of Sabo: Bond of Three Brothers - A Miraculous Reunion and an Inherited Will",
+       "romaji": "ONE PIECE: Episode of Sabo - 3-Kyoudai no Kizuna Kiseki no Saikai to Uketsugareru Ishi"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 21485,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2015,
+      "title": {
+       "english": "One Piece: Adventure of Nebulandia",
+       "romaji": "ONE PIECE: Adventure of Nebulandia"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 21831,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2016,
+      "title": {
+       "english": "One Piece: Heart of Gold",
+       "romaji": "ONE PIECE: Heart of Gold"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 99302,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2017,
+      "title": {
+       "english": "One Piece: Episode of East Blue",
+       "romaji": "ONE PIECE: Episode of East Blue - Luffy to 4-nin no Nakama no Daibouken"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 459,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2000,
+      "title": {
+       "english": "ONE PIECE: The Movie",
+       "romaji": "ONE PIECE (Movie)"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 460,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2001,
+      "title": {
+       "english": "One Piece: Clockwork Island Adventure",
+       "romaji": "ONE PIECE: Nejimaki-jima no Bouken"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 461,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2002,
+      "title": {
+       "english": "One Piece: Chopper’s Kingdom on the Island of Strange Animals",
+       "romaji": "ONE PIECE: Chinjuu-jima no Chopper Oukoku"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 462,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2003,
+      "title": {
+       "english": "One Piece The Movie: The Dead End Adventure",
+       "romaji": "ONE PIECE THE MOVIE: Dead End no Bouken"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 463,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2004,
+      "title": {
+       "english": "One Piece: The Curse of the Sacred Sword",
+       "romaji": "ONE PIECE: Norowareta Seiken"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 464,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2005,
+      "title": {
+       "english": "One Piece: Baron Omatsuri and the Secret Island",
+       "romaji": "ONE PIECE THE MOVIE: Omatsuri Danshaku to Himitsu no Shima"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 465,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2006,
+      "title": {
+       "english": "One Piece: Mega Mecha Soldier of Karakuri Castle",
+       "romaji": "ONE PIECE THE MOVIE: Karakuri-jou no Mecha Kyohei"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 2107,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2007,
+      "title": {
+       "english": "One Piece: The Desert Princess and the Pirates, Adventures in Alabasta",
+       "romaji": "ONE PIECE: Episode of Alabasta - Sabaku no Oujo to Kaizoku-tachi"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 3848,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2008,
+      "title": {
+       "english": "One Piece: Episode Of Chopper +: The Miracle Winter Cherry Blossom",
+       "romaji": "ONE PIECE THE MOVIE: Episode of Chopper Plus - Fuyu ni Saku, Kiseki no Sakura"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 4155,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2009,
+      "title": {
+       "english": "One Piece Film: Strong World",
+       "romaji": "ONE PIECE FILM: STRONG WORLD"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 9999,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2011,
+      "title": {
+       "english": "One Piece 3D: Mugiwara Chase",
+       "romaji": "ONE PIECE 3D: Mugiwara Chase"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 12859,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2012,
+      "title": {
+       "english": "One Piece Film: Z",
+       "romaji": "ONE PIECE FILM: Z"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 21335,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2016,
+      "title": {
+       "english": "One Piece Film: Gold",
+       "romaji": "ONE PIECE FILM: GOLD"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 96427,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Loguetown-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 30013,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "One Piece",
+       "romaji": "ONE PIECE"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 101918,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2018,
+      "title": {
+       "english": "One Piece: Episode of Skypiea",
+       "romaji": "ONE PIECE: Episode of Sorajima"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 8740,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2010,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE FILM: STRONG WORLD - EPISODE:0"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 105143,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2019,
+      "title": {
+       "english": "One Piece: Stampede",
+       "romaji": "ONE PIECE STAMPEDE"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 102639,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Nissan SERENA x One Piece: Sennyuu Sauzando Sanii-gou"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 106492,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Kyutai Panic Adventure!"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 106572,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2011,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Episode of Alabasta - Sabaku no Oujo to Kaizoku-tachi"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 107110,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 3,
+      "seasonYear": 2014,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Cry heart"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 107256,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Kyutai Panic Adventure Returns!!!"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 2385,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2001,
+      "title": {
+       "english": "One Piece: Django's Dance Carnival",
+       "romaji": "ONE PIECE: Nejimaki-jima no Bouken - Jango no Dance Carnival"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 101099,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "HUNGRY DAYS: Aoharu ka yo."
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 21880,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2016,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE FILM: GOLD - episode 0 711ver."
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 5252,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2008,
+      "title": {
+       "english": "One Piece: Romance Dawn Story",
+       "romaji": "ONE PIECE: ROMANCE DAWN STORY"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 30793,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Wanted! Eiichiro Oda Before One Piece",
+       "romaji": "WANTED! Oda Eiichiro Tanpenshuu"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 113308,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Kinen Satsuei"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 114761,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "A-RA-SHI : Reborn"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 10033,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 147,
+      "seasonYear": 2011,
+      "title": {
+       "english": null,
+       "romaji": "Toriko"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 813,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 291,
+      "seasonYear": 1989,
+      "title": {
+       "english": "Dragon Ball Z",
+       "romaji": "Dragon Ball Z"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 126649,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2016,
+      "title": {
+       "english": "The Great Tongari Island Treasure Hunting Adventure",
+       "romaji": "Tokyo One Piece Tower: Tongari Shima no Dai Hihou"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 134184,
+      "format": "ONE_SHOT",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Romance Dawn",
+       "romaji": "Romance Dawn"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 141902,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2022,
+      "title": {
+       "english": "One Piece Film: Red",
+       "romaji": "ONE PIECE FILM: RED"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 143293,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "One Piece: Annecy Festival 60th Anniversary",
+       "romaji": "One Piece: Annecy Festival 60th Anniversary"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 167404,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2024,
+      "title": {
+       "english": "MONSTERS: 103 Mercies Dragon Damnation",
+       "romaji": "MONSTERS: Ippaku Sanjou Hiryuu Jigoku"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 171630,
+      "format": null,
+      "status": "NOT_YET_RELEASED",
+      "episodes": 7,
+      "seasonYear": 2027,
+      "title": {
+       "english": "THE ONE PIECE",
+       "romaji": "THE ONE PIECE"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 177475,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE×KAWAISOUNI! Kono Boushi wo Omae ni Azukeru"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 182469,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2024,
+      "title": {
+       "english": "ONE PIECE FAN LETTER",
+       "romaji": "ONE PIECE FAN LETTER"
+      }
+     }
+    },
+    {
+     "relationType": "SUMMARY",
+     "node": {
+      "id": 183423,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 21,
+      "seasonYear": 2024,
+      "title": {
+       "english": "One Piece Log: Fish-Man Island Saga",
+       "romaji": "ONE PIECE: Gyojin Tou-hen"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 187225,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2025,
+      "title": {
+       "english": null,
+       "romaji": "LOS ANGELES LAKERS x ONE PIECE"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 188668,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 5,
+      "seasonYear": 2025,
+      "title": {
+       "english": null,
+       "romaji": "Koisuru ONE PIECE"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 197178,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2026,
+      "title": {
+       "english": "ONE PIECE HEROINES",
+       "romaji": "ONE PIECE HEROINES"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 187380,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2025,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE: Original Episode/Luffy, Law"
+      }
+     }
+    },
+    {
+     "relationType": "SPIN_OFF",
+     "node": {
+      "id": 204432,
+      "format": "TV_SHORT",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2026,
+      "title": {
+       "english": null,
+       "romaji": "CHOPPER's"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 215855,
+      "format": "MOVIE",
+      "status": "NOT_YET_RELEASED",
+      "episodes": 1,
+      "seasonYear": 2027,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE FILM: GOD VALLEY"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 215856,
+      "format": "MOVIE",
+      "status": "NOT_YET_RELEASED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "ONE PIECE FILM: BAAD"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 269,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 366,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2004,
+  "popularity": 522995,
+  "startDate": {
+   "year": 2004,
+   "month": 10,
+   "day": 5
+  },
+  "title": {
+   "english": "Bleach",
+   "romaji": "BLEACH",
+   "native": "BLEACH"
+  },
+  "synonyms": [
+   "ブリーチ",
+   "'בליץ",
+   "เทพมรณะ",
+   "بليتش",
+   "Блич"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "http://www.hulu.com/bleach",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/play/35278?bstar_from=bstar-web.pgc-media-info.0.0",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLxSscENEp7JhUQ-NvGTp34p7vqZarUZ7Y",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://youtube.com/playlist?list=PLxSscENEp7Jh8xTD3hhwG-NyaZHEXe7rd",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.disneyplus.com/en-gb/series/bleach/6g48QKlgQdWK",
+    "site": "Disney Plus",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.starplus.com/series/bleach/6g48QKlgQdWK",
+    "site": "Star+",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://youtube.com/@official_bleach",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/562ee9eb-adb5-43ab-b974-52ddfebee9c8",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 30012,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Bleach",
+       "romaji": "BLEACH"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 834,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2006,
+      "title": {
+       "english": null,
+       "romaji": "BLEACH: The Sealed Sword Frenzy"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 1686,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2006,
+      "title": {
+       "english": "Bleach the Movie: Memories of Nobody",
+       "romaji": "BLEACH: MEMORIES OF NOBODY"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 2889,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2007,
+      "title": {
+       "english": "Bleach the Movie: The DiamondDust Rebellion",
+       "romaji": "BLEACH: The DiamondDust Rebellion - Mou Hitotsu no Hyourinmaru"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 4835,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2008,
+      "title": {
+       "english": "Bleach the Movie: Fade to Black",
+       "romaji": "BLEACH: Fade to Black - Kimi no Na wo Yobu"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 8247,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2010,
+      "title": {
+       "english": "Bleach the Movie: Hell Verse",
+       "romaji": "BLEACH: Jigoku-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 100719,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2008,
+      "title": {
+       "english": null,
+       "romaji": "BLEACH Colorful!: Gotei Juusan Yatai Daisakusen!"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 116674,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2022,
+      "title": {
+       "english": "BLEACH: Thousand-Year Blood War",
+       "romaji": "BLEACH: Sennen Kessen-hen"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 116673,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 3,
+      "seasonYear": 2020,
+      "title": {
+       "english": "BURN THE WITCH",
+       "romaji": "BURN THE WITCH"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 154037,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2004,
+      "title": {
+       "english": null,
+       "romaji": "BLEACH: memories in the rain"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 182561,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "BLEACH 20th Anime Anniversary Official Trailer",
+       "romaji": "BLEACH 20th PV"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 21087,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2015,
+  "popularity": 768485,
+  "startDate": {
+   "year": 2015,
+   "month": 10,
+   "day": 5
+  },
+  "title": {
+   "english": "One-Punch Man",
+   "romaji": "One Punch Man",
+   "native": "ワンパンマン"
+  },
+  "synonyms": [
+   "OPM",
+   "Wanpanman",
+   "איש האגרוף הבודד",
+   "一拳超人",
+   "วันพันช์แมน",
+   "Jagoan Sekali Pukul S1",
+   "رجل اللكمة الواحدة",
+   "ون بنش مان",
+   "Ванпанчмен",
+   "Nhất Quyền Nhân"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "http://www.hulu.com/onepunch-man",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80117291",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl2XdtLhB9NG2Ch050jWFm9G",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://wetv.vip/id/play/r386s7hzwidwkpv/r0035owmbkx",
+    "site": "WeTV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/2ekpp4jtbwt",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/media/36279",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLpm1VVK4UL16FvVk0QOffUwXX_vaHVjZP",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl0YZIflIt1EK0dcjLuMuxLd",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 74347,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "One-Punch Man",
+       "romaji": "One Punch-Man"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 21416,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 6,
+      "seasonYear": 2016,
+      "title": {
+       "english": "One-Punch Man OVA",
+       "romaji": "One Punch Man OVA"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 97668,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2019,
+      "title": {
+       "english": "One-Punch Man Season 2",
+       "romaji": "One Punch Man 2"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 21386,
+      "format": "OVA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2015,
+      "title": {
+       "english": "One-Punch Man: Road to Hero",
+       "romaji": "One Punch Man: Road to Hero"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 21612,
+  "format": "TV_SHORT",
+  "status": "FINISHED",
+  "episodes": 13,
+  "duration": 4,
+  "season": "SPRING",
+  "seasonYear": 2016,
+  "popularity": 9023,
+  "startDate": {
+   "year": 2016,
+   "month": 4,
+   "day": 7
+  },
+  "title": {
+   "english": "Onigiri",
+   "romaji": "Onigiri",
+   "native": "鬼斬"
+  },
+  "synonyms": [
+   "Demon Slayer",
+   "Demon Cutter"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [],
+  "relations": {
+   "edges": []
+  }
+ },
+ {
+  "id": 100922,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2018,
+  "popularity": 236100,
+  "startDate": {
+   "year": 2018,
+   "month": 7,
+   "day": 14
+  },
+  "title": {
+   "english": "Grand Blue Dreaming",
+   "romaji": "Grand Blue",
+   "native": "ぐらんぶる"
+  },
+  "synonyms": [
+   "ก๊วนป่วนชวนบุ๋งบุ๋ง"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.amazon.com/dp/B07FFW6Q7Y",
+    "site": "Amazon Prime Video",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://netflix.com/jp-en/title/81169530",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.primevideo.com/detail/0R9VJMVT7G1I5K03IUINLFHRBO/ref=atv_sr_fle_c_Tn74RA_1_1_1?sr=1-1&pageTypeIdSource=ASIN&pageTypeId=B07FFG6LVL&qid=1660943438",
+    "site": "Amazon Prime Video",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/series/GNVHKN94W/grand-blue-dreaming",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://youtube.com/playlist?list=PLbuF5Onrcu9eIU19Z-bEE5hgmBfAfvkmW",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87395,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Grand Blue Dreaming",
+       "romaji": "Grand Blue"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 182309,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2025,
+      "title": {
+       "english": "Grand Blue Dreaming Season 2",
+       "romaji": "Grand Blue Season 2"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 101922,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "duration": 24,
+  "season": "SPRING",
+  "seasonYear": 2019,
+  "popularity": 996496,
+  "startDate": {
+   "year": 2019,
+   "month": 4,
+   "day": 6
+  },
+  "title": {
+   "english": "Demon Slayer: Kimetsu no Yaiba",
+   "romaji": "Kimetsu no Yaiba",
+   "native": "鬼滅の刃"
+  },
+  "synonyms": [
+   "KnY",
+   "Kimetsu no Yaiba: Kyoudai no Kizuna",
+   "Demon Slayer: Kimetsu no Yaiba: Bonds of Siblings",
+   "鬼滅の刃-兄妹の絆-",
+   "鬼灭之刃",
+   "הלהב קוטל השדים",
+   "قاتل الشياطين",
+   "ดาบพิฆาตอสูร",
+   "Miecz zabójcy demonów – Kimetsu no Yaiba",
+   " Guardians de la nit: Kimetsu no Yaiba",
+   "İblis Keser",
+   "ΚΥΝΗΓΟΣ ΔΑΙΜΟΝΩΝ: KIMETSU NO YAIBA",
+   "Zabiják démonů",
+   "شیطان کش",
+   "귀멸의 칼날",
+   "Истребитель демонов",
+   "Клинок, рассекающий демонов"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/demon-slayer-kimetsu-no-yaiba",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/demon-slayer-kimetsu-no-yaiba",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81091393",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87216,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 112151,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2020,
+      "title": {
+       "english": "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train",
+       "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 129627,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 4,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Junior High and High School!! Kimetsu Academy Story: Valentine Edition",
+       "romaji": "Chuukou Ikkan!! Kimetsu Gakuen Monogatari: Valentine-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 129874,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 7,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc",
+       "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen (TV)"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 154541,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 3,
+      "seasonYear": 2020,
+      "title": {
+       "english": "Junior High and High School!! Kimetsu Academy Story: Kimetsu no Utage Special Edition",
+       "romaji": "Chuukou Ikkan!! Kimetsu Gakuen Monogatari: Kimetsu no Utage Tokubetsu-hen"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 187383,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Kimetsu no Yaiba x MLB Tokyo Series presented by Guggenheim"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 108465,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "duration": 24,
+  "season": "WINTER",
+  "seasonYear": 2021,
+  "popularity": 459424,
+  "startDate": {
+   "year": 2021,
+   "month": 1,
+   "day": 11
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation",
+   "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu",
+   "native": "無職転生 ～異世界行ったら本気だす～"
+  },
+  "synonyms": [
+   "Jobless Reincarnation: I Will Seriously Try If I Go To Another World",
+   "无职转生 ~到了异世界就拿出真本事~",
+   "เกิดชาตินี้พี่ต้องเทพ",
+   "Thất nghiệp chuyển sinh"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl01_ftoIT3birJWkpxFZkEl",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/mushoku-tensei-jobless-reincarnation-787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80987039",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://wetv.vip/en/play/ecmp615ib5kswl3",
+    "site": "WeTV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/tg0bzbp8zd",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 85564,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 127720,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Cour 2",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 117086,
+  "format": "TV_SHORT",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 3,
+  "season": "FALL",
+  "seasonYear": 2020,
+  "popularity": 6188,
+  "startDate": {
+   "year": 2020,
+   "month": 10,
+   "day": 8
+  },
+  "title": {
+   "english": "Grand Blues!",
+   "romaji": "Guraburu!",
+   "native": "ぐらぶるっ！"
+  },
+  "synonyms": [],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/grand-blues",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLxSscENEp7Jizam_K1c4BX1jgvqjJs9u7",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 103069,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Guraburu!"
+      }
+     }
+    },
+    {
+     "relationType": "PARENT",
+     "node": {
+      "id": 21361,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2017,
+      "title": {
+       "english": "Granblue Fantasy: The Animation",
+       "romaji": "GRANBLUE FANTASY The Animation"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 21322,
+      "format": "TV_SHORT",
+      "status": "FINISHED",
+      "episodes": 10,
+      "seasonYear": 2019,
+      "title": {
+       "english": "Mysteria Friends",
+       "romaji": "Manaria Friends"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 127720,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2021,
+  "popularity": 325214,
+  "startDate": {
+   "year": 2021,
+   "month": 10,
+   "day": 4
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation Cour 2",
+   "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2",
+   "native": "無職転生 ～異世界行ったら本気だす～ 第2クール"
+  },
+  "synonyms": [
+   "Mushoku Tensei: Jobless Reincarnation Part 2",
+   "เกิดชาตินี้พี่ต้องเทพ พาร์ท 2"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.hulu.com/series/mushoku-tensei-jobless-reincarnation-787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl01_ftoIT3birJWkpxFZkEl",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://wetv.vip/en/play/ecmp615ib5kswl3",
+    "site": "WeTV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/tg0bzbp8zd",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80987039",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 108465,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 85564,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 141534,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2022,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Cour 2 - Eris the Goblin Slayer",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2 - Eris no Goblin Toubatsu"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 146065,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2023,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Season 2",
+       "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 129627,
+  "format": "ONA",
+  "status": "FINISHED",
+  "episodes": 4,
+  "duration": 3,
+  "season": "WINTER",
+  "seasonYear": 2021,
+  "popularity": 18808,
+  "startDate": {
+   "year": 2021,
+   "month": 2,
+   "day": 14
+  },
+  "title": {
+   "english": "Junior High and High School!! Kimetsu Academy Story: Valentine Edition",
+   "romaji": "Chuukou Ikkan!! Kimetsu Gakuen Monogatari: Valentine-hen",
+   "native": "中高一貫!!キメツ学園物語 ～バレンタイン編～"
+  },
+  "synonyms": [
+   "Tales of a Demon Slayer Academy: Valentine Specials",
+   "キメツ学園物語 バレンタイン編",
+   "Kimetsu Gakuen Monogatari: Valentine-hen",
+   "初高中同校！！鬼灭学园物语",
+   "Kimetsu Gakuen: Valentine-hen",
+   "Академия Клинка: День Святого Валентина"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.bilibili.com/bangumi/media/md28234839",
+    "site": "Bilibili",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81572035",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/series/GNVHKNPP7/junior-high-and-high-school-kimetsu-academy-story",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 101922,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 26,
+      "seasonYear": 2019,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 154541,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 3,
+      "seasonYear": 2020,
+      "title": {
+       "english": "Junior High and High School!! Kimetsu Academy Story: Kimetsu no Utage Special Edition",
+       "romaji": "Chuukou Ikkan!! Kimetsu Gakuen Monogatari: Kimetsu no Utage Tokubetsu-hen"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 129874,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 7,
+  "duration": 23,
+  "season": "FALL",
+  "seasonYear": 2021,
+  "popularity": 362012,
+  "startDate": {
+   "year": 2021,
+   "month": 10,
+   "day": 10
+  },
+  "title": {
+   "english": "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc",
+   "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen (TV)",
+   "native": "鬼滅の刃 無限列車編 (TV)"
+  },
+  "synonyms": [
+   "KnY 2",
+   "ดาบพิฆาตอสูร : ศึกรถไฟสู่นิรันดร์ (TV)",
+   "鬼灭之刃 无限列车篇",
+   "Demon Slayer: Kimetsu no Yaiba: Le train de l'Infini",
+   "Demon Slayer: Kimetsu no Yaiba season 2",
+   "Miecz zabójcy demonów – Kimetsu no Yaiba: Nieskończony Pociąg",
+   "귀멸의 칼날: 무한열차편",
+   "Клинок, Рассекающий Демонов: Бесконечный Поезд"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://crunchyroll.com/series/GY5P48XEY/Demon-Slayer-Kimetsu-no-Yaiba",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/us/title/81091393",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/play/1023002",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/1imq8t95p2d",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/demon-slayer-kimetsu-no-yaiba-mugen-train-arc",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87216,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 101922,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 26,
+      "seasonYear": 2019,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 112151,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2020,
+      "title": {
+       "english": "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train",
+       "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 142329,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": 2022,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Entertainment District Arc",
+       "romaji": "Kimetsu no Yaiba: Yuukaku-hen"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 141534,
+  "format": "SPECIAL",
+  "status": "FINISHED",
+  "episodes": 1,
+  "duration": 24,
+  "season": "WINTER",
+  "seasonYear": 2022,
+  "popularity": 84453,
+  "startDate": {
+   "year": 2022,
+   "month": 3,
+   "day": 16
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation Cour 2 - Eris the Goblin Slayer",
+   "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2 - Eris no Goblin Toubatsu",
+   "native": "無職転生 ～異世界行ったら本気だす～ 第2クール エリスのゴブリン討伐"
+  },
+  "synonyms": [
+   "Mushoku Tensei: Jobless Reincarnation Cour 2 Special",
+   "Mushoku Tensei: Jobless Reincarnation Part 2 Special",
+   "เกิดชาตินี้พี่ต้องเทพ OVA",
+   "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2 Special"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.hulu.com/series/mushoku-tensei-jobless-reincarnation-787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80987039",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://wetv.vip/en/play/ecmp615ib5kswl3",
+    "site": "WeTV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PARENT",
+     "node": {
+      "id": 127720,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Cour 2",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 85564,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 141902,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "duration": 115,
+  "season": "SUMMER",
+  "seasonYear": 2022,
+  "popularity": 78648,
+  "startDate": {
+   "year": 2022,
+   "month": 8,
+   "day": 6
+  },
+  "title": {
+   "english": "One Piece Film: Red",
+   "romaji": "ONE PIECE FILM: RED",
+   "native": "ONE PIECE FILM RED"
+  },
+  "synonyms": [
+   "One Piece Film 15",
+   "فيلم ون بيس: ريد",
+   "วันพีซ ฟิล์ม เรด"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://crunchyroll.com/watch/G8WUNGPZ8",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81700392",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PARENT",
+     "node": {
+      "id": 21,
+      "format": "TV",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": 1999,
+      "title": {
+       "english": "ONE PIECE",
+       "romaji": "ONE PIECE"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153959,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "New Genesis",
+       "romaji": "Shin Jidai"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153964,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "I'm invincible",
+       "romaji": "Watashi wa Saikyou"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153966,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "Backlight",
+       "romaji": "Gyakkou"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153973,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "Fleeting Lullaby",
+       "romaji": "Utakata Lullaby"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153982,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "The World's Continuation",
+       "romaji": "Sekai no Tsuzuki"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 153986,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "Tot Musica",
+       "romaji": "Tot Musica"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 154001,
+      "format": "MUSIC",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "Where the Wind Blows",
+       "romaji": "Kaze no Yukue"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 142329,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "duration": 24,
+  "season": "WINTER",
+  "seasonYear": 2022,
+  "popularity": 485465,
+  "startDate": {
+   "year": 2021,
+   "month": 12,
+   "day": 5
+  },
+  "title": {
+   "english": "Demon Slayer: Kimetsu no Yaiba Entertainment District Arc",
+   "romaji": "Kimetsu no Yaiba: Yuukaku-hen",
+   "native": "鬼滅の刃 遊郭編"
+  },
+  "synonyms": [
+   "KnY 2",
+   "Demon Slayer: Kimetsu no Yaiba - Le quartier des plaisirs",
+   "ดาบพิฆาตอสูร ภาค 2 บทย่านเริงรมย์",
+   "Miecz zabójcy demonów – Kimetsu no Yaiba: Dzielnica uciech",
+   "귀멸의 칼날: 환락의 거리편",
+   "Клинок, Рассекающий Демонов: Квартал Красных Фонарей"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://crunchyroll.com/series/GY5P48XEY/Demon-Slayer-Kimetsu-no-Yaiba",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/play/1023002",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/1imq8t95p2d",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/us/title/81091393",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/demon-slayer-kimetsu-no-yaiba-entertainment-district-arc",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87216,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 129874,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 7,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc",
+       "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen (TV)"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 112151,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2020,
+      "title": {
+       "english": "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train",
+       "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 145139,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": 2023,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc",
+       "romaji": "Kimetsu no Yaiba: Katanakaji no Sato-hen"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 142770,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "duration": 121,
+  "season": "FALL",
+  "seasonYear": 2022,
+  "popularity": 201953,
+  "startDate": {
+   "year": 2022,
+   "month": 11,
+   "day": 11
+  },
+  "title": {
+   "english": "Suzume",
+   "romaji": "Suzume no Tojimari",
+   "native": "すずめの戸締まり"
+  },
+  "synonyms": [
+   "铃芽之旅",
+   "Khóa Chặt Cửa Nào Suzume",
+   "การผนึกประตูของซุซุเมะ",
+   "Судзуме зачиняє двері",
+   "Судзумэ"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/GP5HJ8425/suzume",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81696498",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "ADAPTATION",
+     "node": {
+      "id": 156544,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Suzume",
+       "romaji": "Suzume no Tojimari"
+      }
+     }
+    },
+    {
+     "relationType": "CHARACTER",
+     "node": {
+      "id": 166058,
+      "format": "SPECIAL",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Big Mac® to, Susume!"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 145139,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "duration": 24,
+  "season": "SPRING",
+  "seasonYear": 2023,
+  "popularity": 374357,
+  "startDate": {
+   "year": 2023,
+   "month": 4,
+   "day": 9
+  },
+  "title": {
+   "english": "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc",
+   "romaji": "Kimetsu no Yaiba: Katanakaji no Sato-hen",
+   "native": "鬼滅の刃 刀鍛冶の里編"
+  },
+  "synonyms": [
+   "KnY 3",
+   "ดาบพิฆาตอสูร ภาค 3 บทหมู่บ้านช่างตีดาบ",
+   "Demon Slayer: Kimetsu no Yaiba - Le village des forgerons",
+   "Истребитель демонов: Kimetsu no Yaiba. Деревня кузнецов",
+   "Miecz zabójcy demonów – Kimetsu no Yaiba: Wioska płatnerzy"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/GY5P48XEY/demon-slayer-kimetsu-no-yaiba",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/2e0tbmdwxqp",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/media/2079053/",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81091393",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/demon-slayer-kimetsu-no-yaiba-swordsmith-village-arc-a92c9b0f-1aa2-42f4-9b73-29d0d51e27ba",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87216,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 142329,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": 2022,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Entertainment District Arc",
+       "romaji": "Kimetsu no Yaiba: Yuukaku-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 166240,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 8,
+      "seasonYear": 2024,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc",
+       "romaji": "Kimetsu no Yaiba: Hashira Geiko-hen"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 146065,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2023,
+  "popularity": 264466,
+  "startDate": {
+   "year": 2023,
+   "month": 7,
+   "day": 3
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation Season 2",
+   "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu",
+   "native": "無職転生Ⅱ ～異世界行ったら本気だす～"
+  },
+  "synonyms": [
+   "เกิดชาตินี้พี่ต้องเทพ ซีซั่น 2",
+   "Mushoku Tensei: Isekai Ittara Honki Dasu 2nd Season",
+   "Mushoku Tensei II: Jobless Reincarnation",
+   "Mushoku Tensei II: Reencarnación desde cero",
+   "无职转生～到了异世界就拿出真本事～第2季"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G24H1N3MP/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/2084136",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl3kNUmd8rDL2WnmI-C6LKgt",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/mushoku-tensei-jobless-reincarnation-787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/2c6hrvdebhd",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80987039",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLpm1VVK4UL15vNsXU2LkMwkHxGIxtPd19",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 127720,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2021,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Cour 2",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu Part 2"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 142989,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu - Shitsui no Majutsushi-hen"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 85564,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 166873,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2024,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Season 2 Part 2",
+       "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu Part 2"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 152802,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2023,
+  "popularity": 69074,
+  "startDate": {
+   "year": 2023,
+   "month": 7,
+   "day": 10
+  },
+  "title": {
+   "english": "Dark Gathering",
+   "romaji": "Dark Gathering",
+   "native": "ダークギャザリング"
+  },
+  "synonyms": [
+   "คู่หูต่างขั้วกับภารกิจกำจัดผี"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.hidive.com/tv/dark-gathering",
+    "site": "HIDIVE",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://youtube.com/playlist?list=PLwLSw1_eDZl27LXaPp_ryQdu41PQGpWEq",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/nd4lyz6mpt",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLpm1VVK4UL14JGEg2HzBJ9enWVg7AgD_t",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/id-en/title/81707187",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/dark-gathering-42809c33-ab67-4fbf-9d7d-c52b4c1f56cf",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 109608,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Dark Gathering",
+       "romaji": "Dark Gathering"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 201388,
+      "format": "TV",
+      "status": "NOT_YET_RELEASED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Dark Gathering 2nd Season"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 153518,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "duration": 25,
+  "season": "WINTER",
+  "seasonYear": 2024,
+  "popularity": 226596,
+  "startDate": {
+   "year": 2024,
+   "month": 1,
+   "day": 4
+  },
+  "title": {
+   "english": "Delicious in Dungeon",
+   "romaji": "Dungeon Meshi",
+   "native": "ダンジョン飯"
+  },
+  "synonyms": [
+   "Dungeon Food",
+   "Dungeon Meal",
+   "Tragones y Mazmorras",
+   "Gloutons et Dragons",
+   "Подземелье вкусностей",
+   "던전밥",
+   "สูตรลับตำรับดันเจียน",
+   "Mỹ vị hầm ngục",
+   "Підземелля смакоти",
+   "迷宫饭",
+   "מבוכים ומטעמים",
+   "Dunmeshi",
+   "Labužníci v kobce",
+   "طعام الدهليز اللذيذ"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.netflix.com/title/81564899",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 86082,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Delicious in Dungeon",
+       "romaji": "Dungeon Meshi"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 111516,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": null,
+      "title": {
+       "english": "Delicious in Dungeon CM",
+       "romaji": "Dungeon Meshi CM"
+      }
+     }
+    },
+    {
+     "relationType": "OTHER",
+     "node": {
+      "id": 158627,
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2017,
+      "title": {
+       "english": null,
+       "romaji": "Dungeon Meshi: Senshi no Kantan Cooking!"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 178031,
+      "format": "ONA",
+      "status": "NOT_YET_RELEASED",
+      "episodes": null,
+      "seasonYear": 2027,
+      "title": {
+       "english": "Delicious in Dungeon Season 2",
+       "romaji": "Dungeon Meshi 2nd Season"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 166240,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 8,
+  "duration": 30,
+  "season": "SPRING",
+  "seasonYear": 2024,
+  "popularity": 278100,
+  "startDate": {
+   "year": 2024,
+   "month": 5,
+   "day": 12
+  },
+  "title": {
+   "english": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc",
+   "romaji": "Kimetsu no Yaiba: Hashira Geiko-hen",
+   "native": "鬼滅の刃 柱稽古編"
+  },
+  "synonyms": [
+   "KnY 4",
+   "Demon Slayer: Kimetsu no Yaiba - L'entraînement des Piliers",
+   "Miecz zabójcy demonów – Kimetsu no Yaiba: Trening Filarów",
+   "Клинок, рассекающий демонов: Тренировка столпов"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.bilibili.tv/en/media/2104174",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/series/GY5P48XEY/demon-slayer-kimetsu-no-yaiba",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/f5331794-7c00-41f0-8646-e94c0b09c1a1",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81091393",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 145139,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 11,
+      "seasonYear": 2023,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc",
+       "romaji": "Kimetsu no Yaiba: Katanakaji no Sato-hen"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87216,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba",
+       "romaji": "Kimetsu no Yaiba"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 178788,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2025,
+      "title": {
+       "english": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+       "romaji": "Kimetsu no Yaiba: Mugenjou-hen Movie 1 - Akaza Sairai"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 166873,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SPRING",
+  "seasonYear": 2024,
+  "popularity": 210277,
+  "startDate": {
+   "year": 2024,
+   "month": 4,
+   "day": 8
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation Season 2 Part 2",
+   "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu Part 2",
+   "native": "無職転生Ⅱ ～異世界行ったら本気だす～ 第2クール"
+  },
+  "synonyms": [
+   "Mushoku Tensei: Jobless Reincarnation Season 2 Cour 2",
+   "เกิดชาตินี้พี่ต้องเทพ ซีซั่น 2 ครึ่งหลัง",
+   "Mushoku Tensei: Isekai Ittara Honki Dasu 2nd Season Part 2",
+   "Mushoku Tensei II: Jobless Reincarnation Part 2",
+   "Mushoku Tensei II: Reencarnación desde cero",
+   "无职转生～到了异世界就拿出真本事～第2季"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G24H1N3MP/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/a8ey3c5oap",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/2104111",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/channel/UCGbshtvS9t-8CW11W7TooQg",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 85564,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 146065,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2023,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Season 2",
+       "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 178789,
+      "format": "TV",
+      "status": "RELEASING",
+      "episodes": 14,
+      "seasonYear": 2026,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Season 3",
+       "romaji": "Mushoku Tensei III: Isekai Ittara Honki Dasu"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 178789,
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": 14,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2026,
+  "popularity": 159699,
+  "startDate": {
+   "year": 2026,
+   "month": 7,
+   "day": 4
+  },
+  "title": {
+   "english": "Mushoku Tensei: Jobless Reincarnation Season 3",
+   "romaji": "Mushoku Tensei III: Isekai Ittara Honki Dasu",
+   "native": "無職転生Ⅲ ～異世界行ったら本気だす～"
+  },
+  "synonyms": [
+   "無職転生 ～異世界行ったら本気だす～ 第3期",
+   "Mushoku Tensei: Isekai Ittara Honki Dasu 3rd Season",
+   "เกิดชาตินี้พี่ต้องเทพ ซีซั่น 3"
+  ],
+  "nextAiringEpisode": {
+   "episode": 14,
+   "airingAt": 1790506800,
+   "timeUntilAiring": 422542
+  },
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G24H1N3MP/mushoku-tensei-jobless-reincarnation",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/ds3kartbap",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl1LMA6zhohDzfoV-XXFxS9Z",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/media/2411609",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/80987039",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 166873,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2024,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation Season 2 Part 2",
+       "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu Part 2"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 85470,
+      "format": "NOVEL",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation",
+       "romaji": "Mushoku Tensei: Isekai Ittara Honki Dasu"
+      }
+     }
+    },
+    {
+     "relationType": "ALTERNATIVE",
+     "node": {
+      "id": 146378,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Mushoku Tensei: Jobless Reincarnation ~Eris Sharpens Her Fangs~",
+       "romaji": "Mushoku Tensei: Eris wa Honki de Kiba wo Togu"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 182309,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2025,
+  "popularity": 68734,
+  "startDate": {
+   "year": 2025,
+   "month": 7,
+   "day": 8
+  },
+  "title": {
+   "english": "Grand Blue Dreaming Season 2",
+   "romaji": "Grand Blue Season 2",
+   "native": "ぐらんぶる Season 2"
+  },
+  "synonyms": [
+   "Grand Blue ก๊วนป่วนชวนบุ๋งบุ๋ง ซีซัน 2"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/GNVHKN94W/grand-blue-dreaming",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLbuF5Onrcu9euvzKp4BbWaV1NJYw2PoDT",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 100922,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2018,
+      "title": {
+       "english": "Grand Blue Dreaming",
+       "romaji": "Grand Blue"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87395,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Grand Blue Dreaming",
+       "romaji": "Grand Blue"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 199111,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2026,
+      "title": {
+       "english": "Grand Blue Dreaming Season 3",
+       "romaji": "Grand Blue Season 3"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 187538,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2026,
+  "popularity": 70864,
+  "startDate": {
+   "year": 2026,
+   "month": 7,
+   "day": 4
+  },
+  "title": {
+   "english": "BLACK TORCH",
+   "romaji": "BLACK TORCH",
+   "native": "BLACK TORCH"
+  },
+  "synonyms": [
+   "ブラックトーチ",
+   "Tocha Negra"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/GT00377907/black-torch",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/am6qsz178h",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl3mx2NrmJSwHk-VtvhmGnZz",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 98148,
+      "format": "MANGA",
+      "status": "FINISHED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Black Torch",
+       "romaji": "BLACK TORCH"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 199111,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SUMMER",
+  "seasonYear": 2026,
+  "popularity": 41705,
+  "startDate": {
+   "year": 2026,
+   "month": 7,
+   "day": 7
+  },
+  "title": {
+   "english": "Grand Blue Dreaming Season 3",
+   "romaji": "Grand Blue Season 3",
+   "native": "ぐらんぶる Season 3"
+  },
+  "synonyms": [
+   "Grand Blue ก๊วนป่วนชวนบุ๋งบุ๋ง ซีซัน 3"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/GNVHKN94W/grand-blue-dreaming",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/2414407",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 182309,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2025,
+      "title": {
+       "english": "Grand Blue Dreaming Season 2",
+       "romaji": "Grand Blue Season 2"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87395,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Grand Blue Dreaming",
+       "romaji": "Grand Blue"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 217136,
+      "format": "TV",
+      "status": "NOT_YET_RELEASED",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": null,
+       "romaji": "Grand Blue Season 4"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 201388,
+  "format": "TV",
+  "status": "NOT_YET_RELEASED",
+  "episodes": null,
+  "duration": null,
+  "season": null,
+  "seasonYear": null,
+  "popularity": 6678,
+  "startDate": {
+   "year": 2027,
+   "month": null,
+   "day": null
+  },
+  "title": {
+   "english": null,
+   "romaji": "Dark Gathering 2nd Season",
+   "native": "ダークギャザリング 第2期"
+  },
+  "synonyms": [],
+  "nextAiringEpisode": null,
+  "externalLinks": [],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 109608,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Dark Gathering",
+       "romaji": "Dark Gathering"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 152802,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 25,
+      "seasonYear": 2023,
+      "title": {
+       "english": "Dark Gathering",
+       "romaji": "Dark Gathering"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 217136,
+  "format": "TV",
+  "status": "NOT_YET_RELEASED",
+  "episodes": null,
+  "duration": null,
+  "season": null,
+  "seasonYear": null,
+  "popularity": 4352,
+  "startDate": {
+   "year": null,
+   "month": null,
+   "day": null
+  },
+  "title": {
+   "english": null,
+   "romaji": "Grand Blue Season 4",
+   "native": "ぐらんぶる Season 4"
+  },
+  "synonyms": [
+   "Grand Blue Dreaming Season 4"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 87395,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "Grand Blue Dreaming",
+       "romaji": "Grand Blue"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 199111,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2026,
+      "title": {
+       "english": "Grand Blue Dreaming Season 3",
+       "romaji": "Grand Blue Season 3"
+      }
+     }
+    }
+   ]
+  }
+ }
+]

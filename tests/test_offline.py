@@ -1,432 +1,753 @@
-"""Offline test — mock + REAL aninidhi data ke saath poora pipeline.
-
-Run: python tests/test_offline.py
-(AniList/dubinfo/YouTube mocked — aninidhi REAL package use hota hai)
 """
+tests/test_offline.py — offline test suite.
+
+  * AniList / dubinfo / YouTube / AnimeSchedule  -> MOCKED (fixtures = real captured data)
+  * AniNidhi                                     -> REAL package (bundled snapshot, no network)
+
+Chalane ka tareeka:
+    cd anime-dub-bot && python -m pytest tests/ -v
+ya:
+    python tests/test_offline.py
+"""
+from __future__ import annotations
+
 import asyncio
+import json
 import os
 import sys
-import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timezone
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# --- environment: sab kuch offline + clock freeze (config import se PEHLE) ---
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+os.environ["ANINIDHI_SOURCE_URL"] = ""                       # bundled snapshot, no network
+os.environ.setdefault("ANINIDHI_CACHE_DIR", "/tmp/aninidhi-test-cache")
+os.environ["BOT_FAKE_NOW"] = "2026-09-22T12:00:00+00:00"     # 22 Sep 2026, 05:30 PM IST
+os.environ["DB_PATH"] = ":memory:"
 
-import config
-import formatter
-from database import Database
-from sources import aggregator, anilist, anischedule, dubinfo, youtube, aninidhi_src
+import config                                                # noqa: E402
+import formatter                                             # noqa: E402
+import texts                                                 # noqa: E402
+from database import Database                                 # noqa: E402
+from notifier import Notifier                                 # noqa: E402
+from sources.aggregator import Aggregator, CardData           # noqa: E402
+from sources.anilist import MediaEntry, _parse_media          # noqa: E402
+from sources.aninidhi_src import (                            # noqa: E402
+    AniNidhiSource,
+    franchise_key,
+    parse_season,
+    weekly_progress,
+)
+from sources.youtube import YouTubeSource                     # noqa: E402
 
-# ---- Mock data (AniList sandbox se reachable nahi, isliye mock) ----
-# Real facts use kiye hain: 12 episodes, ep 12 -> 19 Sep 2026, ab season complete
-MOCK_ANILIST = {
-    "anilist_id": 123456,
-    "mal_id": 555000,
-    "title": "Black Torch",
-    "romaji": "Black Torch",
-    "native": "ブラックトーチ",
-    "status": "FINISHED",
-    "status_display": "Completed ✅ (sab episodes release ho chuke)",
-    "episodes": 12,
-    "format": "TV",
-    "season": "SUMMER",
-    "year": 2026,
-    "next_episode": None,
-    "next_airing_at": None,
-    "links": [
-        {"site": "Crunchyroll", "url": "https://crunchyroll.com/black-torch"},
-        {"site": "Netflix", "url": "https://netflix.com/title/123"},
-    ],
-}
-
-# dubinfo purana data deta hai (3 eps) — aninidhi fresh hai (4) — max lena chahiye
-MOCK_DUBINFO = {
-    "title": "Black Torch",
-    "platforms": [
-        {"name": "Crunchyroll", "url": "https://crunchyroll.com/x",
-         "region": "India", "langs": ["jp", "en", "hi"]},
-    ],
-    "langs": {
-        "jp": {"released": 12, "latest": "2026-09-19T15:30:00Z"},
-        "en": {"released": 12, "latest": "2026-09-19T15:30:00Z"},
-        "hi": {"released": 3, "latest": "2026-09-12T12:00:00Z"},
-    },
-}
+FIXTURES = json.loads((Path(__file__).parent / "anilist_fixtures.json").read_text(encoding="utf-8"))
+TODAY = date(2026, 9, 22)
 
 
-async def mock_get_anime(anilist_id):
-    return dict(MOCK_ANILIST)
+def run(coro):
+    """pytest-asyncio plugin ke bina async test chalane ka helper."""
+    return asyncio.run(coro)
 
 
-# ---- Multi-season mock (real AniNidhi titles se — DDD S1/S2 finished, Black Torch airing) ----
-MOCK_S1 = {"anilist_id": 30, "mal_id": None, "title": "Dan Da Dan", "romaji": "Dan Da Dan",
-           "native": "", "status": "FINISHED", "status_display": "Completed ✅",
-           "episodes": 12, "format": "TV", "season": "FALL", "year": 2024,
-           "next_episode": None, "next_airing_at": None, "links": [],
-           "relations": [{"relation": "SEQUEL", "anilist_id": 31, "format": "TV"}]}
-MOCK_S2 = {"anilist_id": 31, "mal_id": None, "title": "Dan Da Dan 2nd Season", "romaji": None,
-           "native": "", "status": "FINISHED", "status_display": "Completed ✅",
-           "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2025,
-           "next_episode": None, "next_airing_at": None, "links": [],
-           "relations": [{"relation": "PREQUEL", "anilist_id": 30, "format": "TV"},
-                        {"relation": "SEQUEL", "anilist_id": 32, "format": "TV"}]}
-MOCK_S3 = {"anilist_id": 32, "mal_id": None, "title": "Black Torch", "romaji": None,
-           "native": "", "status": "RELEASING", "status_display": "Ongoing",
-           "episodes": 12, "format": "TV", "season": "SUMMER", "year": 2026,
-           "next_episode": 12, "next_airing_at": None, "links": [],
-           "relations": [{"relation": "PREQUEL", "anilist_id": 31, "format": "TV"}]}
+# ---------------------------------------------------------------------------
+# MOCK AniList — behaviour real API jaisa (title match + popularity order)
+# ---------------------------------------------------------------------------
+class FakeAniList:
+    def __init__(self, rows=None):
+        self.rows = {r["id"]: r for r in (rows or FIXTURES)}
+        self.entries = {i: _parse_media(r) for i, r in self.rows.items()}
+        self.search_queries: list[str] = []
+        self.requests_made = 0
+        self.fail_ids: set[int] = set()
 
-MOCK_MOVIE = {"anilist_id": 50, "mal_id": None, "title": "Suzume", "romaji": "Suzume no Tojimari",
-             "native": "", "status": "FINISHED", "status_display": "Released ✅",
-             "episodes": None, "format": "MOVIE", "duration": 122,
-             "release_date": "2022-11-11",
-             "season": None, "year": 2022,
-             "next_episode": None, "next_airing_at": None, "links": [], "relations": []}
+    # -- AniListClient jaisa interface --------------------------------------
+    def cached_entry(self, anime_id: int) -> MediaEntry | None:
+        return self.entries.get(anime_id)
 
-# ---- Mushoku Tensei style chain: cours alag entries (AniList) — merge hone chahiye ----
-MOCK_MOVIE_MT = {"anilist_id": 45, "mal_id": None,
-                 "title": "Mushoku Tensei: Jobless Reincarnation - Eris the Goblin Slayer",
-                 "romaji": None, "native": "", "status": "FINISHED",
-                 "status_display": "Released ✅", "episodes": None, "format": "MOVIE",
-                 "duration": 95, "release_date": "2022-12-16", "season": None,
-                 "year": 2022, "next_episode": None, "next_airing_at": None,
-                 "links": [], "relations": []}
+    async def search(self, query: str, per_page: int = 12) -> list[MediaEntry]:
+        self.search_queries.append(query)
+        self.requests_made += 1
+        q = query.strip().lower()
+        words = [w for w in q.replace(":", " ").split() if w]
+        hits = []
+        for e in self.entries.values():
+            titles = [t.lower() for t in e.titles()]
+            if any(q in t for t in titles) or all(
+                any(w in t for t in titles) for w in words
+            ):
+                hits.append(e)
+        hits.sort(key=lambda e: -(self.rows[e.id].get("popularity") or 0))
+        return hits[:per_page]
 
-MOCK_MT = [
-    {"anilist_id": 40, "title": "Mushoku Tensei: Jobless Reincarnation",
-     "status": "FINISHED", "episodes": 11, "year": 2021, "format": "TV",
-     "next_episode": None,
-     "relations": [{"relation": "SIDE_STORY", "anilist_id": 45, "format": "MOVIE"}]},
-    {"anilist_id": 41, "title": "Mushoku Tensei: Jobless Reincarnation Part 2",
-     "status": "FINISHED", "episodes": 12, "year": 2021, "format": "TV",
-     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 40, "format": "TV"}]},
-    {"anilist_id": 42, "title": "Mushoku Tensei: Jobless Reincarnation Season 2",
-     "status": "FINISHED", "episodes": 13, "year": 2023, "format": "TV",
-     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 41, "format": "TV"}]},
-    {"anilist_id": 43, "title": "Mushoku Tensei: Jobless Reincarnation Season 2 Part 2",
-     "status": "FINISHED", "episodes": 12, "year": 2024, "format": "TV",
-     "next_episode": None, "relations": [{"relation": "PREQUEL", "anilist_id": 42, "format": "TV"}]},
-    {"anilist_id": 44, "title": "Mushoku Tensei: Jobless Reincarnation Season 3",
-     "status": "RELEASING", "episodes": 14, "year": 2026, "format": "TV",
-     "next_episode": 14, "relations": [{"relation": "PREQUEL", "anilist_id": 43, "format": "TV"}]},
-]
-for _m in MOCK_MT:
-    _m.update({"mal_id": None, "romaji": None, "native": "",
-               "status_display": "x", "season": None, "next_airing_at": None,
-               "links": []})
+    async def many(self, ids, force: bool = False) -> list[MediaEntry]:
+        self.requests_made += 1
+        out = []
+        for i in ids:
+            if i in self.fail_ids:
+                continue
+            e = self.entries.get(i)
+            if e:
+                out.append(e)
+        return out
 
-MOCK_DB = {123456: MOCK_ANILIST, 30: MOCK_S1, 31: MOCK_S2, 32: MOCK_S3, 50: MOCK_MOVIE,
-           45: MOCK_MOVIE_MT,
-           **{m["anilist_id"]: m for m in MOCK_MT}}
+    async def get(self, anime_id: int, force: bool = False) -> MediaEntry | None:
+        self.requests_made += 1
+        return None if anime_id in self.fail_ids else self.entries.get(anime_id)
+
+    def clear_cache(self) -> None:
+        pass
 
 
-async def mock_get_anime_db(anilist_id):
-    return dict(MOCK_DB[anilist_id])
+class FakeYouTube:
+    """YouTube mock — sirf wahi hits deta hai jo test me chahiye."""
+
+    def __init__(self, hits=None):
+        self.hits = hits or []
+        self.calls = 0
+
+    async def scan(self, titles, season=None, hindi_only=True):
+        self.calls += 1
+        return list(self.hits)
+
+    async def aclose(self):
+        pass
 
 
-async def mock_get_anime_many_db(ids):
-    return [dict(MOCK_DB[i]) for i in ids if i in MOCK_DB]
+class FakeDubInfo:
+    enabled = False
 
-
-async def mock_get_dub_info(query, base_url):
-    return dict(MOCK_DUBINFO)
-
-
-async def mock_as_search(query, token):
-    return []
-
-
-async def mock_yt_find(query):
-    return None  # Black Torch YouTube pe nahi hai (Crunchyroll pe hai)
-
-
-async def main():
-    anilist.get_anime = mock_get_anime_db
-    anilist.get_anime_many = mock_get_anime_many_db
-    dubinfo.get_dub_info = mock_get_dub_info
-    anischedule.search_anime = mock_as_search
-    youtube.find_episodes = mock_yt_find
-
-    dbpath = os.path.join(tempfile.mkdtemp(), "test.db")
-    db = Database(dbpath)
-
-    # ---- 1. REAL aninidhi — Black Torch ka actual record ----
-    r = aninidhi_src.hindi_dub_status("Black Torch", total=12)
-    assert r is not None and r["platforms"], "aninidhi record milna chahiye"
-    assert any(p["platform"] == "Crunchyroll" for p in r["platforms"])
-    # Real check: 29 Aug start, weekly => aaj tak jitne hone chahiye
-    from datetime import date
-    expected_eps = (date.today() - date(2026, 8, 29)).days // 7 + 1
-    assert r["eps"] == min(expected_eps, 12), f"eps={r['eps']} != {expected_eps}"
-    print(f"[OK] aninidhi REAL — eps={r['eps']}, next={r['next']}")
-
-    # ---- 2. Season-aware + variant matching (REAL data) ----
-    r2 = aninidhi_src.hindi_dub_status("Dan Da Dan 2nd Season")
-    assert r2 and r2["found"], "variant matching se Season 2 milna chahiye"
-    assert any(p["platform"] == "Crunchyroll" for p in r2["platforms"])
-    assert r2["finished"], "DDD S2 ka dub finished hai"
-    print("[OK] aninidhi season matching — 'Dan Da Dan 2nd Season'")
-
-    r3 = aninidhi_src.hindi_dub_status("Jujutsu Kaisen 2nd Season")
-    assert r3 and r3["found"] and r3["finished"]
-    print("[OK] aninidhi season matching — 'Jujutsu Kaisen 2nd Season'")
-
-    r4 = aninidhi_src.hindi_dub_status("Bleach")
-    assert r4 is not None and not r4.get("found"), "Bleach nahi milna chahiye (no official HI dub)"
-    print("[OK] aninidhi not-found case — 'Bleach'")
-
-    r5 = aninidhi_src.hindi_dub_status("Blue Box 2nd Season")
-    if r5 and r5.get("found"):
-        print(f"[OK] aninidhi upcoming — Blue Box S2: upcoming={r5.get('upcoming')}, announced={r5.get('announced')}")
-
-    # ---- 3. Aggregator: aninidhi > purana dubinfo (max lena chahiye) ----
-    info = await aggregator.get_anime_info(123456, db=db, force=True)
-    assert info["hi_aired"] == r["eps"], f"hi_aired={info['hi_aired']}"
-    assert info["en_aired"] == 12
-    assert info["jp_aired"] == 12  # FINISHED => sab episodes
-    assert info["hi_source"] == "aninidhi"
-    assert info["next_by_lang"]["hi"] == r["next"].strftime("%d %b %Y (estimated)")
-    print(f"[OK] aggregator — hi={info['hi_aired']}, next_hi={info['next_by_lang']['hi']}")
-
-    # ---- 4. Card ----
-    card = formatter.format_card(info)
-    print("\n---------- CARD ----------")
-    print(card)
-    print("--------------------------\n")
-    for must in ("🎬 Black Torch", "Hindi dub: 4 episodes" if r["eps"] == 4 else "Hindi dub:",
-                 "📅 Next episode:", "Crunchyroll"):
-        assert must in card, f"card me missing: {must}"
-    print("[OK] formatter card")
-
-    # ---- 5. Past-date guard (_est_next) ----
-    old = datetime(2020, 1, 1, tzinfo=timezone.utc)
-    out = aggregator._est_next(old)
-    assert out is None or "(estimated)" in out, "past date se future estimate hi aana chahiye"
-    now = datetime.now(timezone.utc)
-    assert aggregator._est_next(now + timedelta(days=7)) is not None
-    # purani date aage bump hoti hai, past me nahi rehti
-    if out:
-        print(f"[OK] past-date guard — 2020 se -> {out}")
-    else:
-        print("[OK] past-date guard — None (8+ hafte purana)")
-
-    # ---- 6. Manual fix (/setep) ----
-    db.set_manual_fix(123456, "hi", 5)
-    info2 = await aggregator.get_anime_info(123456, db=db, force=True)
-    assert info2["hi_aired"] == 5
-    assert info2["hi_source"] == "manual"
-    assert "/setep se set kiya" in formatter.format_card(info2)
-    print("[OK] manual fix (/setep)")
-
-    # ---- 7. Notification (user ke exact format mein) ----
-    new_ep = r["eps"] + 1
-    note = formatter.format_notification(info, "hi", new_ep, 12)
-    print("---------- NOTIF ----------")
-    print(note)
-    print("---------------------------")
-    assert "aa chuka hai 🎉" in note
-    assert f"Episode <b>{new_ep}</b> (Hindi dub)" in note
-    assert "Platform: Crunchyroll (India)" in note, "sirf relevant platform dikhna chahiye"
-    assert "Netflix" not in note, "Hindi dub notification me Netflix nahi aana chahiye"
-    assert f"Hindi dub: {new_ep}/12 episodes" in note
-    assert "⏱ " in note
-    assert formatter.notification_watch_url(info, "hi"), "watch URL milna chahiye"
-    note_jp = formatter.format_notification(info, "jp", 5, 12)
-    assert "Japanese audio: 5/12 episodes" in note_jp
-    print("[OK] notification format — user ke format jaisa")
-
-    # ---- 8. YouTube feed parsing (pure function) ----
-    sample_feed = """<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <entry><title>Black Torch Episode 4 [Hindi Dub]</title>
-  <published>2026-09-15T15:30:00+00:00</published>
-  <link href="https://youtu.be/xyz"/></entry>
-  <entry><title>Some Other Anime Episode 7 Hindi Dub</title>
-  <published>2026-09-14T15:30:00+00:00</published>
-  <link href="https://youtu.be/abc"/></entry>
-</feed>"""
-    entries = youtube.parse_feed(sample_feed)
-    assert len(entries) == 2
-    assert youtube.extract_episode("Black Torch Episode 4 [Hindi Dub]") == 4
-    assert youtube.extract_episode("EP. 12 Hindi") == 12
-    assert youtube._matches("Black Torch", "BLACK TORCH Episode 4 [Hindi Dub]")
-    assert not youtube._matches("Black Torch", "Some Other Anime Episode 7")
-    print("[OK] YouTube feed parse")
-
-    # ---- 9. Database ----
-    db.upsert_user(999, "Shinchan")
-    counts = aggregator.lang_counts(info)
-    db.add_follow(999, 123456, "Black Torch", "", ["hi"], counts)
-    f = db.get_follow(999, 123456)
-    assert f["last_counts"]["hi"] == info["hi_aired"]
-    db.set_lang_state(123456, "hi", counts["hi"], "2026-09-19T10:00:00+00:00")
-    st = db.get_lang_states(123456)
-    assert st["hi"]["last_ep"] == counts["hi"]
-    print("[OK] database + lang_state")
-
-    # ---- 10. Multi-season card (user ka naya format) ----
-    info_ms = await aggregator.get_anime_info(32, db=db, force=True)
-    card_ms = formatter.format_card(info_ms)
-    print("---------- MULTI-SEASON CARD ----------")
-    print(card_ms)
-    print("---------------------------------------")
-    assert "• Season 1 (2024)" in card_ms, "S1 label + year"
-    assert "• Season 2 (2025)" in card_ms
-    assert "• Season 3 (ongoing)" in card_ms, "airing season ke liye (ongoing)"
-    assert card_ms.count("me complete)") >= 1, "finished dubs ka complete note"
-    assert "Hindi dub: 4 episodes" in card_ms, "current (S3=Black Torch) ka hi=4"
-    assert "Japanese audio: 11 episodes" in card_ms, "S3 ka jp=11 (next=12)"
-    assert "Season 3: 12 episodes planned" in card_ms, "top line me current season num"
-    print("[OK] multi-season card format")
-
-    # ---- 11. Fuzzy search (typo) ----
-    async def mock_search_anime(q):
-        if "mushoko" in q.lower():
-            return []  # typo wala direct search fail
-        if "mushoku" in q.lower():
-            return [{"anilist_id": 77, "title": "Mushoku Tensei: Jobless Reincarnation"}]
+    async def lookup(self, titles):
         return []
 
-    anilist.search_anime = mock_search_anime
-    res = await aggregator.search("mushoko tensai")
-    assert res, "typo correction ke baad search kaam karna chahiye"
-    assert res[0]["title"].startswith("Mushoku Tensei")
-    print("[OK] fuzzy search — 'mushoko tensai' -> Mushoku Tensei mil gaya")
 
-    # ---- 12. Movie card ----
-    info_mv = await aggregator.get_anime_info(50, db=db, force=True)
-    card_mv = formatter.format_card(info_mv)
-    print("---------- MOVIE CARD ----------")
-    print(card_mv)
-    print("--------------------------------")
-    assert "🎞 Movie details:" in card_mv
-    assert "• Movie (2022)" in card_mv
-    assert "Released: 11 Nov 2022" in card_mv
-    assert "Hindi dub: Available ✅" in card_mv, "Suzume ka real anidhi record — dub available"
-    assert "Japanese audio: Available ✅" in card_mv
-    assert "Season" not in card_mv, "movie me Season lines nahi"
-    assert "Next episode" not in card_mv, "movie me next episode section nahi"
-    note_mv = formatter.format_notification(info_mv, "hi", 1, None)
-    assert "Hindi Dub Aa Gayi" in note_mv
-    print("[OK] movie card — Suzume")
+class FakeSchedule:
+    enabled = False
 
-    # ---- 13. Mushoku-style: cours merge ho kar 3 season dikhne chahiye ----
-    r_mt = aninidhi_src.hindi_dub_status("Mushoku Tensei: Jobless Reincarnation Season 3")
-    assert r_mt and r_mt["found"], "colon-variant matching kaam karni chahiye"
-    assert r_mt["eps"] and r_mt["eps"] >= 3, "S3 dub airing hai — eps milne chahiye"
-    print(f"[OK] aninidhi long-title fix — S3 hi eps={r_mt['eps']}")
+    async def next_episode(self, query):
+        return None
 
-    info_mt = await aggregator.get_anime_info(44, db=db, force=True)
-    card_mt = formatter.format_card(info_mt)
-    print("---------- MUSHOKU CARD ----------")
-    print(card_mt)
-    print("----------------------------------")
-    # 3 season hone chahiye — 5 nahi (cours merge)
-    assert "• Season 1 (2021)" in card_mt
-    assert "• Season 2 (2023)" in card_mt
-    assert "• Season 3 (ongoing)" in card_mt
-    assert "Season 4" not in card_mt and "Season 5" not in card_mt, \
-        "cours merge nahi hue — 5 season aa gaye"
-    assert "Released: 23/23 episodes" in card_mt, "S1 = 11+12"
-    assert "Released: 25/25 episodes" in card_mt, "S2 = 13+12"
-    assert "Released: 13/14 episodes" in card_mt, "S3 ongoing"
-    assert "Season 3: 14 episodes planned" in card_mt
-    assert f"Hindi dub: {r_mt['eps']} episodes" in card_mt, "S3 ka real dub count"
-    # Movies section — franchise ki movie bhi isi card me
-    assert "🎥 Movies / Specials:" in card_mt
-    assert "Eris the Goblin Slayer" in card_mt
-    assert "Hindi dub: Available ✅" in card_mt
-    print("[OK] mushoku cours-merge — 3 seasons, Hindi dub + movie section")
 
-    # ---- 14. Franchise pick — same franchise to seedha card ----
-    mt_results = [
-        {"anilist_id": 40, "title": "Mushoku Tensei: Jobless Reincarnation"},
-        {"anilist_id": 41, "title": "Mushoku Tensei: Jobless Reincarnation Cour 2"},
-        {"anilist_id": 42, "title": "Mushoku Tensei: Jobless Reincarnation Season 2"},
-        {"anilist_id": 45, "title": "Mushoku Tensei: Jobless Reincarnation Cour 2 - Eris the Goblin Slayer"},
+def make_aggregator(yt=None, cache=None, aninidhi=None) -> Aggregator:
+    return Aggregator(
+        anilist=FakeAniList(),
+        aninidhi=aninidhi or AniNidhiSource(),
+        yt=yt or FakeYouTube(),
+        dinfo=FakeDubInfo(),
+        sched=FakeSchedule(),
+        cache=cache,
+    )
+
+
+# ===========================================================================
+# 1. REAL AniNidhi: Black Torch -> 4 episodes + next date
+# ===========================================================================
+def test_01_real_aninidhi_black_torch():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    assert data is not None, "Black Torch ka card banna chahiye"
+    assert data.hindi_found is True
+    assert data.hi == 4, f"22 Sep 2026 tak 4 Hindi episodes hone chahiye, mile {data.hi}"
+    assert data.hi_platforms == ["Crunchyroll"], data.hi_platforms
+    assert data.next_hi_date == date(2026, 9, 26), data.next_hi_date
+    assert "Hindi dub: 4 episodes" in formatter.format_card(data)
+    assert "26 Sep 2026 (estimated)" in formatter.format_card(data)
+    # Japanese audio complete hai (AniList: 12/12 FINISHED)
+    assert data.jp == 12 and data.planned_total == 12
+
+
+def test_01b_real_aninidhi_dataset_is_loaded():
+    """AniNidhi REAL package use ho raha hai — 400+ records."""
+    src = AniNidhiSource()
+    rows = run(src.all_records())
+    assert len(rows) >= 400, f"AniNidhi me 488 records hone chahiye, mile {len(rows)}"
+    bt = [r for r in rows if (r.get("title") or "") == "Black Torch"]
+    assert bt, "Black Torch record milna chahiye"
+    assert bt[0]["hindi_dubs"][0]["platform"] == "Crunchyroll"
+
+
+# ===========================================================================
+# 2. Season matching: "Jujutsu Kaisen 2nd Season" record
+# ===========================================================================
+def test_02_season_matching_jujutsu_2nd_season():
+    # AniList ka title "Jujutsu Kaisen 2nd Season" hai, AniNidhi ka "Jujutsu Kaisen (Season 2)"
+    base, season, cour, kind = parse_season("Jujutsu Kaisen 2nd Season")
+    assert season == 2
+    assert franchise_key(base) == "jujutsu kaisen"
+
+    src = AniNidhiSource()
+    recs = run(src.lookup(["Jujutsu Kaisen 2nd Season"]))
+    by_season = {}
+    for r in recs:
+        by_season.setdefault(r.season, []).append(r)
+    assert 2 in by_season, f"Season 2 ka record milna chahiye, mile {sorted(by_season)}"
+    s2 = by_season[2][0]
+    assert s2.display_platform == "Crunchyroll"
+    assert s2.release_date == date(2023, 9, 22)
+
+    # cour parsing bhi
+    assert parse_season("Mushoku Tensei (Season 2 Cour 1)") == ("Mushoku Tensei", 2, 1, None)
+    assert parse_season("Demon Slayer: Kimetsu no Yaiba – Mugen Train Arc (Season 2 – Cour 1)")[1:] == (2, 1, None)
+
+
+# ===========================================================================
+# 3. Not-found: Bleach -> found=False (ye SAHI jawab hai)
+# ===========================================================================
+def test_03_not_found_bleach():
+    src = AniNidhiSource()
+    recs = run(src.lookup(["Bleach", "BLEACH", "ブリーチ"]))
+    assert recs == [], "Bleach ka koi official streaming Hindi dub nahi hai"
+
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("bleach", force=True))[1]
+    assert data is not None
+    assert data.hindi_found is False
+    card = formatter.format_card(data)
+    assert "No official Hindi dub found" in card
+    assert "Hindi dub: 4" not in card  # kabhi invent nahi karega
+
+
+# ===========================================================================
+# 4. Card formats: multi-season / movie / single-season
+# ===========================================================================
+def test_04_card_format_multi_season():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("mushoku tensei", force=True))[1]
+    card = formatter.format_card(data)
+    assert card.startswith("🎬 Mushoku Tensei: Jobless Reincarnation")
+    assert "📌 Status: Ongoing" in card
+    assert "📺 Available platforms:" in card
+    assert "Audio: Japanese, Hindi" in card
+    assert "Subtitles: English" in card
+    assert "Season 3: 14 episodes planned" in card
+    assert "🎞 Season details:" in card
+    assert "📅 Next episode:" in card
+    assert "• Japanese audio: 27 Sep 2026, 04:30 PM IST" in card
+    assert "• English dub: To be announced" in card
+    assert "⏱ Last checked:\n22 Sep 2026, 05:30 PM IST" in card
+    assert card.rstrip().endswith(f"🤖 {config.VERSION}")
+
+
+def test_04b_card_format_movie_suzume():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("suzume", force=True))[1]
+    assert data.kind == "movie"
+    card = formatter.format_card(data)
+    assert "🎬 Movie — 121 min, released 11 Nov 2022" in card
+    assert "🎞 Movie details:" in card
+    assert "Hindi dub: Available ✅ (Crunchyroll)" in card
+    assert "📅 Next episode:" not in card, "movie card me Next episode section nahi hota"
+    assert "🎞 Season details:" not in card
+
+
+def test_04c_card_format_single_season():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    card = formatter.format_card(data)
+    assert "🎞 Season details:" not in card, "single-season me Season details header nahi"
+    assert "Released: 12/12 episodes" in card
+    assert "Hindi dub: 4 episodes" in card
+    assert "Japanese audio: 12 episodes" in card
+    assert "English dub: Unknown" in card
+    assert "• Japanese audio: All episodes released" in card
+
+
+# ===========================================================================
+# 5. Cours merge: Mushoku = 3 seasons + movies section
+# ===========================================================================
+def test_05_cours_merge_mushoku():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("mushoku tensei", force=True))[1]
+    assert len(data.seasons) == 3, f"5 AniList entries -> 3 seasons, mile {len(data.seasons)}"
+    got = [(s.planned, s.released) for s in data.seasons]
+    assert got == [(23, 23), (25, 25), (14, 13)], got
+    assert [s.number for s in data.seasons] == [1, 2, 3]
+    assert data.extras, "special/movie section ke liye entries honi chahiye"
+    assert "🎥 Movies / Specials:" in formatter.format_card(data)
+    # S1 ke do cours merge hue
+    assert len(data.seasons[0].entry_ids) == 2
+    assert len(data.seasons[1].entry_ids) == 2
+
+
+# ===========================================================================
+# 6. Search: franchise pick + best match + exact match + garbage guard
+# ===========================================================================
+def test_06a_franchise_pick_grand_blue():
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("grand blue dreaming"))
+    assert outcome.chosen is not None, "direct card milna chahiye, pick list nahi"
+    assert outcome.candidates == []
+    assert outcome.matched_by in ("exact", "franchise", "single", "wordset", "best")
+    data = run(agg.build_card(outcome.chosen.id, force=True))
+    # Grand Blue Dreaming / Season 2 / Season 3 ek hi card me
+    assert len(data.seasons) >= 3
+    assert any("Grand Blue Season 3" in t or "Grand Blue Dreaming Season 3" in t
+               for s in data.seasons for t in s.titles)
+
+
+def test_06b_exact_match_one_piece_not_movie():
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("one piece"))
+    assert outcome.chosen is not None, "pick list nahi, direct card"
+    assert outcome.chosen.id == 21, f"main ONE PIECE series chahiye, mila {outcome.chosen.id}"
+    assert "FILM" not in (outcome.chosen.romaji or "").upper()
+
+
+def test_06c_best_match_dark_gathering():
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("dark gathering"))
+    assert outcome.chosen is not None
+    assert outcome.chosen.id == 152802, "Dark Gathering (2023) chahiye"
+
+
+def test_06d_ambiguous_shows_pick_list():
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("one"))
+    assert outcome.chosen is None, "'one' ambiguous hai -> pick list"
+    assert outcome.needs_pick is True
+    assert len(outcome.candidates) >= 2
+    text = formatter.format_pick_list(outcome.candidates)
+    assert texts.PICK_LIST_HEADER in text
+
+
+def test_06e_garbage_guard_no_single_word_fallback():
+    """
+    2-word query fail ho to 1-word search KABHI nahi hona chahiye.
+    ("black torch" fail hone par "Black Jack / Black Cat / Black God" ki
+    garbage list dena strictly forbidden hai.)
+    """
+    # (a) 2-word query jo exist nahi karta -> clean not-found, koi 1-word retry nahi
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("zzz qqq"))
+    assert outcome.not_found is True
+    assert outcome.candidates == []
+    for q in agg.anilist.search_queries:
+        assert len(q.split()) >= 2, f"1-word fallback forbidden, par query chala: {q!r}"
+
+    # (b) 3-word query -> sirf pehle 2 words ka subset chalega, 1 word kabhi nahi
+    agg2 = make_aggregator()
+    outcome2 = run(agg2.resolve_search("zzz qqq www"))
+    assert outcome2.not_found is True
+    for q in agg2.anilist.search_queries:
+        assert len(q.split()) >= 2, f"1-word fallback forbidden: {q!r}"
+
+    # (c) 3-word query jiska 2-word subset valid hai -> wahi card milega
+    agg3 = make_aggregator()
+    outcome3 = run(agg3.resolve_search("black torch xyzzy"))
+    assert outcome3.chosen is not None and outcome3.matched_by.startswith("subset:")
+    assert all(len(q.split()) >= 2 for q in agg3.anilist.search_queries)
+
+
+def test_06f_no_synonym_exact_trap():
+    """Onigiri ka synonym 'Demon Slayer' hai — exact match usse Onigiri na dikhaye."""
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("demon slayer"))
+    assert outcome.chosen is not None
+    assert outcome.chosen.id == 101922, f"Onigiri(21612) nahi, main series chahiye — mila {outcome.chosen.id}"
+
+    data = run(agg.build_card(outcome.chosen.id, force=True))
+    # har arc apna alag season (ek hi me merge nahi)
+    assert len(data.seasons) == 5, [(s.number, s.titles[0]) for s in data.seasons]
+    assert [(s.planned, s.released) for s in data.seasons] == [
+        (26, 26), (7, 7), (11, 11), (11, 11), (8, 8)
     ]
-    assert aggregator.franchise_pick(mt_results, "mushoku tensei") == 40, \
-        "default pehla (S1) chahiye"
-    assert aggregator.franchise_pick(mt_results, "mushoku tensei season 2") == 42, \
-        "season 2 query -> S2 entry"
-    # Grand Blue case — spinoff ('Grand Blues!') alag key hai, par majority
-    # ek hi franchise -> phir bhi seedha card
-    gb_results = [
-        {"anilist_id": 70, "title": "Grand Blue Dreaming"},
-        {"anilist_id": 71, "title": "Grand Blue Dreaming Season 3"},
-        {"anilist_id": 72, "title": "Grand Blue Dreaming Season 2"},
-        {"anilist_id": 73, "title": "Grand Blues!"},
-    ]
-    assert aggregator.franchise_pick(gb_results, "grand blue") == 70, \
-        "spinoff ke bawajood direct card"
-    # Genuinely alag anime — pick list dikhni chahiye
-    diff = [{"anilist_id": 80, "title": "One Piece"},
-            {"anilist_id": 81, "title": "One Punch Man"},
-            {"anilist_id": 82, "title": "One Room"}]
-    assert aggregator.franchise_pick(diff, "one") is None, \
-        "alag franchise -> pick list"
-    print("[OK] franchise pick — direct card (spinoff-tolerant) logic")
+    # Onigiri card me season ban ke nahi dikhna chahiye
+    assert not any("Onigiri" in t for s in data.seasons for t in s.titles)
 
-    # ---- 15. Grand Blue scenario: base S1 pe card, S3 ongoing ----
-    # Real bug: S1 pe card banta hai to next-episode S1 (complete) ka
-    # aata tha — ab latest ongoing season (S3) ka aana chahiye
-    orig32 = MOCK_DB[32]
-    MOCK_DB[32] = dict(orig32)
-    MOCK_DB[32]["next_airing_at"] = int(datetime(
-        2026, 9, 27, 15, 0, tzinfo=timezone.utc).timestamp())
+
+def test_06g_one_piece_no_relation_noise():
+    """ONE PIECE ka AniList 'PREQUEL' = MONSTERS ONA — usse Season 1 me merge nahi hona chahiye."""
+    agg = make_aggregator()
+    data = run(agg.build_card(21, force=True))
+    assert len(data.seasons) == 1
+    assert data.seasons[0].entry_ids == [21], data.seasons[0].entry_ids
+    assert data.seasons[0].planned is None and data.seasons[0].released == 1179
+    # AniNidhi: Egghead arcs (Finished) -> count unknown, par dub available tha
+    card = formatter.format_card(data)
+    assert "Available ✅ (complete)" in card
+    assert "• Hindi dub: All episodes released" in card
+
+
+# ===========================================================================
+# 7. Current season: S1 base par bhi S3 ka next episode / status
+# ===========================================================================
+def test_07_current_season_rule_from_s1_base():
+    agg = make_aggregator()
+    data = run(agg.build_card(108465, query="mushoku tensei", force=True))  # S1 entry
+    assert data.current_number == 3, data.current_number
+    assert data.current_label == "Season 3"
+    assert data.status_text == "Ongoing", "S3 airing hai to status Ongoing"
+    assert data.planned_total == 14
+    assert data.jp == 13 and data.hi == 4
+    assert data.next_jp_text == "27 Sep 2026, 04:30 PM IST"
+    assert data.next_hi_text == "27 Sep 2026 (estimated)"
+    card = formatter.format_card(data)
+    assert "Season 3: 14 episodes planned" in card
+    # notification engine inhi counts ko track karega
+    assert data.hi_platforms == ["Crunchyroll"]
+
+
+def test_07b_current_season_prefers_dub_airing_over_announced():
+    """Grand Blue: JP S3 complete, S4 announced, par S3 ka Hindi dub abhi airing hai."""
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("grand blue dreaming", force=True))[1]
+    assert data.current_number == 3, data.current_number
+    assert data.hi == 4
+    assert data.next_hi_date == date(2026, 9, 28), data.next_hi_date
+
+
+# ===========================================================================
+# 8. Notification format — exact match
+# ===========================================================================
+def test_08_notification_format_exact():
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    db.add_follow(
+        user_id=4242,
+        anime_id=data.anime_id,
+        title=data.title,
+        langs=["hi"],
+        jp_count=data.jp,
+        en_count=None,
+        hi_count=4,                    # abhi 4, agla pass 5 dega
+        total_eps=data.planned_total,
+        watch_url="https://www.crunchyroll.com/series/black-torch",
+        platform="Crunchyroll",
+    )
+
+    class FakeBot:
+        def __init__(self):
+            self.sent = []
+
+        async def send_message(self, chat_id, text, parse_mode=None, reply_markup=None):
+            self.sent.append({"chat_id": chat_id, "text": text, "parse_mode": parse_mode, "kb": reply_markup})
+
+    bot = FakeBot()
+    notifier = Notifier(aggregator=agg, db=db, bot=bot)
+
+    # ek hafta aage badhao -> 5 episode
+    os.environ["BOT_FAKE_NOW"] = "2026-09-29T12:00:00+00:00"
     try:
-        info_gb = await aggregator.get_anime_info(30, db=db, force=True)
-        assert info_gb["hi_aired"] == 4, "top-level hi = S3 ka count (notifier)"
-        assert info_gb["status"] == "RELEASING", "franchise ongoing hai"
-        assert info_gb["current_season_num"] == 3
-        assert info_gb["next_by_lang"]["jp"] \
-            and "27 Sep 2026" in info_gb["next_by_lang"]["jp"], \
-            "S3 ka JP next episode"
-        assert info_gb["next_by_lang"]["hi"] \
-            and "26 Sep 2026" in info_gb["next_by_lang"]["hi"], \
-            "S3 ka Hindi next (REAL anidhi se)"
-        card_gb = formatter.format_card(info_gb)
-        assert "Status: Ongoing" in card_gb, "S3 ongoing -> Ongoing"
-        assert "Season 3: 12 episodes planned" in card_gb, "top line S3"
-        assert "Japanese audio: 27 Sep 2026" in card_gb
-        assert "Hindi dub: 26 Sep 2026" in card_gb
-        assert not all(v == "All episodes released"
-                       for v in info_gb["next_by_lang"].values()), \
-            "S3 ongoing me 'All released' nahi"
+        sent = run(notifier.run_once())
     finally:
-        MOCK_DB[32] = orig32
-    print("[OK] grand blue fix — S1 base pe bhi S3 ka next episode/date")
+        os.environ["BOT_FAKE_NOW"] = "2026-09-22T12:00:00+00:00"
 
-    # ---- 16. Dark Gathering scenario — noisy list me bhi seedha card ----
-    dg_results = [
-        {"anilist_id": 90, "title": "Dark Gathering", "romaji": None},
-        {"anilist_id": 91, "title": "Darker than Black", "romaji": None},
-        {"anilist_id": 92, "title": "The Dark Maid", "romaji": None},
-        {"anilist_id": 93, "title": "Black Butler", "romaji": None},
-    ]
-    assert aggregator.franchise_pick(dg_results, "dark gathering") is None
-    assert aggregator.best_match_pick(dg_results, "dark gathering") == 90, \
-        "poora naam match -> seedha Dark Gathering card"
-    # Ambiguous bina exact ke: 'one' -> One Piece/One Punch Man -> list
-    one_results = [{"anilist_id": 94, "title": "One Piece", "romaji": None},
-                   {"anilist_id": 95, "title": "One Punch Man", "romaji": None},
-                   {"anilist_id": 96, "title": "One Room", "romaji": None}]
-    assert aggregator.best_match_pick(one_results, "one") is None
-    # Exact match priority: 'one piece' -> seedha One Piece (Film: Red nahi)
-    op_results = [{"anilist_id": 97, "title": "One Piece", "romaji": None},
-                  {"anilist_id": 98, "title": "One Piece Film: Red", "romaji": None}]
-    assert aggregator.best_match_pick(op_results, "one piece") == 97
-    # 'naruto' -> exact Naruto card (Shippuden chain me aa jayega)
-    n_results = [{"anilist_id": 99, "title": "Naruto", "romaji": None},
-                 {"anilist_id": 100, "title": "Naruto Shippuden", "romaji": None}]
-    assert aggregator.best_match_pick(n_results, "naruto") == 99
-    # list_all cache kaam kar raha hai
-    la = aninidhi_src.list_all_cached()
-    assert la, "list_all_cached khali nahi"
-    assert aninidhi_src.list_all_cached() is la, "cache se wahi object"
-    print("[OK] dark gathering fix — noisy list me bhi seedha card")
-
-    print("\n✅ SAB TESTS PASS HO GAYE!")
+    assert len(sent) == 1, sent
+    assert sent[0]["user_id"] == 4242
+    assert sent[0]["episode"] == 5
+    assert bot.sent[0]["parse_mode"] == "HTML"
+    expected = (
+        "🔔 <b>BLACK TORCH</b> — Naya Episode!\n"
+        "\n"
+        "📌 Episode <b>5</b> (Hindi dub) aa chuka hai 🎉\n"
+        "📺 Platform: Crunchyroll\n"
+        "📈 Hindi dub: 5/12 episodes\n"
+        "⏱ 29 Sep 2026, 05:30 PM IST"
+    )
+    assert bot.sent[0]["text"] == expected, repr(bot.sent[0]["text"])
+    # ▶️ Watch button lag gaya
+    assert bot.sent[0]["kb"] is not None
+    assert "▶️ Watch" in bot.sent[0]["kb"].inline_keyboard[0][0].text
+    # DB update ho gaya -> agla pass dubara notify nahi karega
+    assert db.get_follow(4242, data.anime_id)["hi_count"] == 5
 
 
+def test_08b_no_notification_without_increase():
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    db.add_follow(4242, data.anime_id, data.title, ["hi"], jp_count=data.jp, hi_count=4, total_eps=12)
+    notifier = Notifier(aggregator=agg, db=db, bot=None)
+    sent = run(notifier.run_once())
+    assert sent == [], "count na badhe to notification nahi"
+
+
+# ===========================================================================
+# 9. /setep override — sabse high priority
+# ===========================================================================
+def test_09_setep_override():
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    before = run(agg.build_card_by_query("black torch", force=True))[1]
+    assert before.hi == 4
+
+    db.set_manual_fix(before.anime_id, "hi", 9, note="test", set_by=1)
+    after = run(agg.build_card(before.anime_id, force=True))
+    assert after.hi == 9, "manual override jeetna chahiye"
+    assert "Hindi dub: 9 episodes" in formatter.format_card(after)
+    assert db.get_manual_fix(before.anime_id) == {"hi": 9}
+
+    # override hatao -> real data wapas
+    db.delete_manual_fix(before.anime_id, "hi")
+    again = run(agg.build_card(before.anime_id, force=True))
+    assert again.hi == 4
+
+
+def test_09b_overrides_json_highest_priority(tmp_path=None):
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "overrides.json"
+        agg = make_aggregator()
+        data = run(agg.build_card_by_query("black torch", force=True))[1]
+        p.write_text(json.dumps({str(data.anime_id): {"hi": 7, "jp": 12}}), encoding="utf-8")
+        old = config.OVERRIDES_PATH
+        config.OVERRIDES_PATH = str(p)
+        try:
+            d2 = run(agg.build_card(data.anime_id, force=True))
+        finally:
+            config.OVERRIDES_PATH = old
+        assert d2.hi == 7
+
+
+# ===========================================================================
+# 10. Fuzzy search: "mushoko tensai" -> Mushoku Tensei
+# ===========================================================================
+def test_10_fuzzy_typo_tolerance():
+    agg = make_aggregator()
+    outcome = run(agg.resolve_search("mushoko tensai"))
+    assert outcome.chosen is not None, "typo ke baad bhi result milna chahiye"
+    assert "mushoku" in (outcome.chosen.romaji or "").lower()
+    assert outcome.matched_by.startswith("typo:")
+    assert outcome.suggestions, "suggestions bhi milni chahiye"
+
+    # galat-cheez guard: har word ~80% similar na ho to suggestion nahi
+    src = AniNidhiSource()
+    assert run(src.fuzzy_titles("mushoko tensai")), "mushoko tensai -> suggestions"
+    assert run(src.fuzzy_titles("zzzzzzz qqqqqqq")) == []
+
+
+# ===========================================================================
+# Extra: weekly math, YouTube parsing, negative cache, DB flow, formatter
+# ===========================================================================
+def test_11_weekly_math_and_past_guard():
+    # Black Torch: Crunchyroll 29 Aug 2026
+    prog = weekly_progress(date(2026, 8, 29), "Airing", 12, TODAY)
+    assert prog.episodes == 4
+    assert prog.next_date == date(2026, 9, 26)
+    assert prog.estimated is True
+
+    # start se pehle
+    prog0 = weekly_progress(date(2026, 10, 1), "Airing", 12, TODAY)
+    assert prog0.episodes == 0 and prog0.next_date == date(2026, 10, 1)
+
+    # complete
+    done = weekly_progress(date(2026, 4, 2), "Finished", 12, TODAY)
+    assert done.episodes == 12 and done.complete and done.next_date is None
+    assert done.complete_month == "Jun 2026"
+
+    # planned cap
+    capped = weekly_progress(date(2020, 1, 1), "Airing", 12, TODAY)
+    assert capped.episodes == 12
+
+    # weekly estimate kabhi past date nahi deta (formula hi future deta hai)
+    assert weekly_progress(date(2026, 8, 29), "Airing", None, date(2026, 9, 26)).next_date == date(2026, 10, 3)
+
+    # TBA / unknown
+    assert weekly_progress(None, "Airing", 12, TODAY).episodes is None
+    assert weekly_progress(date(2026, 12, 1), "TBA", 12, TODAY).episodes is None
+
+
+def test_11b_past_date_guard_on_card():
+    """Agar estimated date nikal chuki ho to card par 'To be announced' dikhega."""
+    from sources.aggregator import SeasonInfo
+
+    agg = make_aggregator()
+    stale = SeasonInfo(number=1, label="Season 1", planned=12, released=12,
+                       hi_count=6, hi_platforms=["Crunchyroll"], hi_status="Airing",
+                       hi_next=date(2026, 9, 1))          # ye date nikal chuki (today 22 Sep)
+    assert agg._hi_next_text(stale, TODAY) == "To be announced"
+
+    future = SeasonInfo(number=1, label="Season 1", planned=12, released=12,
+                        hi_count=4, hi_platforms=["Crunchyroll"], hi_status="Airing",
+                        hi_next=date(2026, 9, 26))
+    assert agg._hi_next_text(future, TODAY) == "26 Sep 2026 (estimated)"
+
+    nodub = SeasonInfo(number=1, label="Season 1", planned=12, released=12, jp_count=12)
+    assert agg._hi_next_text(nodub, TODAY) == "No official Hindi dub found"
+
+    done = SeasonInfo(number=1, label="Season 1", planned=12, released=12,
+                      hi_count=12, hi_platforms=["Crunchyroll"], hi_status="Finished",
+                      hi_complete_month="Jun 2026")
+    assert agg._hi_next_text(done, TODAY) == "All episodes released"
+
+
+def test_12_youtube_episode_extraction():
+    from sources.youtube import YTVideo
+
+    v1 = YTVideo("a", "BLACK TORCH - Episode 08 [EN Sub] | Muse IN", "", "")
+    assert v1.episode() == (8, None) and v1.is_hindi is False
+    v2 = YTVideo("b", "Black Torch Episode 4 Hindi Dub", "", "")
+    assert v2.episode() == (4, None) and v2.is_hindi is True
+    v3 = YTVideo("c", "[Hindi Dub] Campfire Cooking - Episode 22 (S2E10)", "", "")
+    assert v3.episode() == (10, 2) and v3.is_hindi is True
+    v4 = YTVideo("d", "JoJo's Bizarre Adventure (S3): Diamond is Unbreakable - Episode 20 [Hindi Dub]", "", "")
+    assert v4.episode() == (20, 3) and v4.is_hindi is True
+
+
+def test_12b_youtube_negative_cache(tmp_path=None):
+    """Handle resolve fail ho to 1 ghanta skip (warna har card 45s waste)."""
+    import tempfile
+
+    class Store:
+        def __init__(self):
+            self.data = {}
+
+        def get(self, key):
+            return self.data.get(key)
+
+        def set(self, key, value, ttl):
+            self.data[key] = value
+
+        def expired_negative(self, key):
+            return key in self.data and self.data[key] is None
+
+    store = Store()
+    yt = YouTubeSource(store=store)
+    calls = {"n": 0}
+
+    async def fail_resolve(handle):
+        calls["n"] += 1
+        return None
+
+    yt._resolve_handle = fail_resolve
+    got = run(yt.channel_id_for({"name": "Muse India", "handle": "MuseIndia"}))
+    assert got is None and calls["n"] == 1
+    got2 = run(yt.channel_id_for({"name": "Muse India", "handle": "MuseIndia"}))
+    assert got2 is None and calls["n"] == 1, "negative cache ke baad dobara resolve nahi hona chahiye"
+
+    # success permanent cache
+    async def ok_resolve(handle):
+        return "UCYYhAzgWuxPauRXdPpLAX3Q"
+
+    yt2 = YouTubeSource(store=store)
+    yt2._resolve_handle = ok_resolve
+    assert run(yt2.channel_id_for({"name": "Muse India", "handle": "MuseIndiaOK"})) == "UCYYhAzgWuxPauRXdPpLAX3Q"
+    assert store.data["yt:handle:museindiaok"] == "UCYYhAzgWuxPauRXdPpLAX3Q"
+
+
+def test_12c_youtube_can_raise_hindi_count():
+    """YouTube par asli episode dikha to count badhna chahiye (planned ke andar)."""
+    hits = [{"channel": "Muse India", "title": "Black Torch Episode 6 Hindi Dub",
+             "episode": 6, "season": None, "is_hindi": True, "url": "u", "published": "", "channel_id": "UC"}]
+    agg = make_aggregator(yt=FakeYouTube(hits))
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    assert data.hi == 6, data.hi
+    # AniNidhi (Crunchyroll) + YouTube evidence (Muse India) dono platform list me
+    assert data.hi_platforms == ["Crunchyroll", "Muse India"], data.hi_platforms
+
+
+def test_13_database_follow_flow():
+    db = Database(":memory:")
+    db.touch_user(1, "ram")
+    db.add_follow(1, 111, "Black Torch", ["hi", "jp"], jp_count=12, hi_count=4, total_eps=12)
+    assert db.follow_count() == 1
+    f = db.get_follow(1, 111)
+    assert f["langs"] == ["hi", "jp"] and f["hi_count"] == 4
+    db.set_lang_state(1, 111, ["en"])
+    assert db.get_lang_state(1, 111) == ["en"]
+    db.update_counts(1, 111, jp_count=12, hi_count=5)
+    assert db.get_follow(1, 111)["hi_count"] == 5
+    assert db.remove_follow(1, 111) is True
+    assert db.follow_count() == 0
+    assert db.get_lang_state(1, 111) is None
+    # cache
+    db.cache_set("k", "v", 60)
+    assert db.cache_get("k") == "v"
+    db.cache_set("neg", None, 60)
+    assert db.cache_get("neg") is None and db.expired_negative("neg") is True
+    assert db.stats()["users"] == 1
+
+
+def test_14_platform_canon():
+    from sources import platforms
+
+    assert platforms.canon("Anime Times (Prime Video)") == "anime-times"
+    assert platforms.canon("Amazon Prime Video") == "prime-video"
+    assert platforms.canon("Muse India") == "muse-india"
+    assert platforms.canon("crunchyroll") == "crunchyroll"
+    assert platforms.display("Anime Times (Prime Video)") == "Anime Times"
+    assert platforms.is_india_available("Crunchyroll") is True
+    assert platforms.is_india_available("Hulu") is False
+    assert platforms.dedupe_preserve(["Crunchyroll", "crunchyroll", "Netflix"]) == ["Crunchyroll", "Netflix"]
+
+
+def test_15_franchise_key_stripping():
+    assert franchise_key("Mushoku Tensei: Jobless Reincarnation Season 2 Part 2") == "mushoku tensei"
+    assert franchise_key("Grand Blue Dreaming Season 3") == "grand blue dreaming"
+    assert franchise_key("Demon Slayer: Kimetsu no Yaiba – Mugen Train Arc (Season 2 – Cour 1)") == "demon slayer"
+    assert franchise_key("Jujutsu Kaisen 2nd Season") == "jujutsu kaisen"
+    assert franchise_key("One Piece: Egghead Arc (Ep. 1089-1128)") == "one piece"
+
+
+def test_16_card_cache_sqlite():
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    d1 = run(agg.build_card_by_query("black torch", force=True))[1]
+    assert db.get_card(d1.anime_id) is not None
+    # cache hit (force=False)
+    d2 = run(agg.build_card(d1.anime_id))
+    assert isinstance(d2, CardData)
+    assert d2.hi == d1.hi and d2.title == d1.title
+    # round-trip me data lost nahi hona chahiye
+    restored = CardData.from_dict(json.loads(db.get_card(d1.anime_id)))
+    assert restored.next_hi_date == d1.next_hi_date
+    assert restored.seasons[0].hi_start == d1.seasons[0].hi_start
+
+
+def test_17_title_variants_for_aninidhi():
+    from sources.aninidhi_src import title_variants
+
+    v = title_variants(["Sparks of Tomorrow", "Nijusseiki Denki Mokuroku: Eureka Evrika", "二十世紀電氣目錄"])
+    assert v[0] == "Sparks of Tomorrow"
+    assert "Nijusseiki Denki Mokuroku" in v
+    # AniNidhi me English naam se record hai -> mil jaana chahiye
+    src = AniNidhiSource()
+    recs = run(src.lookup(["Sparks of Tomorrow", "Nijusseiki Denki Mokuroku: Eureka Evrika"]))
+    assert recs, "Sparks of Tomorrow ka Netflix Hindi dub milna chahiye"
+    assert any(r.display_platform == "Netflix" for r in recs)
+
+
+def test_18_optional_sources_disabled_by_default():
+    """dubinfo / anischedule configured nahi -> turant skip, koi latency nahi."""
+    from sources.anischedule import AniScheduleSource
+    from sources.dubinfo import DubInfoSource
+
+    assert DubInfoSource(base_url="").enabled is False
+    assert run(DubInfoSource(base_url="").lookup(["anything"])) == []
+    assert AniScheduleSource(token="").enabled is False
+    assert run(AniScheduleSource(token="").next_episode("anything")) is None
+
+
+def test_19_ist_formatting():
+    dt = datetime.fromtimestamp(1790506800, tz=timezone.utc)
+    assert config.ts_ist(dt) == "27 Sep 2026, 04:30 PM IST"
+    assert config.date_ist_short(date(2026, 9, 26)) == "26 Sep 2026"
+
+
+def test_20_version_tag_everywhere():
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("suzume", force=True))[1]
+    assert formatter.format_card(data).rstrip().endswith(f"🤖 {config.VERSION}")
+    assert config.VERSION in texts.VERSION_MSG.format(
+        version=config.VERSION, version_long=config.VERSION_LONG,
+        poll_minutes=20, ist_now="x"
+    )
+
+
+# ---------------------------------------------------------------------------
+# bina pytest ke chalane par bhi sab test chalein
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    asyncio.run(main())
+    failures = 0
+    tests = [(n, f) for n, f in sorted(globals().items()) if n.startswith("test_") and callable(f)]
+    for name, fn in tests:
+        try:
+            fn()
+            print(f"PASS  {name}")
+        except Exception as exc:  # noqa: BLE001
+            failures += 1
+            print(f"FAIL  {name}: {type(exc).__name__}: {exc}")
+    print(f"\n{len(tests) - failures}/{len(tests)} passed")
+    sys.exit(1 if failures else 0)
