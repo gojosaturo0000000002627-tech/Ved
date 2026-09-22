@@ -1,211 +1,431 @@
-"""AniNidhi — official Hindi dub tracker (PyPI: aninidhi).
-
-488+ anime ka Hindi dub record: Crunchyroll, Netflix, Prime Video, Muse India.
-Daily auto-refresh + offline snapshot fallback — koi API key nahi chahiye.
-
-Isse milta hai:
-  - Hindi dub kis platform par hai + kab start hua + status (Airing/Finished/TBA)
-  - Weekly release math -> kitne episodes aa chuke + next episode ki date
-  - Upcoming dubs -> "Starts 4 Oct 2026" (future release date)
-
-NOTE: aninidhi.search() apne andar prefix-match karta hai, isliye hum
-season-suffix hata kar multiple variants try karte hain (e.g.
-"Jujutsu Kaisen 2nd Season" -> base "Jujutsu Kaisen" -> season-aware match).
 """
+sources/aninidhi_src.py — Hindi dub ka REAL database (PyPI package `aninidhi`).
+
+`aninidhi` 488+ real records deta hai (platform + release_date + status), no API key.
+Package khud ek hosted dataset se daily refresh karta hai aur offline me bundled
+snapshot par fallback karta hai — isliye ye source kabhi hard-fail nahi hota.
+
+Yahan hum:
+  * list_all() ko 6 ghante cache karte hain (network call hai)
+  * title variants try karte hain: English -> Romaji -> Native (+ colon-prefix variants)
+  * AniNidhi title se season/cour parse karte hain ("(Season 2 Cour 1)" -> S2)
+  * weekly math karte hain: dub start + 7-din interval = kitne episode aa chuke
+"""
+from __future__ import annotations
+
+import asyncio
+import difflib
+import logging
 import re
 import time
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 
-# list_all() ka cache — 488 records ka network call har baar nahi karna
-# chahiye. Not-found fallback isse bahut baar chalta hai (e.g. Dark Gathering).
-_LIST_TTL = 6 * 3600  # 6 ghante
-_list_cache: dict = {"ts": 0.0, "data": None}
+import config
+from sources import platforms
+
+log = logging.getLogger("aninidhi")
+
+try:  # real package; tests me bhi yahi use hota hai
+    import aninidhi
+except ImportError:  # pragma: no cover - package requirements me hai
+    aninidhi = None
+    log.warning("aninidhi package install nahi hai — Hindi dub data nahi milega")
+
+# ---------------------------------------------------------------------------
+# Season / cour parsing
+# ---------------------------------------------------------------------------
+_ORDINALS = {"1st": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5, "6th": 6, "7th": 7, "8th": 8}
+_ROMAN = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5, "vi": 6, "vii": 7, "viii": 8, "ix": 9, "x": 10}
+
+_RE_SEASON_NUM = re.compile(r"season\s*[-–—]?\s*(\d{1,2})", re.I)
+_RE_ORDINAL_SEASON = re.compile(r"(\dst|\dnd|\drd|\dth)\s+season", re.I)
+_RE_COUR = re.compile(r"(?:cour|part|cours)\s*[-–—]?\s*(\d{1,2})", re.I)
+_RE_ROMAN = re.compile(r"\b([ivx]{1,5})\b(?=\s*[:–—-]|\s*$)", re.I)
+_RE_SEASON_WORD_TAIL = re.compile(r"\bseason\s*(\d{1,2})\b", re.I)
+_PAREN = re.compile(r"\(([^)]*)\)\s*$")
 
 
-def list_all_cached() -> list:
-    """aninidhi.list_all() — 6 ghante cache ke saath."""
-    try:
-        import aninidhi
-    except ImportError:
-        return []
-    now = time.time()
-    if _list_cache["data"] is None or now - _list_cache["ts"] > _LIST_TTL:
-        try:
-            _list_cache["data"] = aninidhi.list_all() or []
-            _list_cache["ts"] = now
-        except Exception:
-            pass
-    return _list_cache["data"] or []
-
-
-def _norm(s: str) -> str:
-    """Sirf alphanumeric, sab lowercase — spacing/punctuation sab ignore."""
-    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
-
-
-def _words(s: str) -> list:
-    return [w for w in re.sub(r"[^a-z0-9\s]", " ", (s or "").lower()).split()
-            if len(w) > 1]
-
-
-def _season_num(title: str) -> int | None:
-    """'Jujutsu Kaisen 2nd Season' / 'Blue Box (Season 2)' -> 2"""
-    m = re.search(r"(?:season|part|cour)\s*(\d+)", title, re.IGNORECASE)
-    if m:
-        return int(m.group(1))
-    m = re.search(r"(\d+)(?:st|nd|rd|th)\s+(?:season|part|cour)", title,
-                  re.IGNORECASE)
-    if m:
-        return int(m.group(1))
-    words = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5,
-             "sixth": 6, "seventh": 7}
-    m = re.search(r"\b(" + "|".join(words) + r")\s+(?:season|part)",
-                  title, re.IGNORECASE)
-    if m:
-        return words[m.group(1).lower()]
-    return None
-
-
-def _title_variants(title: str) -> list:
-    """'Mushoku Tensei: Jobless Reincarnation Season 3' ->
-    ['...Season 3', '...Reincarnation', 'Mushoku Tensei']
-
-    1. Original naam
-    2. Season/part/cour suffix hata kar
-    3. Colon se pehle wala hissa (subtitle hata kar) — aninidhi ka
-       search lambe official naam pe fail hota hai, chhota naam chahiye
+def parse_season(title: str, default_one: bool = True) -> tuple[str, int | None, int | None, str | None]:
     """
-    v = [title]
-    for pat in (r"\s*[\(\[]?\s*(?:season|part|cour)\s*\d+[^\)\]]*[\)\]]?\s*$",
-                r"\s*[-–—:]\s*(?:season|part|cour)\s*\d+.*$",
-                r"\s*\d+(?:st|nd|rd|th)\s+(?:season|part|cour).*$"):
-        s = re.sub(pat, "", title, flags=re.IGNORECASE).strip(" -–—:")
-        if s and s.lower() != title.lower() and s not in v:
-            v.append(s)
-    # Colon-prefix: "Mushoku Tensei: Jobless Reincarnation" -> "Mushoku Tensei"
-    extra = []
-    for t in v:
-        if ":" in t:
-            pre = t.split(":")[0].strip(" -–—")
-            if len(pre) >= 3 and pre not in v and pre not in extra:
-                extra.append(pre)
-    v.extend(extra)
-    return v
+    AniNidhi/AniList title -> (base_title, season_number, cour, kind)
 
-
-def _strip_season(s: str) -> str:
-    """'Jujutsu Kaisen 2nd Season' / 'Jujutsu Kaisen (Season 2)' -> 'Jujutsu Kaisen'"""
-    s = re.sub(r"\([^)]*(?:season|cour|part)[^)]*\)", " ", s, flags=re.IGNORECASE)
-    s = re.sub(r"\b\d+(?:st|nd|rd|th)\s+(?:season|part|cour)\b", " ", s,
-               flags=re.IGNORECASE)
-    s = re.sub(r"\b(?:season|cour|part)\s*\d+\b", " ", s, flags=re.IGNORECASE)
-    return s.strip(" -–—:")
-
-
-def _best_match(records: list, query: str) -> dict | None:
-    """Normalized title match — season awareness ke saath.
-
-    Season suffix dono taraf strip hota hai (query aur record), phir
-    season number se bonus/penalty — taki '2nd Season' wala query
-    '(Season 2)' record se hi mile, kisi aur season se nahi.
+    kind: 'series' | 'movie' | 'ova' | 'special' | None
+    Example:
+      'Mushoku Tensei (Season 2 Cour 1)' -> ('Mushoku Tensei', 2, 1, 'series')
+      'Suzume (Movie)'                   -> ('Suzume', None, None, 'movie')
+      'Black Torch'                      -> ('Black Torch', 1, None, 'series')
     """
-    if not records:
-        return None
-    qs = _norm(_strip_season(query))
-    qw = _words(_strip_season(query))
-    qseason = _season_num(query)
-    best, best_score = None, -1
-    for r in records:
-        t = r.get("title") or ""
-        ts = _norm(_strip_season(t))
-        if not ts:
-            continue
-        if qs and ts == qs:
-            score = 100
-        elif qs and (qs in ts or ts in qs):
-            score = 75
-        elif qw and all(w in ts for w in qw):
-            score = 60
+    raw = (title or "").strip()
+    base = raw
+    marker = ""
+    m = _PAREN.search(raw)
+    if m:
+        marker = m.group(1)
+        base = raw[: m.start()].strip()
+
+    blob = f"{base} {marker}"
+    kind: str | None = None
+    low = marker.lower()
+    if "movie" in low or "film" in low:
+        kind = "movie"
+    elif "ova" in low or "ona" in low:
+        kind = "ova"
+    elif "special" in low or "recap" in low:
+        kind = "special"
+
+    season: int | None = None
+    sm = _RE_SEASON_NUM.search(marker) or _RE_SEASON_NUM.search(base)
+    if sm:
+        season = int(sm.group(1))
+    else:
+        om = _RE_ORDINAL_SEASON.search(marker) or _RE_ORDINAL_SEASON.search(base)
+        if om:
+            season = _ORDINALS.get(om.group(1).lower())
         else:
-            continue
-        tseason = _season_num(t)
-        if qseason is not None and tseason is not None:
-            score += 10 if qseason == tseason else -25
-        elif qseason is not None and tseason is None:
-            score -= 5
-        if score > best_score:
-            best, best_score = r, score
-    return best
+            # "Mushoku Tensei II: ..." / "Grand Blue Season 3" style roman numeral
+            rm = _RE_ROMAN.search(base)
+            if rm and rm.group(1).lower() in _ROMAN and rm.group(1).lower() != "i":
+                season = _ROMAN[rm.group(1).lower()]
+            else:
+                sm2 = _RE_SEASON_WORD_TAIL.search(base)
+                if sm2:
+                    season = int(sm2.group(1))
+
+    cour: int | None = None
+    cm = _RE_COUR.search(marker) or _RE_COUR.search(base)
+    if cm:
+        cour = int(cm.group(1))
+
+    # "(Ep. 1089-1128)" jaise arc batches — season marker nahi hai
+    if season is None and default_one and not marker.strip():
+        season = 1  # plain base title = pehla season (AniNidhi records ke liye)
+    return base, season, cour, kind
 
 
-def hindi_dub_status(query: str, total: int | None = None) -> dict | None:
-    """Anime ka Hindi dub status.
-
-    Return (None = source error):
-      {"found": True, "platforms": [...], "eps": int|None, "next": date|None,
-       "finished": bool, "upcoming": date|None, "announced": bool}
-      ya {"found": False} — record nahi mila (official dub unknown)
+def franchise_key(title: str) -> str:
     """
-    try:
-        import aninidhi
-    except ImportError:
-        print("[aninidhi] package installed nahi hai (pip install aninidhi)")
-        return None
+    Title se season/part/cour/colon-prefix/dash-subtitle markers hata ke ek key.
+    'Mushoku Tensei: Jobless Reincarnation Season 2 Part 2' -> 'mushoku tensei'
+    'Grand Blue Dreaming Season 3'                          -> 'grand blue dreaming'
+    """
+    t = (title or "").lower()
+    t = _PAREN.sub(" ", t)                      # (Season 2 Cour 1) hatao
+    t = t.split(":")[0]                          # colon prefix/suffix
+    t = re.split(r"\s[–—-]\s", t)[0]             # " – Mugen Train Arc"
+    # "Season 3" / "Part 2" / "Cour 2" ko number ke saath hatao
+    t = re.sub(r"\b(?:season|part|cour|cours|stage)\s*[-–—]?\s*\d{1,2}\b", " ", t)
+    t = re.sub(r"\b(the|movie|film|ova|ona|special|tv|arc|cour|cours|part|season|stage|episode|ep)\b", " ", t)
+    t = re.sub(r"\b(1st|2nd|3rd|\d{1,2}(st|nd|rd|th))\b", " ", t)
+    t = re.sub(r"\b[ivx]{1,5}\b", " ", t)        # roman numerals
+    t = re.sub(r"[^a-z0-9]+", " ", t)
+    t = t.strip()
+    # aakhri me bacha hua bare number ("grand blue dreaming 3") bhi hatao —
+    # par agar title sirf number hai ("86") to usse chhedna nahi
+    stripped = re.sub(r"\s\d{1,2}$", "", t).strip()
+    return stripped or t
 
-    rec = None
-    try:
-        for variant in _title_variants(query):
-            records = aninidhi.search(variant) or []
-            rec = _best_match(records, query)
-            if rec:
-                break
-    except Exception as e:
-        print(f"[aninidhi] search fail: {e}")
-    if not rec:
-        # Fallback: poore dataset me khud match karo
-        # (aninidhi ka search kabhi-kabhi lambe naam pe miss kar deta hai)
-        try:
-            rec = _best_match(list_all_cached(), query)
-        except Exception:
-            rec = None
-    if not rec or not rec.get("hindi_available"):
-        return {"found": False}
 
-    today = date.today()
-    out = {"found": True, "platforms": [], "eps": None, "next": None,
-           "finished": False, "upcoming": None, "announced": False,
-           "record": rec}
-    for d in rec.get("hindi_dubs") or []:
-        rd = _to_date(d.get("release_date"))
-        st = (d.get("status") or "").strip()
-        out["platforms"].append({
-            "platform": d.get("platform"),
-            "release_date": str(d.get("release_date") or ""),
-            "status": st,
-        })
-        if st.lower() == "finished":
-            out["finished"] = True
+def title_variants(titles: list[str]) -> list[str]:
+    """
+    AniNidhi lookup ke liye variants, order me:
+      English -> Romaji -> Native, aur har ek ka colon-prefix chhota roop.
+    ('Sparks of Tomorrow' chalta hai, 'Nijusseiki Denki Mokuroku: Eureka Evrika' nahi.)
+    """
+    out: list[str] = []
+    for t in titles:
+        if not t:
             continue
-        if rd and rd > today:
-            # Future release — upcoming dub
-            if out["upcoming"] is None or rd < out["upcoming"]:
-                out["upcoming"] = rd
-            continue
-        if st.lower() in ("tba", "announced", "upcoming"):
-            out["announced"] = True
-            continue
-        if st.lower() in ("airing", "ongoing") and rd and rd <= today:
-            days = (today - rd).days
-            eps = days // 7 + 1
-            if total:
-                eps = min(eps, total)
-            out["eps"] = max(out["eps"] or 0, eps)
-            out["next"] = rd + timedelta(days=7 * (days // 7 + 1))
+        t = t.strip()
+        if t not in out:
+            out.append(t)
+        # "Mushoku Tensei: Jobless Reincarnation Season 3" -> "Mushoku Tensei"
+        if ":" in t:
+            head = t.split(":")[0].strip()
+            if head and head not in out:
+                out.append(head)
+        # "Grand Blue Dreaming Season 2" -> "Grand Blue Dreaming"
+        stripped = re.sub(r"\b(season|part|cour|cours)\s*[-–—]?\s*\d{1,2}\b", " ", t, flags=re.I)
+        stripped = re.sub(r"\s+", " ", stripped).strip()
+        if stripped and stripped != t and stripped not in out:
+            out.append(stripped)
+        # parenthetical hata ke
+        noparen = _PAREN.sub("", t).strip()
+        if noparen and noparen not in out:
+            out.append(noparen)
     return out
 
 
-def _to_date(s):
-    try:
-        return date.fromisoformat(str(s))
-    except (TypeError, ValueError):
+# ---------------------------------------------------------------------------
+# Dub records
+# ---------------------------------------------------------------------------
+@dataclass
+class DubRecord:
+    platform: str
+    display_platform: str
+    release_date: date | None
+    status: str          # Airing / Finished / TBA / Removed
+    media_type: str      # series / movie
+    aninidhi_title: str
+    season: int | None
+    cour: int | None
+
+    @property
+    def usable(self) -> bool:
+        """Removed = platform se hata diya gaya, isliye usable nahi."""
+        return self.status.lower() != "removed" and self.release_date is not None
+
+
+@dataclass
+class SeasonDub:
+    season: int | None
+    records: list[DubRecord] = field(default_factory=list)
+    matched_title: str | None = None
+
+    @property
+    def start(self) -> date | None:
+        """Dub kab shuru hua — sabse pehla usable platform."""
+        dates = [r.release_date for r in self.records if r.usable]
+        return min(dates) if dates else None
+
+    @property
+    def platforms(self) -> list[str]:
+        return platforms.dedupe_preserve([r.display_platform for r in self.records if r.usable])
+
+    def platform_for_status(self, status: str | None = None) -> list[str]:
+        want = (status or "").lower()
+        return platforms.dedupe_preserve(
+            [r.display_platform for r in self.records if r.usable and (not want or r.status.lower() == want)]
+        )
+
+
+def parse_date(s: str | None) -> date | None:
+    if not s:
         return None
+    try:
+        return date.fromisoformat(str(s)[:10])
+    except ValueError:
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Weekly math — dub start + 7 din = episodes released
+# ---------------------------------------------------------------------------
+@dataclass
+class DubProgress:
+    episodes: int | None = None
+    next_date: date | None = None
+    complete: bool = False
+    complete_month: str | None = None      # "Jun 2026"
+    status: str | None = None
+    platforms: list[str] = field(default_factory=list)
+    estimated: bool = False
+
+    @property
+    def known(self) -> bool:
+        return self.episodes is not None
+
+
+def weekly_progress(
+    start: date | None,
+    status: str | None,
+    planned_total: int | None,
+    today: date,
+) -> DubProgress:
+    """
+    Dub start date + 7-din interval se episodes released.
+
+    Rules:
+      * start None / TBA      -> kuch nahi pata (kabhi guess nahi)
+      * today < start         -> 0 episode, next = start
+      * status Finished       -> planned_total (pata ho to), warna weekly math
+      * planned cap           -> weekly math kabhi planned se upar nahi jaata
+      * Past-date guard       -> next date nikal chuka ho to None (card par 'To be announced')
+    """
+    out = DubProgress(status=status)
+    if start is None:
+        return out
+
+    if (status or "").lower() == "tba":
+        out.next_date = start
+        return out
+
+    if today < start:
+        out.episodes = 0
+        out.next_date = start
+        return out
+
+    weeks = (today - start).days // 7
+    n = weeks + 1
+    complete = False
+    if planned_total and n >= planned_total:
+        n = planned_total
+        complete = True
+    if (status or "").lower() == "finished":
+        complete = True
+        if planned_total:
+            n = planned_total
+        else:
+            # dub complete hai, par total episodes ka koi real record nahi —
+            # weekly math se fake number banana forbidden hai
+            n = None
+
+    out.episodes = n
+    out.complete = complete
+    if complete:
+        # completion month = start + 7*(total-1) — real start date se derived
+        if planned_total:
+            end = start + timedelta(days=7 * (planned_total - 1))
+            out.complete_month = end.strftime("%b %Y")
+        out.next_date = None
+    else:
+        nxt = start + timedelta(days=7 * n)
+        # Past-date guard: estimate nikal chuka hai to honest answer do
+        out.next_date = None if nxt <= today else nxt
+        out.estimated = True
+    return out
+
+
+# ---------------------------------------------------------------------------
+# AniNidhi wrapper + 6h cache
+# ---------------------------------------------------------------------------
+class AniNidhiSource:
+    def __init__(self) -> None:
+        self._all: list[dict] | None = None
+        self._fetched_at: float = 0.0
+        self._fuzzy_titles: list[str] | None = None
+        self._lock = asyncio.Lock()
+
+    # -- raw dataset ---------------------------------------------------------
+    def _load_sync(self) -> list[dict]:
+        """Blocking network call — hamesha thread me chalao."""
+        if aninidhi is None:
+            return []
+        return list(aninidhi.list_all() or [])
+
+    async def all_records(self, force: bool = False) -> list[dict]:
+        """list_all() ka 6-ghante cache."""
+        if not force and self._all is not None and (time.time() - self._fetched_at) < config.ANINIDHI_TTL:
+            return self._all
+        async with self._lock:
+            if not force and self._all is not None and (time.time() - self._fetched_at) < config.ANINIDHI_TTL:
+                return self._all
+            data = await asyncio.wait_for(
+                asyncio.to_thread(self._load_sync), timeout=config.DUB_LOOKUP_TIMEOUT
+            )
+            self._all = data
+            self._fetched_at = time.time()
+            self._fuzzy_titles = None
+            return data
+
+    def cached_count(self) -> int:
+        return len(self._all or [])
+
+    async def age_seconds(self) -> float | None:
+        return None if not self._fetched_at else time.time() - self._fetched_at
+
+    # -- records -> DubRecord -------------------------------------------------
+    def _to_records(self, rows: list[dict]) -> list[DubRecord]:
+        recs: list[DubRecord] = []
+        for row in rows:
+            title = row.get("title") or ""
+            base, season, cour, kind = parse_season(title)
+            for d in row.get("hindi_dubs") or []:
+                plat = d.get("platform")
+                if not plat:
+                    continue
+                recs.append(
+                    DubRecord(
+                        platform=platforms.canon(plat) or plat.lower(),
+                        display_platform=platforms.display(plat),
+                        release_date=parse_date(d.get("release_date")),
+                        status=(d.get("status") or "TBA").strip(),
+                        media_type=(d.get("media_type") or kind or "series"),
+                        aninidhi_title=title,
+                        season=season,
+                        cour=cour,
+                    )
+                )
+        return recs
+
+    # -- main lookup ---------------------------------------------------------
+    async def lookup(self, titles: list[str], timeout: float | None = None) -> list[DubRecord]:
+        """
+        Title variants try karke matching AniNidhi records dhundho.
+        Franchise key par match hota hai taaki "(Season 2 Cour 1)" jaise
+        suffix wale records bhi pakde jaayein.
+        """
+        limit = timeout or config.DUB_LOOKUP_TIMEOUT
+        try:
+            rows = await asyncio.wait_for(self.all_records(), timeout=limit)
+        except asyncio.TimeoutError:
+            log.warning("AniNidhi lookup timeout (%ss) — Hindi dub data skip", limit)
+            return []
+
+        variants = title_variants(titles)
+        keys = {franchise_key(v) for v in variants}
+        keys.discard("")
+        picked: dict[str, dict] = {}
+        for row in rows:
+            rtitle = row.get("title") or ""
+            rkey = franchise_key(rtitle)
+            if not rkey:
+                continue
+            # exact key match ya variant ka substring match (AniNidhi ke chhote titles ke liye)
+            hit = rkey in keys
+            if not hit:
+                for v in variants:
+                    vk = franchise_key(v)
+                    if vk and (vk == rkey or vk.startswith(rkey + " ") or rkey.startswith(vk + " ")):
+                        hit = True
+                        break
+            if hit:
+                picked[rtitle] = row
+        return self._to_records(list(picked.values()))
+
+    async def group_by_season(self, titles: list[str]) -> dict[int | None, SeasonDub]:
+        """Records ko season number par group karo."""
+        recs = await self.lookup(titles)
+        groups: dict[int | None, SeasonDub] = {}
+        for r in recs:
+            g = groups.setdefault(r.season, SeasonDub(season=r.season))
+            g.records.append(r)
+            g.matched_title = g.matched_title or r.aninidhi_title
+        return groups
+
+    # -- fuzzy (typo tolerance) ---------------------------------------------
+    async def fuzzy_titles(self, query: str, cutoff: float | None = None) -> list[str]:
+        """
+        'mushoko tensai' -> ['Mushoku Tensei (Season 1)', ...]
+        Har word ~80% similar ho to hi accept (warna garbage aayega).
+        """
+        rows = await self.all_records()
+        if self._fuzzy_titles is None:
+            self._fuzzy_titles = sorted({(r.get("title") or "") for r in rows if r.get("title")})
+        cut = cutoff or config.FUZZY_CUTOFF
+        qwords = [w for w in re.split(r"[^a-z0-9]+", query.lower()) if len(w) >= 3]
+        if not qwords:
+            return []
+        good: list[tuple[float, str]] = []
+        for t in self._fuzzy_titles:
+            base, _s, _c, _k = parse_season(t)
+            candidates = {franchise_key(t), franchise_key(base)}
+            best_word_score = 1.0
+            matched_words = 0
+            for w in qwords:
+                score = max(
+                    difflib.SequenceMatcher(None, w, tw).ratio()
+                    for cand in candidates
+                    for tw in cand.split()
+                ) if candidates else 0.0
+                if score >= cut:
+                    matched_words += 1
+                best_word_score = min(best_word_score, score)
+            if matched_words == len(qwords) and best_word_score >= cut:
+                good.append((best_word_score, t))
+        good.sort(reverse=True)
+        return [t for _s, t in good[:10]]
+
+
+# module-level singleton
+source = AniNidhiSource()

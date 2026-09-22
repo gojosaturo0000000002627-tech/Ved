@@ -1,86 +1,108 @@
-"""AnimeSchedule.net API v3 — dub premieres, air times, streaming platforms.
-
-Docs: https://animeschedule.net/api/v3/documentation
-Token chahiye: account banao -> Settings -> API -> app create -> Bearer token.
-Token na ho to ye source skip ho jata hai (bot AniList + dub-info se kaam chalata hai).
 """
-import asyncio
+sources/anischedule.py — OPTIONAL AnimeSchedule API (token chahiye).
+
+Sirf tab active jab ANISCHEDULE_TOKEN set ho. Iska kaam sirf itna hai:
+AniList ke `nextAiringEpisode` ko corroborate karna (kabhi override nahi).
+
+NOTE: ye optional integration hai. Agar aapka token plan endpoints ka shape
+alag deta hai to _parse() silently None dega aur card AniList par hi chalega —
+koi galat data nahi dikhega.
+"""
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass
+from datetime import datetime, timezone
 
 import httpx
 
-BASE = "https://animeschedule.net/api/v3"
+import config
 
-STATUS_MAP = {"Finished": "Completed ✅ (sab episodes release ho chuke)",
-              "Ongoing": "Ongoing", "Delayed": "Delayed (rukka hua)",
-              "Upcoming": "Upcoming (abhi shuru nahi hua)"}
+log = logging.getLogger("anischedule")
 
 
-def _headers(token: str) -> dict:
-    h = {"Accept": "application/json"}
-    if token:
-        h["Authorization"] = f"Bearer {token}"
-    return h
+@dataclass
+class ScheduleEpisode:
+    number: int | None
+    air_date: datetime | None
+    title: str | None
 
 
-async def _get(path: str, params: dict | None, token: str):
-    if not token:
-        return None  # token ke bina private endpoint 401 deta hai
-    last_err = None
-    for attempt in range(3):
+class AniScheduleSource:
+    def __init__(self, token: str | None = None, base_url: str | None = None, timeout: float | None = None):
+        self.token = (token if token is not None else config.ANISCHEDULE_TOKEN).strip()
+        self.base_url = (base_url if base_url is not None else config.ANISCHEDULE_URL).rstrip("/")
+        self.timeout = timeout or config.OPTIONAL_SOURCE_TIMEOUT
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.token)
+
+    def _headers(self) -> dict:
+        return {
+            "Authorization": f"Bearer {self.token}",
+            "User-Agent": config.USER_AGENT,
+            "Accept": "application/json",
+        }
+
+    async def search_id(self, query: str) -> str | None:
+        if not self.enabled:
+            return None
         try:
-            async with httpx.AsyncClient() as client:
-                r = await client.get(BASE + path, params=params,
-                                     headers=_headers(token), timeout=20)
-                if r.status_code in (401, 403):
-                    return None  # token galat — silently skip
-                r.raise_for_status()
-                return r.json()
-        except (httpx.HTTPError, ValueError) as e:
-            last_err = e
-            await asyncio.sleep(2 * (attempt + 1))
-    if last_err:
-        print(f"[anischedule] request failed: {last_err}")
-    return None
-
-
-def _parse(a: dict) -> dict:
-    """AnimeSchedule anime object -> unified dict."""
-    websites = a.get("websites") or {}
-    streams = []
-    for s in websites.get("streams") or []:
-        label = s.get("label") or ""
-        streams.append({
-            "platform": s.get("platform") or s.get("site"),
-            "url": s.get("url"),
-            "label": label,
-            "is_dub": "dub" in label.lower(),
-        })
-    return {
-        "slug": a.get("route"),
-        "title": a.get("title"),
-        "status": a.get("status"),
-        "status_display": STATUS_MAP.get(a.get("status", ""), a.get("status", "?")),
-        "episodes": a.get("episodes") or None,
-        "jp_premier": a.get("premier"),
-        "sub_premier": a.get("subPremier"),
-        "dub_premier": a.get("dubPremier"),   # English dub ka
-        "dub_time": a.get("dubTime"),
-        "jpn_time": a.get("jpnTime"),
-        "sub_time": a.get("subTime"),
-        "streams": streams,
-        "updated_at": a.get("updatedAt"),
-    }
-
-
-async def search_anime(query: str, token: str) -> list:
-    data = await _get("/anime", {"q": query}, token)
-    if not isinstance(data, list):
-        return []
-    return [_parse(a) for a in data[:8]]
-
-
-async def get_anime(slug: str, token: str) -> dict | None:
-    data = await _get(f"/anime/{slug}", None, token)
-    if not isinstance(data, dict):
+            async with httpx.AsyncClient(timeout=self.timeout, headers=self._headers()) as c:
+                resp = await c.get(f"{self.base_url}/animes/search/{query}")
+                if resp.status_code != 200:
+                    return None
+                data = resp.json()
+        except Exception as exc:
+            log.info("anischedule search fail: %s", exc)
+            return None
+        rows = data.get("data") if isinstance(data, dict) else data
+        if isinstance(rows, list) and rows:
+            return rows[0].get("id")
         return None
-    return _parse(data)
+
+    async def next_episode(self, query: str) -> ScheduleEpisode | None:
+        """Agla episode kab aa raha hai (UTC)."""
+        if not self.enabled:
+            return None
+        anime_id = await self.search_id(query)
+        if not anime_id:
+            return None
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout, headers=self._headers()) as c:
+                resp = await c.get(f"{self.base_url}/animes/{anime_id}/episodes")
+                if resp.status_code != 200:
+                    return None
+                data = resp.json()
+        except Exception as exc:
+            log.info("anischedule episodes fail: %s", exc)
+            return None
+        rows = data.get("data") if isinstance(data, dict) else data
+        if not isinstance(rows, list):
+            return None
+        now = datetime.now(timezone.utc)
+        upcoming = []
+        for ep in rows:
+            if not isinstance(ep, dict):
+                continue
+            number = ep.get("number") or ep.get("episodeNumber")
+            raw = ep.get("airDateTime") or ep.get("airDate") or ep.get("airdate")
+            dt = None
+            if raw:
+                try:
+                    dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                except ValueError:
+                    dt = None
+            if dt and dt >= now:
+                upcoming.append((dt, int(number) if isinstance(number, (int, float)) else None, ep.get("title")))
+        if not upcoming:
+            return None
+        upcoming.sort(key=lambda x: x[0])
+        dt, number, title = upcoming[0]
+        return ScheduleEpisode(number=number, air_date=dt, title=title)
+
+
+source = AniScheduleSource()

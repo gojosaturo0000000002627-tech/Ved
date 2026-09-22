@@ -1,143 +1,111 @@
-"""anime-dub-info API (self-hosted) — Hindi/Indian dub episode counts.
-
-Ye ek open-source project hai (github.com/sama511/anime-dub-info) jo
-Crunchyroll, Netflix, Prime Video, Anime Times, JioHotstar, ZEE5, MX Player,
-Muse India, Ani-One — sab par dub episode counts track karta hai.
-
-Public instance kabhi up kabhi down rehti hai, isliye DUB_INFO_API env
-mein apni instance ka URL daalo (README mein deploy guide hai).
-Response shape tolerant parse ki jati hai — alag forks thode different hain.
 """
-import asyncio
+sources/dubinfo.py — OPTIONAL self-hosted anime-dub-info API.
+
+Sirf tab active jab DUBINFO_URL set ho. Warna `enabled` False aur sab kuch khaali,
+taki card bina kisi extra latency ke ban jaaye.
+
+Expected response (defensively parse hota hai — koi bhi field missing ho sakta hai):
+    GET {DUBINFO_URL}/anime/{query}
+    {
+      "results": [
+        {"title": "Black Torch",
+         "dubs": [{"language": "Hindi", "episodes": 4, "platform": "Crunchyroll",
+                   "next_episode": "2026-09-26", "url": "..."}]}
+      ]
+    }
+"""
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass
+from datetime import date
 
 import httpx
 
-from .platforms import canon_platform, platform_region
+import config
+from sources import platforms
+
+log = logging.getLogger("dubinfo")
+
+_LANGS = ("hindi", "english", "japanese")
 
 
-async def _get_json(client: httpx.AsyncClient, url: str):
-    r = await client.get(url, timeout=20)
-    if r.status_code >= 400:
-        return None
-    try:
-        return r.json()
-    except ValueError:
-        return None
+@dataclass
+class DubInfoResult:
+    language: str                    # 'hindi' | 'english' | 'japanese'
+    episodes: int | None
+    platform: str | None
+    url: str | None
+    next_episode: date | None
 
 
-def _parse_languages(lang_list) -> dict:
-    """[{language: "Hindi", total_released_episodes: 3, latest_episode_added: ...}]
-    -> {"hi": {"released": 3, "latest": iso-date}}"""
-    out = {}
-    if not isinstance(lang_list, list):
-        return out
-    for l in lang_list:
-        if not isinstance(l, dict):
-            continue
-        name = (l.get("language") or l.get("lang") or "").lower()
-        if "hindi" in name:
-            code = "hi"
-        elif "english" in name:
-            code = "en"
-        elif "japanese" in name or "raw" in name:
-            code = "jp"
+class DubInfoSource:
+    """Self-hosted dub API ka patla wrapper. Unconfigured = no-op."""
+
+    def __init__(self, base_url: str | None = None, timeout: float | None = None):
+        self.base_url = (base_url if base_url is not None else config.DUBINFO_URL).rstrip("/")
+        self.timeout = timeout or config.OPTIONAL_SOURCE_TIMEOUT
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.base_url)
+
+    async def lookup(self, titles: list[str]) -> list[DubInfoResult]:
+        """English -> Romaji -> Native variants try karo. Fail = khaali list."""
+        if not self.enabled:
+            return []
+        for title in titles[:3]:
+            try:
+                async with httpx.AsyncClient(
+                    timeout=self.timeout, headers={"User-Agent": config.USER_AGENT}
+                ) as c:
+                    resp = await c.get(f"{self.base_url}/anime/{title}")
+                    if resp.status_code != 200:
+                        continue
+                    parsed = self._parse(resp.json())
+            except Exception as exc:
+                log.info("dubinfo fail (%s): %s", title, exc)
+                continue
+            if parsed:
+                return parsed
+        return []
+
+    @staticmethod
+    def _parse(payload) -> list[DubInfoResult]:
+        """JSON -> DubInfoResult list. Unknown shape = khaali list (kabhi guess nahi)."""
+        if isinstance(payload, dict):
+            results = payload.get("results")
+            if not isinstance(results, list):
+                results = [payload] if payload.get("dubs") else []
         else:
-            continue
-        released = (l.get("total_released_episodes")
-                   or l.get("totalReleasedEpisodes")
-                   or l.get("episodes")
-                   or 0)
-        try:
-            released = int(released)
-        except (TypeError, ValueError):
-            released = 0
-        out[code] = {
-            "released": released,
-            "latest": (l.get("latest_episode_added")
-                       or l.get("latestEpisodeAdded")),
-        }
-    return out
+            return []
+
+        out: list[DubInfoResult] = []
+        for row in results:
+            if not isinstance(row, dict):
+                continue
+            for dub in row.get("dubs") or []:
+                if not isinstance(dub, dict):
+                    continue
+                lang = str(dub.get("language") or "").strip().lower()
+                if lang not in _LANGS:
+                    continue
+                eps = dub.get("episodes")
+                raw_next = dub.get("next_episode") or dub.get("next")
+                try:
+                    next_date = date.fromisoformat(str(raw_next)[:10]) if raw_next else None
+                except (ValueError, TypeError):
+                    next_date = None
+                out.append(
+                    DubInfoResult(
+                        language=lang,
+                        episodes=int(eps) if isinstance(eps, (int, float)) else None,
+                        platform=platforms.display(dub.get("platform")) if dub.get("platform") else None,
+                        url=dub.get("url"),
+                        next_episode=next_date,
+                    )
+                )
+        return out
 
 
-async def get_dub_info(query: str, base_url: str) -> dict | None:
-    """Anime ke dub/platform details. None = source available nahi / nahi mila."""
-    if not base_url:
-        return None
-    for search_path in ("/anime/search", "/search"):
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await _try_search(client, base_url, search_path, query)
-            if res:
-                return res
-        except Exception as e:
-            print(f"[dubinfo] {search_path} failed: {e}")
-            await asyncio.sleep(1)
-    return None
-
-
-async def _try_search(client: httpx.AsyncClient, base_url: str,
-                      search_path: str, query: str) -> dict | None:
-    r = await client.get(f"{base_url}{search_path}",
-                         params={"q": query}, timeout=20)
-    if r.status_code >= 400:
-        return None
-    try:
-        results = r.json()
-    except ValueError:
-        return None
-    if isinstance(results, dict):
-        results = results.get("results") or results.get("data") or []
-    if not isinstance(results, list) or not results:
-        return None
-    # Best title match
-    q = query.lower()
-    best = None
-    for item in results:
-        if not isinstance(item, dict):
-            continue
-        name = (item.get("name") or item.get("title") or "").lower()
-        if name and (q in name or name in q):
-            best = item
-            break
-    best = best or results[0]
-    route = best.get("route") or best.get("id") or best.get("slug")
-    if route is None:
-        return None
-    detail = await _get_json(client, f"{base_url}/anime/{route}")
-    if not detail:
-        return None
-    return _parse_detail(detail, best)
-
-
-def _parse_detail(detail: dict, search_item: dict) -> dict:
-    name = (detail.get("name") or detail.get("title")
-            or search_item.get("name") or search_item.get("title"))
-    platforms = []
-    langs_global = {}
-    dubs = detail.get("dubs") or detail.get("platforms") or []
-    if isinstance(dubs, dict):
-        dubs = list(dubs.values())
-    for d in dubs:
-        if not isinstance(d, dict):
-            continue
-        plat_name = canon_platform(d.get("name") or d.get("platform") or "")
-        if not plat_name:
-            continue
-        langs = _parse_languages(d.get("languages") or d.get("dubs") or [])
-        for code, info in langs.items():
-            prev = langs_global.get(code) or {"released": 0}
-            langs_global[code] = {
-                "released": max(prev["released"], info["released"]),
-                "latest": info.get("latest") or prev.get("latest"),
-            }
-        platforms.append({
-            "name": plat_name,
-            "url": d.get("url") or d.get("link"),
-            "region": "India",  # anime-dub-info Indian platforms track karta hai
-            "langs": sorted(langs.keys()),
-        })
-    return {
-        "title": name,
-        "platforms": platforms,
-        "langs": langs_global,   # {"hi": {"released": 3, "latest": "..."}, ...}
-    }
+source = DubInfoSource()
