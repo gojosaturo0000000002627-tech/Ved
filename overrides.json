@@ -1,0 +1,4 @@
+{
+  "_comment": "Manual overrides — key = AniList anime id. Ye sabse high priority rakhta hai (overrides.json + /setep).",
+  "_example": {"187538": {"hi": 4, "jp": 12}}
+}

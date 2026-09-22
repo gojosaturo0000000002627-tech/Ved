@@ -1,42 +1,161 @@
-"""Anime Dub Bot — configuration (env vars se load hota hai)."""
+"""
+config.py — saare env vars + VERSION + time helpers.
+
+Yahan sirf configuration hai, koi business logic nahi.
+Sab kuch env se aata hai taaki Render par bina code change ke tweak ho sake.
+"""
+from __future__ import annotations
+
+import json
 import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+# ---------------------------------------------------------------------------
+# VERSION — har card ke footer me aur /version par yahi dikhega.
+# Deploy ke baad turant verify karne ka sabse aasaan tareeka.
+# ---------------------------------------------------------------------------
+VERSION = "v1"
+VERSION_LONG = "1.0.0"
 
-# --- Required ---
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+# ---------------------------------------------------------------------------
+# Time — India ke liye IST fix hai (UTC+5:30, koi DST nahi).
+# ---------------------------------------------------------------------------
+IST = timezone(timedelta(hours=5, minutes=30))
 
-# --- Optional data sources ---
-# AnimeSchedule.net ka free API token (account banao -> Settings -> API -> Bearer token)
-ANIMESCHEDULE_TOKEN = os.getenv("ANIMESCHEDULE_TOKEN", "")
 
-# Self-hosted anime-dub-info instance ka base URL (Hindi dub episode counts ke liye)
-# Example: https://anime-dub-info.onrender.com
-DUB_INFO_API = os.getenv("DUB_INFO_API", "").rstrip("/")
+def now_utc() -> datetime:
+    """Abhi ka time (UTC). Tests me BOT_FAKE_NOW set karke freeze kiya ja sakta hai."""
+    fake = os.environ.get("BOT_FAKE_NOW", "").strip()
+    if fake:
+        # Test determinism: '2026-09-22T00:00:00+00:00' ya '2026-09-22'
+        try:
+            dt = datetime.fromisoformat(fake)
+        except ValueError:
+            dt = datetime.strptime(fake, "%Y-%m-%d")
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    return datetime.now(timezone.utc)
 
-# Muse India / Ani-One jaise YouTube channels — Hindi dub episodes ka live source
-# Channel ID (UCxxx...) ya handle (@MuseIndia) — dono chalte hain
-YOUTUBE_CHANNELS = [
-    c.strip() for c in os.getenv("YOUTUBE_CHANNELS",
-                                "@MuseIndia,@Ani-OneAsia,@MuseAsia").split(",")
-    if c.strip()
+
+def now_ist() -> datetime:
+    """Abhi ka time IST me."""
+    return now_utc().astimezone(IST)
+
+
+def ts_ist(dt: datetime | None) -> str:
+    """'21 Sep 2026, 05:55 PM IST' — card/notification ka fixed timestamp format."""
+    if dt is None:
+        return "Unknown"
+    return dt.astimezone(IST).strftime("%d %b %Y, %I:%M %p IST")
+
+
+def date_ist_short(dt) -> str:
+    """'27 Sep 2026' — dub estimate wale lines ke liye."""
+    if dt is None:
+        return "Unknown"
+    return dt.strftime("%d %b %Y")
+
+
+# ---------------------------------------------------------------------------
+# Secrets / core
+# ---------------------------------------------------------------------------
+BOT_TOKEN: str = os.environ.get("BOT_TOKEN", "").strip()
+ADMIN_IDS: list[int] = [
+    int(x) for x in os.environ.get("ADMIN_IDS", "").replace(";", ",").split(",") if x.strip().isdigit()
 ]
 
-# --- Bot behaviour ---
-# Har itne minute mein followed anime check hoga (Render free tier pe 15+ rakho)
-POLL_MINUTES = int(os.getenv("POLL_MINUTES", "20"))
-# Card cache TTL seconds (Ek hi anime baar baar fetch na ho)
-CACHE_TTL = int(os.getenv("CACHE_TTL", "1800"))  # 30 min — repeat search instant
-# Database file
-DB_PATH = os.getenv("DB_PATH", os.path.join("data", "bot.db"))
-# Manual overrides file (galat data theek karne ke liye)
-OVERRIDES_FILE = os.getenv("OVERRIDES_FILE", "overrides.json")
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH: str = os.environ.get("DB_PATH", str(BASE_DIR / "data" / "bot.db"))
+OVERRIDES_PATH: str = os.environ.get("OVERRIDES_PATH", str(BASE_DIR / "overrides.json"))
 
-# Web service port (Render inject karta hai)
-PORT = int(os.getenv("PORT", "8080"))
+# ---------------------------------------------------------------------------
+# Polling / notification engine
+# ---------------------------------------------------------------------------
+POLL_MINUTES: int = max(5, int(os.environ.get("POLL_MINUTES", "20")))
 
-TIMEZONE = "Asia/Kolkata"
+# ---------------------------------------------------------------------------
+# Network timeouts — ek slow source pura card block na kare.
+# ---------------------------------------------------------------------------
+HTTP_TIMEOUT: float = float(os.environ.get("HTTP_TIMEOUT", "15"))
+ANILIST_TIMEOUT: float = float(os.environ.get("ANILIST_TIMEOUT", "12"))
+DUB_LOOKUP_TIMEOUT: float = float(os.environ.get("DUB_LOOKUP_TIMEOUT", "30"))  # 25-40s cap
+YOUTUBE_TIMEOUT: float = float(os.environ.get("YOUTUBE_TIMEOUT", "15"))
+OPTIONAL_SOURCE_TIMEOUT: float = float(os.environ.get("OPTIONAL_SOURCE_TIMEOUT", "15"))
+CARD_BUILD_TIMEOUT: float = float(os.environ.get("CARD_BUILD_TIMEOUT", "40"))
+
+# ---------------------------------------------------------------------------
+# Cache TTLs
+# ---------------------------------------------------------------------------
+ENTRY_CACHE_TTL: int = int(os.environ.get("ENTRY_CACHE_TTL", str(15 * 60)))      # AniList entry: 15 min
+CARD_CACHE_TTL: int = int(os.environ.get("CARD_CACHE_TTL", str(30 * 60)))        # card: 30 min (SQLite)
+ANINIDHI_TTL: int = int(os.environ.get("ANINIDHI_TTL", str(6 * 3600)))           # list_all: 6 ghante
+YT_NEGATIVE_TTL: int = int(os.environ.get("YT_NEGATIVE_TTL", "3600"))            # fail handle: 1 ghanta skip
+YT_FEED_TTL: int = int(os.environ.get("YT_FEED_TTL", str(20 * 60)))              # RSS feed: 20 min
+
+USER_AGENT: str = os.environ.get(
+    "USER_AGENT",
+    "AnimeDubBot/1.0 (+https://github.com/yourname/anime-dub-bot) python-telegram-bot",
+)
+
+# ---------------------------------------------------------------------------
+# Data sources
+# ---------------------------------------------------------------------------
+ANILIST_URL: str = os.environ.get("ANILIST_URL", "https://graphql.anilist.co")
+
+# Optional: self-hosted anime-dub-info API. Khali = disabled.
+DUBINFO_URL: str = os.environ.get("DUBINFO_URL", "").strip().rstrip("/")
+# Optional: AnimeSchedule API (token chahiye). Khali = disabled.
+ANISCHEDULE_TOKEN: str = os.environ.get("ANISCHEDULE_TOKEN", "").strip()
+ANISCHEDULE_URL: str = os.environ.get("ANISCHEDULE_URL", "https://api.anime-schedule.net/v4")
+
+# YouTube channels — handle ya direct channel_id dono chalega.
+# NOTE: @MuseIndia 404 deta hai (galat handle) — isliye negative cache zaroori hai.
+_DEFAULT_YT = [
+    {"name": "Muse India", "handle": "MuseIndia", "channel_id": "UCYYhAzgWuxPauRXdPpLAX3Q"},
+    {"name": "Muse Asia", "handle": "MuseAsia"},
+    {"name": "Ani-One Asia", "handle": "AniOneAsia"},
+    {"name": "Ani-One India", "handle": "AniOneIndia"},
+]
+
+
+def youtube_channels() -> list[dict]:
+    """Env YOUTUBE_CHANNELS (JSON list) ya default list."""
+    raw = os.environ.get("YOUTUBE_CHANNELS", "").strip()
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return [c for c in parsed if isinstance(c, dict)]
+        except json.JSONDecodeError:
+            pass
+    return list(_DEFAULT_YT)
+
+
+# ---------------------------------------------------------------------------
+# Search / season behaviour
+# ---------------------------------------------------------------------------
+MAX_SEASON_CHAIN: int = int(os.environ.get("MAX_SEASON_CHAIN", "5"))   # BFS depth cap
+MAX_PICK_LIST: int = int(os.environ.get("MAX_PICK_LIST", "8"))         # pick list size
+MAX_EXTRA_LIST: int = int(os.environ.get("MAX_EXTRA_LIST", "5"))       # movies/specials dikhane ki limit
+FUZZY_CUTOFF: float = float(os.environ.get("FUZZY_CUTOFF", "0.80"))    # ~80% word similarity
+
+# ---------------------------------------------------------------------------
+# Web service (Render free tier)
+# ---------------------------------------------------------------------------
+PORT: int = int(os.environ.get("PORT", "8080"))
+HOST: str = os.environ.get("HOST", "0.0.0.0")
+# UptimeRobot ko yaad dilane ke liye — Render 15 min baad service sula deta hai.
+HEALTH_PATH: str = "/healthz"
+
+
+def public_stats() -> dict:
+    """/stats endpoint ka default payload (db numbers handlers/main me bharte hain)."""
+    return {
+        "status": "ok",
+        "version": VERSION,
+        "version_long": VERSION_LONG,
+        "poll_minutes": POLL_MINUTES,
+        "ist_now": ts_ist(now_ist()),
+    }

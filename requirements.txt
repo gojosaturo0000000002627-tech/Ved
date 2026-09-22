@@ -1,6 +1,11 @@
-python-telegram-bot~=21.11
-httpx~=0.28
-fastapi~=0.115
-uvicorn~=0.34
-python-dotenv~=1.0
-aninidhi~=0.2
+# Anime Dub Bot — Python 3.12.4 (Render par PYTHON_VERSION=3.12.4 set karna zaroori hai)
+# NOTE: python-telegram-bot v21 ko Python 3.12 chahiye; 3.13+ par kuch versions toot-te hain.
+
+python-telegram-bot==21.11.1
+fastapi==0.141.1
+uvicorn==0.53.0
+httpx==0.28.1
+aninidhi==0.2.1
+
+# tests
+pytest>=8.4

@@ -1,144 +1,240 @@
-"""Anime Dub Bot — main entrypoint.
-
-Ek hi process mein:
-  1. FastAPI web service (Render health check ke liye) — / aur /healthz
-  2. Telegram bot (long polling) — network error aaye to AUTO-RETRY
-  3. Notification engine (episode checker loop)
-
-Run: python main.py
 """
+main.py — FastAPI (health endpoints) + PTB bot (long polling) + notifier loop.
+
+Render free tier par ye ek hi process hai:
+    web service :8080  ->  /healthz ko UptimeRobot har 5 min ping karta hai
+    bot polling        ->  background task, auto-retry ke saath (kabhi marta nahi)
+"""
+from __future__ import annotations
+
 import asyncio
+import contextlib
+import logging
 import os
-import sys
+import signal
+import time
+from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
-from telegram import Update
-from telegram.ext import Application
+from fastapi.responses import HTMLResponse, JSONResponse
 
 import config
 import handlers
-import notifier
-from database import Database
+from database import get_db
+from notifier import Notifier
+from sources.aggregator import Aggregator
 
-api = FastAPI(title="Anime Dub Bot")
-_db: Database | None = None
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
+)
+log = logging.getLogger("main")
 
+STARTED_AT = time.time()
+STOP_EVENT: asyncio.Event | None = None
 
-@api.get("/")
-async def index():
-    return {"bot": "Anime Dub Bot", "status": "running"}
-
-
-@api.get("/healthz")
-async def healthz():
-    return {"status": "ok"}
-
-
-@api.get("/stats")
-async def stats():
-    if _db is None:
-        return {"status": "starting"}
-    follows = _db.all_follows()
-    users = len({f["user_id"] for f in follows})
-    return {"status": "ok", "follows": len(follows), "users": users,
-            "poll_minutes": config.POLL_MINUTES}
+state: dict = {
+    "bot": None,
+    "bot_running": False,
+    "aggregator": None,
+    "notifier": None,
+    "last_error": None,
+}
 
 
-def _get_db() -> Database:
-    global _db
-    if _db is None:
-        _db = Database(config.DB_PATH)
-    return _db
-
-
-async def run_bot():
-    """Telegram bot — kabhi mat ruko.
-
-    Network timeout / koi bhi error aaye to cleanup karke retry karo.
-    Sirf web service zinda rahega, bot khud wapas aa jayega.
+# ---------------------------------------------------------------------------
+# bot lifecycle (auto-retry)
+# ---------------------------------------------------------------------------
+async def run_bot_forever() -> None:
     """
+    Auto-retry startup loop: network timeout, Conflict, kuch bhi ho —
+    bot log karke dobara koshish karta rahega.
+    """
+    global STOP_EVENT
+    STOP_EVENT = STOP_EVENT or asyncio.Event()
+
     if not config.BOT_TOKEN:
-        print("FATAL: BOT_TOKEN set nahi hai! Render ke Environment dekho.")
-        sys.exit(1)
+        log.warning("BOT_TOKEN set nahi hai — sirf web service chalega (health endpoints up hain).")
+        state["last_error"] = "BOT_TOKEN missing"
+        return
 
-    retry = 0
-    while True:
-        app = None
-        notifier_task = None
+    # PTB import yahan karte hain taaki bina token ke bhi web service chale
+    from telegram import Update
+    from telegram.error import Conflict, InvalidToken, TelegramError
+    from telegram.ext import ApplicationBuilder
+
+    backoff = 10
+    while not STOP_EVENT.is_set():
+        application = None
         try:
-            db = _get_db()
-            app = (Application.builder()
-                   .token(config.BOT_TOKEN)
-                   .build())
-            app.bot_data["db"] = db
-            handlers.register_handlers(app, db)
-
-            await app.initialize()
-            await app.start()
-            await app.updater.start_polling(
-                allowed_updates=Update.ALL_TYPES,
-                drop_pending_updates=True,
+            application = (
+                ApplicationBuilder()
+                .token(config.BOT_TOKEN)
+                .concurrent_updates(True)
+                .build()
             )
-            print("[bot] Telegram polling started")
-            retry = 0
-            notifier_task = asyncio.create_task(notifier.notifier_loop(app))
+            handlers.register(application)
+            application.bot_data["aggregator"] = state["aggregator"]
+            application.bot_data["notifier"] = state["notifier"]
 
-            # Bot zinda hai? Periodic check
-            while True:
-                await asyncio.sleep(30)
-                if not app.updater or not app.updater.running:
-                    raise RuntimeError("Telegram polling band ho gaya")
+            async with application:
+                await application.start()
+                await application.updater.start_polling(
+                    allowed_updates=Update.ALL_TYPES,
+                    drop_pending_updates=True,
+                    poll_interval=1.0,
+                    timeout=30,
+                )
+                me = await application.bot.get_me()
+                state["bot"] = application.bot
+                state["bot_running"] = True
+                state["last_error"] = None
+                backoff = 10
+                log.info("Bot chal raha hai: @%s (polling)", me.username)
 
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            retry += 1
-            wait = min(15 * retry, 120)
-            print(f"[bot] ERROR: {e} — {wait}s baad retry "
-                  f"(attempt {retry})")
-            # Notifier bhi band karo (purana app se juda hai)
-            if notifier_task and not notifier_task.done():
-                notifier_task.cancel()
-            # Saaf saafai
-            try:
-                if app:
-                    if app.updater and app.updater.running:
-                        await app.updater.stop()
-                    if app.running:
-                        await app.stop()
-                    await app.shutdown()
-            except Exception as cleanup_err:
-                print(f"[bot] cleanup note: {cleanup_err}")
-            await asyncio.sleep(wait)
+                # notifier ko bot mil gaya, ab wo bhi chalu
+                if state["notifier"] is not None:
+                    state["notifier"].bot = application.bot
+                    asyncio.create_task(state["notifier"].loop())
+
+                await STOP_EVENT.wait()
+        except Conflict as exc:
+            # Do instance ek hi token par chal rahe hain
+            state["last_error"] = f"Conflict: {exc}"
+            log.error(
+                "Telegram Conflict — do instance ek hi token par chal rahe hain. "
+                "Purana instance band karo (Render par duplicate service ya local process). 60s baad retry."
+            )
+            await asyncio.sleep(60)
+        except InvalidToken as exc:
+            state["last_error"] = f"InvalidToken: {exc}"
+            log.error("BOT_TOKEN galat hai: %s", exc)
+            await asyncio.sleep(300)
+        except TelegramError as exc:
+            state["last_error"] = f"TelegramError: {exc}"
+            log.warning("Telegram error, %ss baad retry: %s", backoff, exc)
+            await asyncio.sleep(backoff)
+        except Exception as exc:  # noqa: BLE001
+            state["last_error"] = f"{type(exc).__name__}: {exc}"
+            log.exception("Bot startup fail, %ss baad retry", backoff)
+            await asyncio.sleep(backoff)
+        finally:
+            state["bot_running"] = False
+            if application is not None:
+                with contextlib.suppress(Exception):
+                    await application.stop()
+            backoff = min(backoff * 2, 120)
 
 
-async def run_web():
-    uvicorn_config = uvicorn.Config(
-        api, host="0.0.0.0", port=config.PORT, log_level="warning")
+# ---------------------------------------------------------------------------
+# FastAPI
+# ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db = get_db()
+    aggregator = Aggregator(cache=db)
+    notifier = Notifier(aggregator=aggregator, db=db)
+    state["aggregator"] = aggregator
+    state["notifier"] = notifier
+
+    task = asyncio.create_task(run_bot_forever())
+    log.info("Anime Dub Bot %s start — poll har %d min, db=%s", config.VERSION, config.POLL_MINUTES, db.path)
+    try:
+        yield
+    finally:
+        if STOP_EVENT is not None:
+            STOP_EVENT.set()
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+        with contextlib.suppress(Exception):
+            await aggregator.anilist.aclose()
+        with contextlib.suppress(Exception):
+            await aggregator.yt.aclose()
+
+
+app = FastAPI(title="Anime Dub Bot", version=config.VERSION_LONG, lifespan=lifespan)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def root() -> str:
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Anime Dub Bot</title>
+<style>body{{font-family:system-ui,sans-serif;background:#0f1115;color:#e6e6e6;padding:40px;line-height:1.6}}
+code{{background:#1b1f27;padding:2px 6px;border-radius:4px}} a{{color:#7cc4ff}}</style></head>
+<body>
+<h1>🎬 Anime Dub Bot — {config.VERSION}</h1>
+<p>Hindi anime dub tracker. Ye web service sirf health endpoints ke liye hai
+(Render free tier ko awake rakhne ke liye). Bot Telegram par chalta hai.</p>
+<p><a href="/healthz">/healthz</a> &middot; <a href="/stats">/stats</a></p>
+<p>UptimeRobot / cron-job.org se <code>/healthz</code> ko har 5 minute ping karo.</p>
+</body></html>"""
+
+
+@app.get("/healthz")
+async def healthz() -> JSONResponse:
+    db = get_db()
+    payload = {
+        "status": "ok",
+        "version": config.VERSION,
+        "version_long": config.VERSION_LONG,
+        "bot_running": bool(state["bot_running"]),
+        "bot_configured": bool(config.BOT_TOKEN),
+        "poll_minutes": config.POLL_MINUTES,
+        "follows": db.follow_count(),
+        "uptime_seconds": int(time.time() - STARTED_AT),
+        "ist_now": config.ts_ist(config.now_ist()),
+        "last_error": state["last_error"],
+    }
+    return JSONResponse(payload)
+
+
+@app.get("/stats")
+async def stats() -> JSONResponse:
+    db = get_db()
+    agg = state["aggregator"]
+    payload = {
+        "version": config.VERSION,
+        "version_long": config.VERSION_LONG,
+        "status": "ok",
+        "follows": db.follow_count(),
+        "users": db.count_users(),
+        "followed_anime": len(db.followed_anime_ids()),
+        "manual_fixes": len(db.all_manual_fixes()),
+        "poll_minutes": config.POLL_MINUTES,
+        "bot_running": bool(state["bot_running"]),
+        "notifier_sent": state["notifier"].sent_total if state["notifier"] else 0,
+        "notifier_failed": state["notifier"].failed_total if state["notifier"] else 0,
+        "notifier_last_run": (
+            config.ts_ist(state["notifier"].last_run) if state["notifier"] and state["notifier"].last_run else None
+        ),
+        "anilist_requests": agg.anilist.requests_made if agg else 0,
+        "aninidhi_cached_records": agg.aninidhi.cached_count() if agg else 0,
+        "ist_now": config.ts_ist(config.now_ist()),
+    }
+    return JSONResponse(payload)
+
+
+def main() -> None:
+    """Render: `python main.py` -> uvicorn 0.0.0.0:$PORT"""
+    port = int(os.environ.get("PORT", config.PORT))
+    log.info("Web service %s:%d par (healthCheckPath=%s)", config.HOST, port, config.HEALTH_PATH)
+    uvicorn_config = uvicorn.Config(app, host=config.HOST, port=port, log_level="info", timeout_graceful_shutdown=15)
     server = uvicorn.Server(uvicorn_config)
-    await server.serve()
 
+    # graceful shutdown (Render deploy par SIGTERM aata hai)
+    def _stop(*_args) -> None:
+        if STOP_EVENT is not None:
+            STOP_EVENT.set()
+        server.should_exit = True
 
-async def main():
-    # Web service — health check ke liye hamesha zinda
-    web_task = asyncio.create_task(run_web())
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        with contextlib.suppress(NotImplementedError, ValueError):
+            signal.signal(sig, _stop)
 
-    def _web_failed(task):
-        exc = task.exception() if not task.cancelled() else None
-        print(f"FATAL: web service crash: {exc}")
-        os._exit(1)  # Render khud restart kar dega
-
-    web_task.add_done_callback(_web_failed)
-
-    # Bot — retry-loop ke saath (bot gir bhi jaye to web zinda rahega)
-    asyncio.create_task(run_bot())
-
-    await asyncio.Event().wait()
+    server.run()
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("Bot band ho gaya.")
+    main()

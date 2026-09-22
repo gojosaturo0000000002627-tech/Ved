@@ -1,289 +1,287 @@
-"""Card formatter — bilkul user ke format mein output banata hai."""
-from datetime import datetime
-from typing import Optional
+"""
+formatter.py — card + notification ka EXACT format.
 
-from sources.platforms import INDIA_PLATFORMS
+Yahan koi data fetch nahi hota — sirf CardData ko text me badalna.
+Isliye tests me isko directly assert kiya ja sakta hai.
+"""
+from __future__ import annotations
 
-LANG_LABEL = {"jp": "Japanese audio", "en": "English dub", "hi": "Hindi dub"}
+import html
+from datetime import date, datetime
 
+import config
+import texts
+from sources import platforms
+from sources.aggregator import CardData, ExtraInfo, SeasonInfo
 
-def _pretty_date(s) -> Optional[str]:
-    """'2026-08-29' -> '29 Aug 2026'; '2026-08' -> 'Aug 2026'."""
-    if not s:
-        return None
-    s = str(s)
-    for fmt, out in (("%Y-%m-%d", "%d %b %Y"), ("%Y-%m", "%b %Y")):
-        try:
-            return datetime.strptime(s, fmt).strftime(out)
-        except ValueError:
-            continue
-    return s
+MAX_PLATFORM_LINES = 8
 
-
-def _eps(x: Optional[int]) -> str:
-    return str(x) if x is not None else "?"
+UNKNOWN = "Unknown"
 
 
-def _next_line(value: Optional[str]) -> str:
-    return value or "To be announced"
+# ---------------------------------------------------------------------------
+# chhote helpers
+# ---------------------------------------------------------------------------
+def _count(count: int | None) -> str:
+    return UNKNOWN if count is None else str(count)
 
 
-def _lang_eps(v) -> str:
-    return f"{v} episodes" if v is not None else "Unknown"
+def _count_word(count: int | None) -> str:
+    """'12 episodes' ya 'Unknown' — spec ke hisaab se count ke saath word."""
+    return UNKNOWN if count is None else f"{count} episodes"
 
 
-def _hi_source_tag(info: dict) -> str:
-    """Hindi dub count kis source se aaya — trust ke liye."""
-    src = info.get("hi_source")
-    if src == "youtube":
-        return " (YouTube se track kiya)"
-    if src == "manual":
-        return " (/setep se set kiya)"
-    return ""
+def _hindi_line(count: int | None, complete_month: str | None, platforms_list: list[str], status: str | None) -> str:
+    """Hindi dub count line — kabhi guess nahi, sirf real data."""
+    if count is None and not platforms_list:
+        return "No official Hindi dub found"
+    if (status or "").lower() == "tba":
+        where = f" ({', '.join(platforms_list)})" if platforms_list else ""
+        return f"Announced (TBA){where}"
+    if count is None:
+        if (status or "").lower() == "finished":
+            return "Available ✅ (complete)"      # dub poora hai, count ka record nahi
+        return UNKNOWN
+    if complete_month:
+        return f"{count} episodes ({complete_month} me complete)"
+    return f"{count} episodes"
 
 
-def _hi_line(info: dict) -> str:
-    """Hindi dub line — count, ya note, ya Unknown."""
-    if info.get("hi_aired") is not None:
-        return f"{info['hi_aired']} episodes{_hi_source_tag(info)}"
-    if info.get("hi_note"):
-        return info["hi_note"]
-    return "Unknown"
+def _platform_lines(names: list[str]) -> list[str]:
+    lines = []
+    for n in names[:MAX_PLATFORM_LINES]:
+        lines.append(f"• {n} — India" if platforms.is_india_available(n) else f"• {n} (India me available nahi)")
+    if len(names) > MAX_PLATFORM_LINES:
+        lines.append(f"• ... +{len(names) - MAX_PLATFORM_LINES} more")
+    return lines
 
 
-def format_card(info: dict) -> str:
-    """Aggregated info -> user-style card text."""
-    L = []
-    L.append(f"🎬 {info.get('title', '?')}")
-
-    # Native title (agar Japanese naam alag hai to chhota sa extra)
-    romaji = info.get("romaji")
-    if romaji and romaji.lower() != (info.get("title") or "").lower():
-        L.append(f"   ({romaji})")
-
-    L.append(f"📌 Status: {info.get('status_display', '?')}")
-
-    # Platforms
-    platforms = info.get("platforms") or []
-    if platforms:
-        L.append("")
-        L.append("📺 Available platforms:")
-        for p in platforms:
-            reg = " — India" if p.get("region") == "India" else ""
-            L.append(f"• {p['name']}{reg}")
-        # Audio / Subtitles
-        audio = ["Japanese"]
-        if (info.get("en_aired") or 0) > 0 or any("en" in p.get("langs", []) for p in platforms):
-            audio.append("English")
-        if (info.get("hi_aired") or 0) > 0 or any("hi" in p.get("langs", []) for p in platforms):
-            audio.append("Hindi")
-        L.append(f"Audio: {', '.join(audio)}")
-        subs = ["English"]
-        if (info.get("hi_aired") or 0) > 0:
-            subs.append("Hindi")
-        L.append(f"Subtitles: {', '.join(subs)}")
-
-    total = info.get("total_episodes")
-    nb = info.get("next_by_lang") or {}
-
-    if info.get("is_movie"):
-        # ================= MOVIE CARD =================
-        bits = []
-        if info.get("duration"):
-            bits.append(f"{info['duration']} min")
-        rel_pretty = _pretty_date(info.get("release_date"))
-        if rel_pretty:
-            bits.append(f"released {rel_pretty}")
-        if bits:
-            L.append("Movie — " + ", ".join(bits))
-
-        L.append("")
-        L.append("🎞 Movie details:")
-        year = info.get("year") or str(info.get("release_date") or "")[:4]
-        L.append(f"• Movie ({year})" if year else "• Movie")
-        released = (info.get("status") == "FINISHED") or (rel_pretty is not None
-                    and "Upcoming" not in (info.get("status_display") or ""))
-        if rel_pretty:
-            L.append(f"Released: {rel_pretty}")
-        elif released:
-            L.append("Released: ✅")
-        else:
-            L.append("Released: — (abhi release nahi hui)")
-        # Hindi dub — movie ke liye available/not
-        if info.get("hi_aired"):
-            L.append("Hindi dub: Available ✅")
-        elif nb.get("hi"):
-            L.append(f"Hindi dub: {nb['hi']}")
-        elif info.get("hi_note"):
-            L.append(f"Hindi dub: {info['hi_note']}")
-        else:
-            L.append("Hindi dub: No official Hindi dub found")
-        L.append("Japanese audio: Available ✅" if released else "Japanese audio: —")
-
-        # Movie: dub upcoming ho to hi dikhao, warna section skip
-        if nb.get("hi") and not info.get("hi_aired"):
-            L.append("")
-            L.append("📅 Hindi dub:")
-            L.append(f"• {nb['hi']}")
+def _season_head(s: SeasonInfo) -> str:
+    if s.ongoing:
+        tag = "(ongoing)"
+    elif s.not_yet_released:
+        tag = "(announced)"
+    elif s.year:
+        tag = f"({s.year})"
     else:
-        # ================= SERIES CARD =================
-        # Top line — multi-season me current group ka total (cours merged)
-        seasons = info.get("seasons") or []
-        top_total = total
-        top_num = info.get("current_season_num") or 1
-        if len(seasons) > 1:
-            cur = next((s for s in seasons
-                        if s.get("num") == top_num), None) \
-                or next((s for s in seasons if s.get("is_current")), None)
-            if cur and cur.get("total"):
-                top_total = cur["total"]
-        if top_total:
-            status = info.get("status") or ""
-            word = "planned" if status != "FINISHED" else "total"
-            L.append(f"Season {top_num}: {top_total} episodes {word}")
+        tag = ""
+    return f"• {s.label} {tag}".rstrip()
 
-        seasons = info.get("seasons") or []
-        if len(seasons) > 1:
-            # Multi-season — user format:
-            # • Season 1 (2018) / Released / Hindi dub / Japanese audio
-            L.append("")
-            L.append("🎞 Season details:")
-            for s in seasons:
-                year = "ongoing" if s.get("ongoing") else str(s.get("year") or "")
-                label = f"• Season {s['num']}"
-                if year:
-                    label += f" ({year})"
-                L.append(label)
-                tot = s.get("total")
-                jp = s.get("jp_aired")
-                if tot:
-                    L.append(f"Released: {jp if jp is not None else 0}/{tot} episodes")
-                elif jp:
-                    L.append(f"Released: {jp} episodes")
-                # Hindi dub — current season ke liye main data (zyada sources)
-                hi = s.get("hi_aired")
-                note = s.get("hi_note")
-                if s.get("is_current") and info.get("hi_aired") is not None:
-                    hi = info["hi_aired"]
-                if hi is not None:
-                    line = f"Hindi dub: {hi} episodes"
-                    if note:
-                        line += f" {note}"
-                    elif info.get("hi_source") == "manual" and s.get("is_current"):
-                        line += " (/setep se set kiya)"
-                    L.append(line)
-                elif note:
-                    L.append(f"Hindi dub: {note}")
-                else:
-                    L.append("Hindi dub: No official Hindi dub found")
-                L.append(f"Japanese audio: {_lang_eps(jp)}")
+
+def _season_body(s: SeasonInfo) -> list[str]:
+    """Ek season ki detail lines — Released / Hindi dub / English dub / Japanese audio."""
+    lines: list[str] = []
+    if s.planned is None and s.released is None:
+        lines.append("Released: Unknown")
+    elif s.planned is None:
+        lines.append(f"Released: {s.released} episodes")
+    elif s.released is None:
+        lines.append(f"Released: Unknown/{s.planned} episodes")
+    else:
+        lines.append(f"Released: {s.released}/{s.planned} episodes")
+    lines.append(f"Hindi dub: {_hindi_line(s.hi_count, s.hi_complete_month, s.hi_platforms, s.hi_status)}")
+    lines.append(f"English dub: {_count_word(s.en_count)}")
+    lines.append(f"Japanese audio: {_count_word(s.jp_count)}")
+    return lines
+
+
+def _top_season_line(data: CardData) -> str:
+    """'Season 3: 12 episodes planned' — hamesha CURRENT season ka."""
+    current = next((s for s in data.seasons if s.number == data.current_number), None)
+    if current is None:
+        return ""
+    label = current.label
+    if current.planned is None:
+        return f"{label}: episodes TBD"
+    if current.ongoing or current.not_yet_released:
+        return f"{label}: {current.planned} episodes planned"
+    return f"{label}: {current.planned} episodes total"
+
+
+def _extra_line(e: ExtraInfo) -> list[str]:
+    year = f" ({e.year})" if e.year else ""
+    kind = {"MOVIE": "Movie", "SPECIAL": "Special", "OVA": "OVA", "MUSIC": "Music"}.get(e.format or "", "Extra")
+    head = f"• {e.title}{year} — {kind}"
+    if e.format == "MOVIE" and e.minutes:
+        head += f", {e.minutes} min"
+    sub = f"  Hindi dub: {e.hindi}"
+    if e.hi_platforms:
+        sub += f" ({', '.join(e.hi_platforms)})"
+    return [head, sub]
+
+
+def _movie_line(data: CardData) -> str:
+    """'Movie — 121 min, released 11 Nov 2022'"""
+    bits = []
+    if data.movie_minutes:
+        bits.append(f"{data.movie_minutes} min")
+    if data.movie_date:
+        bits.append(f"released {data.movie_date.strftime('%d %b %Y')}")
+    kind = {"movie": "Movie", "special": "Special", "ova": "OVA"}.get(data.kind, "Movie")
+    if not bits:
+        return f"{kind} — details unknown"
+    return f"{kind} — {', '.join(bits)}"
+
+
+# ---------------------------------------------------------------------------
+# CARD
+# ---------------------------------------------------------------------------
+def format_card(data: CardData) -> str:
+    """Poora card text (plain text — Telegram me bina parse mode ke bhejte hain)."""
+    lines: list[str] = [f"🎬 {data.title}"]
+    if data.romaji and data.romaji.strip().lower() != data.title.strip().lower():
+        lines.append(f"   ({data.romaji})")
+    lines.append(f"📌 Status: {data.status_text}")
+    lines.append("")
+
+    if data.kind != "series":
+        # ---------------- MOVIE / SPECIAL / OVA ----------------
+        lines.append(f"🎬 {_movie_line(data)}")
+        lines.append("")
+        if data.streaming_platforms:
+            lines.append("📺 Available platforms:")
+            lines.extend(_platform_lines(data.streaming_platforms))
         else:
-            L.append("")
-            L.append("🎞 Season details:")
-            L.append("• Season 1")
-            if total:
-                rel = info.get("jp_aired") or info.get("en_aired") or 0
-                L.append(f"Released: {rel}/{total} episodes")
+            lines.append("📺 Available platforms: Unknown")
+        lines.append(f"Audio: {', '.join(data.audio_langs) if data.audio_langs else UNKNOWN}")
+        lines.append(f"Subtitles: {', '.join(data.sub_langs) if data.sub_langs else UNKNOWN}")
+        lines.append("")
+        lines.append("🎞 Movie details:")
+        hi = data.movie_hindi
+        if data.hi_platforms:
+            hi += f" ({', '.join(data.hi_platforms)})"
+        lines.append(f"Hindi dub: {hi}")
+        lines.append("Japanese audio: Available ✅")
+        lines.append(f"English dub: {UNKNOWN}")
+        if data.extras:
+            lines.append("")
+            lines.append("🎥 Related:")
+            for e in data.extras[: config.MAX_EXTRA_LIST]:
+                lines.extend(_extra_line(e))
+    else:
+        # ---------------- SERIES ----------------
+        if data.streaming_platforms or data.hi_platforms:
+            lines.append("📺 Available platforms:")
+            combined = platforms.dedupe_preserve(list(data.hi_platforms) + list(data.streaming_platforms))
+            lines.extend(_platform_lines(combined))
+        else:
+            lines.append("📺 Available platforms: Unknown")
+        lines.append(f"Audio: {', '.join(data.audio_langs) if data.audio_langs else UNKNOWN}")
+        lines.append(f"Subtitles: {', '.join(data.sub_langs) if data.sub_langs else UNKNOWN}")
+        top = _top_season_line(data)
+        if top:
+            lines.append(top)
+        lines.append("")
+
+        if len(data.seasons) > 1:
+            lines.append("🎞 Season details:")
+            for s in data.seasons:
+                lines.append(_season_head(s))
+                lines.extend(_season_body(s))
+        else:
+            # single-season: 'Season details' header nahi, seedha lines
+            s = data.seasons[0] if data.seasons else None
+            if s is not None:
+                lines.extend(_season_body(s))
             else:
-                rel = info.get("jp_aired")
-                if rel:
-                    L.append(f"Released: {rel} episodes")
-            L.append(f"Hindi dub: {_hi_line(info)}")
-            L.append(f"English dub: {_lang_eps(info.get('en_aired'))}")
-            L.append(f"Japanese audio: {_lang_eps(info.get('jp_aired'))}")
+                lines.append("Season details: Unknown")
 
-        # Movies / Specials — franchise ki movies bhi isi card me
-        movies = info.get("movies") or []
-        if movies:
-            L.append("")
-            L.append("🎥 Movies / Specials:")
-            for mv in movies:
-                y = f" ({mv['year']})" if mv.get("year") else ""
-                L.append(f"• {mv['title'] or '?'}{y}")
-                if mv.get("hi"):
-                    L.append("  Hindi dub: Available ✅")
-                elif mv.get("hi_note"):
-                    L.append(f"  Hindi dub: {mv['hi_note']}")
-                else:
-                    L.append("  Hindi dub: No official Hindi dub found")
+        if data.extras:
+            lines.append("")
+            lines.append("🎥 Movies / Specials:")
+            for e in data.extras[: config.MAX_EXTRA_LIST]:
+                lines.extend(_extra_line(e))
+            if len(data.extras) > config.MAX_EXTRA_LIST:
+                lines.append(f"  ... +{len(data.extras) - config.MAX_EXTRA_LIST} more")
 
-        # Next episode (series ke liye)
-        L.append("")
-        L.append("📅 Next episode:")
-        finished = info.get("status") == "FINISHED"
+        # ---------------- Next episode ----------------
+        lines.append("")
+        lines.append("📅 Next episode:")
+        lines.append(f"• Japanese audio: {data.next_jp_text}")
+        lines.append(f"• English dub: {data.next_en_text}")
+        lines.append(f"• Hindi dub: {data.next_hi_text}")
 
-        def _next_or(v):
-            if v:
-                return v
-            if finished:
-                return "All episodes released"
-            return "To be announced"
-
-        L.append(f"• Japanese audio: {_next_or(nb.get('jp'))}")
-        L.append(f"• English dub: {_next_or(nb.get('en'))}")
-        L.append(f"• Hindi dub: {_next_or(nb.get('hi'))}")
-
-    L.append("")
-    L.append("⏱ Last checked:")
-    L.append(info.get("checked_at", "?"))
-
-    return "\n".join(L)
+    # ---------------- footer ----------------
+    lines.append("")
+    lines.append("⏱ Last checked:")
+    lines.append(config.ts_ist(data.last_checked))
+    lines.append(texts.footer())
+    return "\n".join(lines)
 
 
-def relevant_platforms(info: dict, lang: str) -> list:
-    """Notification ke liye us language wale platforms hi dikhao.
-
-    Hindi notification -> jahan Hindi dub hai (jaise Crunchyroll),
-    poora platform list nahi.
+# ---------------------------------------------------------------------------
+# NOTIFICATION
+# ---------------------------------------------------------------------------
+def format_notification(
+    title: str,
+    episode: int,
+    lang_label: str,
+    platform: str | None,
+    count: int,
+    total: int | None,
+    when: datetime | None = None,
+) -> str:
     """
-    platforms = info.get("platforms") or []
-    if lang in ("hi", "en"):
-        rel = [p for p in platforms if lang in (p.get("langs") or [])]
-        if rel:
-            return rel
-        # langs unknown ho to India wale platforms pehle
-        return [p for p in platforms if p.get("region") == "India"] or platforms
-    return platforms  # jp — koi bhi main platform
+    Exact notification format (HTML):
 
+    🔔 <b>{title}</b> — Naya Episode!
 
-def format_notification(info: dict, lang: str, ep: int, total: Optional[int]) -> str:
-    """Naya episode notification message (HTML) — user ke format jaisa:
-
-    🔔 Black Torch — Naya Episode!
-
-    📌 Episode 4 (Hindi dub) aa chuka hai 🎉
-    📺 Platform: Crunchyroll (India)
-    📈 Hindi dub: 4/12 episodes
-    ⏱ 16 Sep 2026, 1:10 PM IST
+    📌 Episode <b>{N}</b> (Hindi dub) aa chuka hai 🎉
+    📺 Platform: {sirf relevant platform}
+    📈 Hindi dub: {N}/{total} episodes
+    ⏱ {IST timestamp}
     """
-    import html as _html
-    title = _html.escape(str(info.get("title", "?")))
-    plats = relevant_platforms(info, lang)
-    names = [p["name"] + (" (India)" if p.get("region") == "India" else "")
-             for p in plats[:3]]
-    plat_str = ", ".join(names) if names else "— (platform par check karo)"
-    total_str = f"/{total}" if total else ""
+    progress = f"{count}/{total}" if total else str(count)
+    lines = [
+        f"🔔 <b>{html.escape(title)}</b> — Naya Episode!",
+        "",
+        f"📌 Episode <b>{episode}</b> ({lang_label}) aa chuka hai 🎉",
+        f"📺 Platform: {html.escape(str(platform)) if platform else UNKNOWN}",
+        f"📈 {lang_label}: {progress} episodes",
+        f"⏱ {config.ts_ist(when or config.now_ist())}",
+    ]
+    return "\n".join(lines)
 
-    if info.get("is_movie"):
-        # Movie notification — dub aa gayi
-        return (
-            f"🔔 <b>{title}</b> — Hindi Dub Aa Gayi! 🎉\n\n"
-            f"📺 Platform: {_html.escape(plat_str)}\n"
-            f"⏱ {info.get('checked_at', '?')}"
+
+# ---------------------------------------------------------------------------
+# Pick list / myfollows
+# ---------------------------------------------------------------------------
+def format_pick_list(candidates: list) -> str:
+    lines = [texts.PICK_LIST_HEADER, ""]
+    for i, e in enumerate(candidates, start=1):
+        year = f" ({e.year})" if e.year else ""
+        fmt = e.format or "?"
+        sub = e.romaji if e.romaji and e.romaji != e.best_title else ""
+        extra = f" — {sub}" if sub else ""
+        lines.append(f"{i}. {e.best_title}{year} — {fmt}{extra}")
+    lines.append("")
+    lines.append(texts.PICK_LIST_FOOTER)
+    return "\n".join(lines)
+
+
+def format_myfollows(follows: list[dict]) -> str:
+    if not follows:
+        return texts.MYFOLLOWS_EMPTY
+    lines = [texts.MYFOLLOWS_HEADER.format(count=len(follows))]
+    for f in follows:
+        counts = []
+        if f.get("hi_count") is not None:
+            total = f.get("total_eps")
+            counts.append(f"hi {f['hi_count']}/{total}" if total else f"hi {f['hi_count']}")
+        if f.get("jp_count") is not None:
+            counts.append(f"jp {f['jp_count']}")
+        if f.get("en_count") is not None:
+            counts.append(f"en {f['en_count']}")
+        suffix = f" — {', '.join(counts)}" if counts else ""
+        lines.append(
+            texts.MYFOLLOWS_LINE.format(
+                title=html.escape(f["title"]),
+                langs=texts.lang_names(f["langs"]),
+                counts=suffix,
+            )
         )
-
-    return (
-        f"🔔 <b>{title}</b> — Naya Episode!\n\n"
-        f"📌 Episode <b>{ep}</b> ({LANG_LABEL[lang]}) aa chuka hai 🎉\n"
-        f"📺 Platform: {_html.escape(plat_str)}\n"
-        f"📈 {LANG_LABEL[lang]}: {ep}{total_str} episodes\n"
-        f"⏱ {info.get('checked_at', '?')}"
-    )
+    return "\n".join(lines)
 
 
-def notification_watch_url(info: dict, lang: str) -> Optional[str]:
-    """Us language ke pehle platform ka watch URL (button ke liye)."""
-    for p in relevant_platforms(info, lang):
-        if p.get("url"):
-            return p["url"]
-    return None
+def format_date(d: date | None) -> str:
+    return config.date_ist_short(d) if d else UNKNOWN

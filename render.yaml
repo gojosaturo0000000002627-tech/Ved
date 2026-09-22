@@ -1,5 +1,4 @@
-# Render.com deployment config
-# Docs: https://render.com/docs/blueprint-spec
+# Render blueprint — GitHub push ke baad "New +" -> "Blueprint" se import karo.
 services:
   - type: web
     name: anime-dub-bot
@@ -8,14 +7,21 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     healthCheckPath: /healthz
+    autoDeploy: true
     envVars:
-      - key: BOT_TOKEN
-        sync: false          # Telegram bot token (BotFather se)
-      - key: ANIMESCHEDULE_TOKEN
-        sync: false          # optional — animeschedule.net free API token
-      - key: DUB_INFO_API
-        sync: false          # optional — self-hosted anime-dub-info URL
-      - key: POLL_MINUTES
-        value: 20            # kitne minute mein episode check ho
       - key: PYTHON_VERSION
-        value: 3.12.4
+        value: "3.12.4"          # PTB v21 ke liye zaroori — 3.13+ par toot-ta hai
+      - key: BOT_TOKEN
+        sync: false              # Render dashboard me secret value daalo
+      - key: POLL_MINUTES
+        value: "20"
+      - key: PORT
+        value: "10000"           # Render apna PORT inject karta hai, par default safe
+      - key: DB_PATH
+        value: "data/bot.db"
+      - key: ADMIN_IDS
+        sync: false
+      - key: DUBINFO_URL
+        sync: false
+      - key: ANISCHEDULE_TOKEN
+        sync: false
