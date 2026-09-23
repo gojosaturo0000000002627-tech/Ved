@@ -15,8 +15,8 @@ from pathlib import Path
 # VERSION — har card ke footer me aur /version par yahi dikhega.
 # Deploy ke baad turant verify karne ka sabse aasaan tareeka.
 # ---------------------------------------------------------------------------
-VERSION = "v1"
-VERSION_LONG = "1.0.0"
+VERSION = "v1.1"
+VERSION_LONG = "1.1.0"
 
 # ---------------------------------------------------------------------------
 # Time — India ke liye IST fix hai (UTC+5:30, koi DST nahi).
@@ -80,6 +80,10 @@ POLL_MINUTES: int = max(5, int(os.environ.get("POLL_MINUTES", "20")))
 # ---------------------------------------------------------------------------
 HTTP_TIMEOUT: float = float(os.environ.get("HTTP_TIMEOUT", "15"))
 ANILIST_TIMEOUT: float = float(os.environ.get("ANILIST_TIMEOUT", "12"))
+# Render free tier par outbound IP SHARED hota hai — AniList 90 req/min poori
+# IP family par lagti hai. Isliye hum throttle karte hain aur 429 par short wait.
+ANILIST_MIN_INTERVAL: float = float(os.environ.get("ANILIST_MIN_INTERVAL", "0.8"))
+ANILIST_RATELIMIT_MAX_WAIT: float = float(os.environ.get("ANILIST_RATELIMIT_MAX_WAIT", "35"))
 DUB_LOOKUP_TIMEOUT: float = float(os.environ.get("DUB_LOOKUP_TIMEOUT", "30"))  # 25-40s cap
 YOUTUBE_TIMEOUT: float = float(os.environ.get("YOUTUBE_TIMEOUT", "15"))
 OPTIONAL_SOURCE_TIMEOUT: float = float(os.environ.get("OPTIONAL_SOURCE_TIMEOUT", "15"))

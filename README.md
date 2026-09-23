@@ -47,6 +47,7 @@ sources/
 tests/
   test_offline.py          — 33 tests: AniList/dubinfo/YouTube mocked, AniNidhi REAL
   test_handlers_offline.py — 14 tests: asli PTB objects, sirf network fake
+  test_live.py             — 5 optional live tests (RUN_LIVE=1; default skip)
   anilist_fixtures.json    — real captured AniList data
 overrides.json     — manual corrections (highest priority)
 render.yaml        — Render blueprint
@@ -65,7 +66,8 @@ python main.py                          # web service + bot dono ek process me
 Sirf tests:
 
 ```bash
-python -m pytest tests/ -v              # 47 tests, fully offline (network ke bina)
+python -m pytest tests/ -v              # 47 offline tests (network ke bina)
+RUN_LIVE=1 python -m pytest tests/test_live.py -v   # +5 live tests (real APIs)
 ```
 
 ## Deploy on Render (free web service)
@@ -105,7 +107,7 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 
 1. Bot ko Telegram par `/start` bhejo
 2. `/version` — live version confirm (`v1`)
-3. `/search grand blue` — card ke footer me bhi `🤖 v1` dikhega
+3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.1`)
 4. Card par **✅ Follow** → language chuno → **✅ Confirm**
 5. `/stats` (admin) ya `https://<service>.onrender.com/stats` — follows/users/poll
 
@@ -133,6 +135,14 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 | AnimeSchedule API | optional airing corroboration | token |
 
 AniList ko **User-Agent header chahiye** (bina uske 403) — code me handled hai.
+
+## Troubleshooting (Render logs)
+
+| Log me kya dikha | Matlab | Kya karein |
+|---|---|---|
+| `telegram.error.Conflict: terminated by other getUpdates` | Do instance ek hi BOT_TOKEN par chal rahe hain. Deploy ke waqt Render purane/naye instance ko thodi der overlap karta hai — **khud theek ho jaata hai** (log me `409` ke turant baad `200 OK` aana iski nishani hai). | Baar-baar aa raha ho to: local `python main.py` band karo, Render dashboard me duplicate service check karo. |
+| `AniList 429 Too Many Requests` | Render free tier ka **outbound IP shared** hota hai — 90 req/min limit poori IP family par lagti hai. Bot khud throttle karta hai (min 0.8s gap), 429 par short wait + retry, aur user ko saaf Hinglish message bhejta hai. | Lagatar aaye to env me `ANILIST_MIN_INTERVAL=1.5` badha do. UptimeRobot wala ping bhi laga rakho taaki cold-start bursts na hon. |
+| BOT_TOKEN kahin leak ho gaya | Koi bhi bot control kar sakta hai. | @BotFather → `/mybots` → API Token → **Revoke** → naya token Render env me update. |
 
 ## Edge cases (day-1 se handled)
 

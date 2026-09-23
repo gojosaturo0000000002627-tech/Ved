@@ -19,6 +19,7 @@ import config
 import formatter
 import texts
 from database import LANG_LABEL, Database, get_db
+from sources import platforms
 from sources.aggregator import Aggregator, CardData
 
 log = logging.getLogger("notifier")
@@ -38,6 +39,9 @@ class Notifier:
         """Forever loop — exception aaye to bhi mar-na nahi."""
         interval = max(60, config.POLL_MINUTES * 60)
         log.info("Notifier shuru: har %d minute", config.POLL_MINUTES)
+        # boot par turant force-refresh burst AniList 429 de sakta hai (shared IP) —
+        # isliye pehla poll thodi der baad
+        await asyncio.sleep(min(90, interval))
         while True:
             try:
                 await self.run_once()
@@ -101,7 +105,7 @@ class Notifier:
             if new <= old:
                 continue
             episode = new
-            platform = self._platform_for(lang, data)
+            platform, url = self._platform_for(lang, data)
             text = formatter.format_notification(
                 title=data.title,
                 episode=episode,
@@ -111,7 +115,7 @@ class Notifier:
                 total=data.planned_total,
                 when=config.now_ist(),
             )
-            ok = await self._send(row["user_id"], text, data, lang, platform)
+            ok = await self._send(row["user_id"], text, platform, url)
             if ok:
                 sent.append(
                     {
@@ -136,23 +140,40 @@ class Notifier:
         return sent
 
     @staticmethod
-    def _platform_for(lang: str, data: CardData) -> str | None:
-        """Sirf wahi platform dikhao jo us language ka dub actually deta hai."""
-        if lang == "hi":
-            return data.hi_platforms[0] if data.hi_platforms else None
-        if lang == "en":
-            return data.watch_platform
-        return data.watch_platform or (data.streaming_platforms[0] if data.streaming_platforms else None)
+    def _url_for(platform: str | None, data: CardData) -> str | None:
+        """Us platform ka asli AniList streaming link (mil to)."""
+        key = platforms.canon(platform)
+        if not key:
+            return None
+        for link in data.streaming_links:
+            if platforms.canon(link.get("site")) == key:
+                return link.get("url")
+        return None
 
-    async def _send(self, user_id: int, text: str, data: CardData, lang: str, platform: str | None) -> bool:
+    @staticmethod
+    def _platform_for(lang: str, data: CardData) -> tuple[str | None, str | None]:
+        """
+        (platform, url) — sirf wahi platform jo us language ka dub actually deta hai:
+          hi -> AniNidhi/YouTube se mila Hindi platform + uska link
+          en -> watch platform (EN dub platform ka koi free data source nahi)
+          jp -> koi bhi streaming platform JP audio deta hai -> pehla link
+        """
+        if lang == "hi":
+            platform = data.hi_platforms[0] if data.hi_platforms else data.watch_platform
+            return platform, Notifier._url_for(platform, data) or data.watch_url
+        if lang == "en":
+            return data.watch_platform, data.watch_url
+        if data.streaming_links:
+            first = data.streaming_links[0]
+            return first.get("site"), first.get("url")
+        return data.watch_platform, data.watch_url
+
+    async def _send(self, user_id: int, text: str, platform: str | None, url: str | None) -> bool:
         if self.bot is None:
             return False
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
         kb = None
-        url = data.watch_url
-        if lang == "jp" and data.streaming_platforms:
-            url = data.watch_url
         if url and platform:
             kb = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(texts.BTN_WATCH.format(platform=platform)[:60], url=url)]]

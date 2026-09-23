@@ -63,6 +63,11 @@ Seedha naam likh kar dobara try karo 👍"""
 TOO_SLOW = "Data sources thoda slow chal rahe hain 🐢 — 10-15 second baad dobara try karo."
 BUILD_ERROR = "Card banate waqt kuch gadbad ho gayi 😓 Thodi der baad dobara try karo."
 ANILIST_DOWN = "AniList abhi jawab nahi de raha 📡 — thodi der baad try karo."
+ANILIST_RATELIMIT = (
+    "AniList ne abhi requests limit kar di hain ⏳ (Render par IP shared hota hai, "
+    "isliye kabhi-kabhi hota hai). Card cache se baaki data aa jaata hai — "
+    "~1 minute baad /search ya 🔄 Refresh dobara try karo."
+)
 
 # ------------------------------------------------------------------ follow
 FOLLOW_PICK_LANG = """<b>{title}</b> ke liye kaunsi language track karni hai? 🎧

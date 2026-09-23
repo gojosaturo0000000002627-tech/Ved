@@ -25,6 +25,7 @@ import formatter
 import texts
 from database import LANG_LABEL, LANGS, get_db
 from sources.aggregator import Aggregator, CardData
+from sources.anilist import AniListRateLimited
 
 log = logging.getLogger("handlers")
 
@@ -129,6 +130,9 @@ async def _search_and_reply(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         outcome, data = await asyncio.wait_for(agg.build_card_by_query(query), timeout=config.CARD_BUILD_TIMEOUT)
     except asyncio.TimeoutError:
         await _edit_or_send(context, progress_msg_id, texts.TOO_SLOW)
+        return
+    except AniListRateLimited:
+        await _edit_or_send(context, progress_msg_id, texts.ANILIST_RATELIMIT)
         return
     except ConnectionError as exc:
         log.warning("search fail: %s", exc)
@@ -263,6 +267,9 @@ async def cmd_setep(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except asyncio.TimeoutError:
         await context.bot.edit_message_text(chat_id=msg.chat_id, message_id=msg.message_id, text=texts.TOO_SLOW)
         return
+    except AniListRateLimited:
+        await context.bot.edit_message_text(chat_id=msg.chat_id, message_id=msg.message_id, text=texts.ANILIST_RATELIMIT)
+        return
     except Exception:  # noqa: BLE001
         log.exception("setep search fail")
         await context.bot.edit_message_text(chat_id=msg.chat_id, message_id=msg.message_id, text=texts.BUILD_ERROR)
@@ -340,8 +347,11 @@ async def cb_pick(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     agg = _aggregator(context)
     try:
         data = await asyncio.wait_for(agg.build_card(anime_id, force=False), timeout=config.CARD_BUILD_TIMEOUT)
+    except AniListRateLimited:
+        await _safe_edit(q, texts.ANILIST_RATELIMIT)
+        return
     except (asyncio.TimeoutError, ConnectionError):
-        await q.edit_message_text(texts.TOO_SLOW)
+        await _safe_edit(q, texts.TOO_SLOW)
         return
     if data is None:
         await q.edit_message_text(texts.BUILD_ERROR)
@@ -466,8 +476,11 @@ async def cb_refresh(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     agg.anilist.clear_cache()
     try:
         data = await asyncio.wait_for(agg.build_card(anime_id, force=True), timeout=config.CARD_BUILD_TIMEOUT)
+    except AniListRateLimited:
+        await _safe_edit(q, texts.ANILIST_RATELIMIT)
+        return
     except (asyncio.TimeoutError, ConnectionError):
-        await q.edit_message_text(texts.TOO_SLOW)
+        await _safe_edit(q, texts.TOO_SLOW)
         return
     if data is None:
         await q.edit_message_text(texts.BUILD_ERROR)
