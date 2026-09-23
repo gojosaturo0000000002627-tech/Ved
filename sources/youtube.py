@@ -111,6 +111,12 @@ class YouTubeSource:
             await self._client.aclose()
         self._client = None
 
+    async def __aenter__(self) -> "YouTubeSource":
+        return self
+
+    async def __aexit__(self, *exc) -> None:
+        await self.aclose()
+
     # -- cache helpers -------------------------------------------------------
     def _cache_get(self, key: str) -> str | None:
         hit = self._res_mem.get(key)
