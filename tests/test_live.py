@@ -199,6 +199,31 @@ def test_live_aninidhi_fuzzy_and_search():
     assert any(r.display_platform == "Netflix" for r in recs)
 
 
+def test_live_anischedule_english_dub():
+    """Real AnimeSchedule API: AniList-ID match + EN dub data (Black Torch/One Piece/Bleach)."""
+    with _EnvGuard():
+        from sources.anischedule import AnimeScheduleSource, en_dub_progress
+
+        async def _work():
+            src = AnimeScheduleSource()
+            try:
+                return await src.lookup_many([187538, 21, 269])
+            finally:
+                await src.aclose()
+
+        m = run(_work())
+    from datetime import date
+
+    bt = m.get(187538)
+    assert bt is not None and bt.has_dub_data, "Black Torch EN dub data milna chahiye"
+    prog = en_dub_progress(bt, date.today())
+    assert prog.count is not None  # 12, complete
+    op = m.get(21)
+    assert op is not None and op.has_dub_data
+    bleach = m.get(269)
+    assert bleach is None or not bleach.has_dub_data  # track nahi karta -> Unknown theek
+
+
 def test_live_notifier_platform_url_matching():
     """Real card se JP/EN/HI teeno ke liye sahi platform+URL pair bante hain."""
     with _EnvGuard():

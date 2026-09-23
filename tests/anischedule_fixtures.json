@@ -1,0 +1,2262 @@
+{
+ "black_torch": {
+  "title": "BLACK TORCH",
+  "route": "black-torch",
+  "dubPremier": "2026-07-04T00:00:00Z",
+  "dubTime": "2026-07-04T13:01:00Z",
+  "episodes": 12,
+  "status": "Finished",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "synonyms": [
+    "\u30d6\u30e9\u30c3\u30af\u30c8\u30fc\u30c1"
+   ]
+  },
+  "websites": {
+   "official": "blacktorch-anime.com/",
+   "mal": "myanimelist.net/anime/61169/Black_Torch",
+   "aniList": "anilist.co/anime/187538/BLACK-TORCH/",
+   "kitsu": "kitsu.app/anime/black-torch",
+   "animePlanet": "www.anime-planet.com/anime/black-torch",
+   "anidb": "anidb.net/anime/19203",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/3QCViMd",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/series/GT00377907/black-torch",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "youtube",
+     "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl3mx2NrmJSwHk-VtvhmGnZz",
+     "name": "YouTube"
+    }
+   ]
+  }
+ },
+ "one_piece": {
+  "title": "One Piece",
+  "route": "one-piece",
+  "dubPremier": "2020-11-24T00:00:00Z",
+  "dubTime": "2026-08-27T16:00:00Z",
+  "episodes": null,
+  "status": "Ongoing",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "native": "\u30ef\u30f3\u30d4\u30fc\u30b9",
+   "abbreviation": "OP",
+   "synonyms": [
+    "\u6d77\u8d3c\u738b"
+   ]
+  },
+  "websites": {
+   "official": "one-piece.com",
+   "mal": "myanimelist.net/anime/21/One_Piece",
+   "aniList": "anilist.co/anime/21/One-Piece",
+   "kitsu": "kitsu.io/anime/one-piece",
+   "animePlanet": "anime-planet.com/anime/one-piece",
+   "anidb": "anidb.net/anime/69",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/3Qfhg3W",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/one-piece",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "amazon",
+     "url": "amzn.to/4xqcSCw",
+     "name": "Amazon"
+    },
+    {
+     "platform": "hulu",
+     "url": "www.hulu.com/series/one-piece-c7a08df6-d0d5-4dd3-afff-d1f90133cd4e",
+     "name": "Hulu"
+    },
+    {
+     "platform": "netflix",
+     "url": "www.netflix.com/title/80107103",
+     "name": "Netflix"
+    },
+    {
+     "platform": "bilibili",
+     "url": "www.bilibili.tv/en/media/37976",
+     "name": "BiliBili TV"
+    }
+   ]
+  }
+ },
+ "mushoku_s3": {
+  "title": "Mushoku Tensei III: Isekai Ittara Honki Dasu",
+  "route": "mushoku-tensei-iii-isekai-ittara-honki-dasu",
+  "dubPremier": "2026-07-19T00:00:00Z",
+  "dubTime": "2026-07-21T15:01:00Z",
+  "episodes": 14,
+  "status": "Ongoing",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "romaji": "Mushoku Tensei III: Isekai Ittara Honki Dasu",
+   "english": "Mushoku Tensei: Jobless Reincarnation 3",
+   "native": "\u7121\u8077\u8ee2\u751f \uff5e\u7570\u4e16\u754c\u884c\u3063\u305f\u3089\u672c\u6c17\u3060\u3059\uff5e \u7b2c3\u671f",
+   "synonyms": [
+    "Mushoku Tensei 3",
+    "Jobless Reincarnation: I Will Seriously Try If I Go To Another World 3",
+    "Mushoku Tensei: Isekai Ittara Honki Dasu Season 3",
+    "Mushoku Tensei: Jobless Reincarnation Season 3"
+   ]
+  },
+  "websites": {
+   "official": "mushokutensei.jp/",
+   "mal": "myanimelist.net/anime/59193/Mushoku_Tensei_III__Isekai_Ittara_Honki_Dasu",
+   "aniList": "anilist.co/anime/178789/Mushoku-Tensei-Isekai-Ittara-Honki-Dasu-3rd-Season/",
+   "kitsu": "kitsu.io/anime/Mushoku-Tensei-Isekai-Ittara-Honki-Dasu-3rd-Season",
+   "animePlanet": "www.anime-planet.com/anime/mushoku-tensei-jobless-reincarnation-3rd-season",
+   "anidb": "anidb.net/anime/18727",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/4wkMsSg",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/series/G24H1N3MP/mushoku-tensei-jobless-reincarnation",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "amazon",
+     "url": "amzn.to/468Ogm8",
+     "name": "Amazon"
+    },
+    {
+     "platform": "youtube",
+     "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl1LMA6zhohDzfoV-XXFxS9Z",
+     "name": "YouTube"
+    },
+    {
+     "platform": "netflix",
+     "url": "www.netflix.com/title/80987039",
+     "name": "Netflix"
+    },
+    {
+     "platform": "bilibili",
+     "url": "www.bilibili.tv/en/media/2411609",
+     "name": "BiliBili TV"
+    }
+   ]
+  }
+ },
+ "suzume": {
+  "title": "Suzume no Tojimari",
+  "route": "suzume-no-tojimari",
+  "dubPremier": "0001-01-01T00:00:00Z",
+  "dubTime": "2023-04-20T00:01:00Z",
+  "episodes": 1,
+  "status": "Finished",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "native": "\u3059\u305a\u3081\u306e\u6238\u7de0\u307e\u308a",
+   "synonyms": [
+    "Suzume's Locking-Up"
+   ]
+  },
+  "websites": {
+   "official": "suzume-tojimari-movie.jp/",
+   "mal": "myanimelist.net/anime/50594",
+   "aniList": "anilist.co/anime/142770",
+   "kitsu": "kitsu.io/anime/45597",
+   "animePlanet": "www.anime-planet.com/anime/suzume-no-tojimari",
+   "anidb": "anidb.net/anime/17041",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/3X0XQDD",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/series/GP5HJ8425/suzume",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "netflix",
+     "url": "www.netflix.com/title/81696498",
+     "name": "Netflix"
+    }
+   ]
+  }
+ },
+ "bleach": {
+  "title": "Bleach",
+  "route": "bleach",
+  "dubPremier": "0001-01-01T00:00:00Z",
+  "dubTime": "2023-03-18T09:01:00Z",
+  "episodes": 366,
+  "status": "Finished",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "native": "\u30d6\u30ea\u30fc\u30c1"
+  },
+  "websites": {
+   "official": "pierrot.jp/title/bleach/",
+   "mal": "myanimelist.net/anime/269/Bleach",
+   "aniList": "anilist.co/anime/269/Bleach/",
+   "kitsu": "kitsu.io/anime/bleach",
+   "animePlanet": "www.anime-planet.com/anime/bleach",
+   "anidb": "anidb.net/anime/2369",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/4gIeWNA",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/bleach",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "amazon",
+     "url": "amzn.to/4xlPCFL",
+     "name": "Amazon"
+    },
+    {
+     "platform": "hulu",
+     "url": "www.hulu.com/series/bleach-0c265948-3450-40ad-89b4-883af457f36d",
+     "name": "Hulu"
+    },
+    {
+     "platform": "youtube",
+     "url": "www.youtube.com/playlist?list=PLxSscENEp7Jh8xTD3hhwG-NyaZHEXe7rd",
+     "name": "YouTube"
+    },
+    {
+     "platform": "netflix",
+     "url": "www.netflix.com/title/70204957",
+     "name": "Netflix"
+    },
+    {
+     "platform": "disney",
+     "url": "www.disneyplus.com/en-gb/series/bleach/6g48QKlgQdWK",
+     "name": "Disney+"
+    },
+    {
+     "platform": "bilibili",
+     "url": "www.bilibili.tv/en/media/35278",
+     "name": "Bilibili TV"
+    }
+   ]
+  }
+ },
+ "mushoku_s2": {
+  "title": "Mushoku Tensei II: Isekai Ittara Honki Dasu",
+  "route": "mushoku-tensei-isekai-ittara-honki-dasu-2",
+  "dubPremier": "2023-07-23T00:00:00Z",
+  "dubTime": "2023-07-16T19:30:00Z",
+  "episodes": 12,
+  "status": "Finished",
+  "dubEpisodeOverride": {
+   "overrideDate": "0001-01-01T00:00:00Z",
+   "overrideEpisode": 0,
+   "episodesAired": 0
+  },
+  "dubDelayedUntil": "0001-01-01T00:00:00Z",
+  "names": {
+   "romaji": "Mushoku Tensei II: Isekai Ittara Honki Dasu",
+   "english": "Mushoku Tensei: Jobless Reincarnation 2",
+   "native": "\u7121\u8077\u8ee2\u751f \uff5e\u7570\u4e16\u754c\u884c\u3063\u305f\u3089\u672c\u6c17\u3060\u3059\uff5e",
+   "synonyms": [
+    "Mushoku Tensei 2",
+    "Jobless Reincarnation: I Will Seriously Try If I Go To Another World 2",
+    "Mushoku Tensei: Isekai Ittara Honki Dasu Season 2",
+    "Mushoku Tensei: Jobless Reincarnation Season 2"
+   ]
+  },
+  "websites": {
+   "official": "mushokutensei.jp/",
+   "mal": "myanimelist.net/anime/51179/Mushoku_Tensei__Isekai_Ittara_Honki_Dasu_2nd_Season",
+   "aniList": "anilist.co/anime/146065/Mushoku-Tensei-Isekai-Ittara-Honki-Dasu-2nd-Season/",
+   "kitsu": "kitsu.io/anime/mushoku-tensei-isekai-ittara-honki-dasu-season-2",
+   "animePlanet": "www.anime-planet.com/anime/mushoku-tensei-jobless-reincarnation-2nd-season",
+   "anidb": "anidb.net/anime/17236",
+   "streams": [
+    {
+     "platform": "apple",
+     "url": "apple.co/4aXyWKM",
+     "name": "Apple TV"
+    },
+    {
+     "platform": "crunchyroll",
+     "url": "www.crunchyroll.com/series/G24H1N3MP/mushoku-tensei-jobless-reincarnation",
+     "name": "Crunchyroll"
+    },
+    {
+     "platform": "amazon",
+     "url": "amzn.to/45mJotp",
+     "name": "Amazon"
+    },
+    {
+     "platform": "hulu",
+     "url": "www.hulu.com/series/mushoku-tensei-jobless-reincarnation-787a5fb4-9cba-4a69-96b2-4fb3b10c860a",
+     "name": "Hulu"
+    },
+    {
+     "platform": "youtube",
+     "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl3kNUmd8rDL2WnmI-C6LKgt",
+     "name": "YouTube"
+    },
+    {
+     "platform": "netflix",
+     "url": "www.netflix.com/title/80987039",
+     "name": "Netflix"
+    },
+    {
+     "platform": "bilibili",
+     "url": "www.bilibili.tv/en/media/2084136",
+     "name": "Bilibili TV"
+    }
+   ]
+  }
+ },
+ "q:Dan Da Dan": [
+  {
+   "title": "Dandadan",
+   "route": "dandadan",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2024-11-07T16:00:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30c0\u30f3\u30c0\u30c0\u30f3",
+    "synonyms": [
+     "DAN DA DAN: FIRST ENCOUNTER"
+    ]
+   },
+   "websites": {
+    "official": "anime-dandadan.com/",
+    "mal": "myanimelist.net/anime/57334/Dandadan",
+    "aniList": "anilist.co/anime/171018/Dandadan/",
+    "kitsu": "kitsu.io/anime/dandadan",
+    "animePlanet": "www.anime-planet.com/anime/dandadan",
+    "anidb": "anidb.net/anime/18290",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3CPhhID",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GG5H5XQ0D/dan-da-dan",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4bEcoAx",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/bad0bb31-0fa5-4a69-b9a5-5e5ed5032a48",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl2OF_CmbcBOUk_216rwS1wD",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81736884",
+      "name": "Netflix"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Dance Dance Danseur",
+   "route": "dance-dance-danseur",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2022-04-14T16:25:00Z",
+   "episodes": 11,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30c0\u30f3\u30b9\u30fb\u30c0\u30f3\u30b9\u30fb\u30c0\u30f3\u30b9\u30fc\u30eb"
+   },
+   "websites": {
+    "official": "danseur-anime.com/",
+    "mal": "myanimelist.net/anime/48702/Dance_Dance_Danseur",
+    "aniList": "anilist.co/anime/132171/Dance-Dance-Danseur/",
+    "kitsu": "kitsu.io/anime/dance-dance-danseur",
+    "animePlanet": "www.anime-planet.com/anime/dance-dance-danseur",
+    "anidb": "anidb.net/anime/16196",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4gAko56",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/dance-dance-danseur",
+      "name": "Crunchyroll"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Dark Moon: Tsuki no Saidan",
+   "route": "dark-moon-tsuki-no-saidan",
+   "dubPremier": "2026-01-09T00:00:00Z",
+   "dubTime": "2026-01-08T16:30:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Dark Moon: Tsuki no Saidan",
+    "english": "Dark Moon: The Blood Altar",
+    "native": "DARK MOON\u3000-\u9ed2\u306e\u6708: \u6708\u306e\u796d\u58c7-",
+    "synonyms": [
+     "DARK MOON: THE BLOOD ALTAR Animation with ENHYPEN",
+     "Kuro no Tsuki: Tsuki no Saidan",
+     "DARK MOON: \ub2ec\uc758 \uc81c\ub2e8",
+     "DARK MOON: Darui Jedan"
+    ]
+   },
+   "websites": {
+    "official": "darkmoon-tba.com/",
+    "mal": "myanimelist.net/anime/59853/Dark_Moon__Tsuki_no_Saidan",
+    "aniList": "anilist.co/anime/181443/DARK-MOON-Kuro-no-Tsuki-Tsuki-no-Saidan/",
+    "kitsu": "kitsu.io/anime/dark-moon-kuro-no-tsuki-tsuki-no-saidan",
+    "animePlanet": "www.anime-planet.com/anime/dark-moon-the-blood-altar",
+    "anidb": "anidb.net/anime/18869",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/49sUHSB",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GT00365556/dark-moon-the-blood-altar",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/45dghsE",
+      "name": "Amazon"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2289383",
+      "name": "BiliBili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Dandadan 2nd Season",
+   "route": "dandadan-2nd-season",
+   "dubPremier": "2025-07-03T00:00:00Z",
+   "dubTime": "2025-07-03T16:00:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30c0\u30f3\u30c0\u30c0\u30f3 \u7b2c2\u671f",
+    "synonyms": [
+     "DAN DA DAN Season 2",
+     "Dan Da Dan: Evil Eye"
+    ]
+   },
+   "websites": {
+    "official": "anime-dandadan.com/",
+    "mal": "myanimelist.net/anime/60543/Dandadan_2nd_Season",
+    "aniList": "anilist.co/anime/185660/Dandadan-2nd-Season/",
+    "kitsu": "kitsu.app/anime/dandadan-2",
+    "animePlanet": "www.anime-planet.com/anime/dandadan-2nd-season",
+    "anidb": "anidb.net/anime/19060",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4le8zoh",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GG5H5XQ0D/dan-da-dan",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4gkunhW",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/bad0bb31-0fa5-4a69-b9a5-5e5ed5032a48",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl2OF_CmbcBOUk_216rwS1wD",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81736884",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2129416",
+      "name": "BiliBili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Dandadan 3rd Season",
+   "route": "dandadan-3rd-season",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": null,
+   "status": "Upcoming",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30c0\u30f3\u30c0\u30c0\u30f3 \u7b2c3\u671f",
+    "synonyms": [
+     "DAN DA DAN Season 3"
+    ]
+   },
+   "websites": {
+    "official": "anime-dandadan.com/",
+    "mal": "myanimelist.net/anime/62516/Dandadan_3rd_Season",
+    "aniList": "anilist.co/anime/198966/Dandadan-3rd-Season/",
+    "kitsu": "kitsu.app/anime/dandadan-3",
+    "animePlanet": "www.anime-planet.com/anime/dandadan-3rd-season",
+    "anidb": "anidb.net/anime/19584"
+   }
+  },
+  {
+   "title": "Dance, Dance, Dance",
+   "route": "dance-dance-dance",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30c0\u30f3\u30b9\u3001\u30c0\u30f3\u30b9\u3001\u30c0\u30f3\u30b9"
+   },
+   "websites": {
+    "official": "ryukato.net/images/works/worksfile/dance_jpg/dance.html",
+    "mal": "myanimelist.net/anime/19235",
+    "aniList": "anilist.co/anime/19235",
+    "kitsu": "kitsu.io/anime/8714"
+   }
+  },
+  {
+   "title": "D.C.S.S.: Da Capo Second Season",
+   "route": "d-c-s-s-da-capo-second-season",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 26,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "D.C.S.S. \uff5e\u30c0\u30fb\u30ab\u30fc\u30dd \u30bb\u30ab\u30f3\u30c9\u30b7\u30fc\u30ba\u30f3\uff5e",
+    "abbreviation": "DC 2",
+    "synonyms": [
+     "D.C.S.G.",
+     "Da Capo 2nd Season",
+     "Da Capo Second Graduation",
+     "Da Capo Second Story"
+    ]
+   },
+   "websites": {
+    "official": "www.hatsunejima.com/",
+    "mal": "myanimelist.net/anime/291",
+    "aniList": "anilist.co/anime/291",
+    "kitsu": "kitsu.io/anime/266",
+    "anidb": "anidb.net/anime/2832"
+   }
+  },
+  {
+   "title": "Diamond no Ace: Second Season",
+   "route": "diamond-no-ace-second-season",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 51,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Diamond no Ace: Second Season",
+    "english": "Ace of the Diamond Second Season",
+    "native": "\u30c0\u30a4\u30e4\u306eA\uff5eSecond Season\uff5e",
+    "synonyms": [
+     "Daiya no Ace 2",
+     "Daiya no Ace: Second Season",
+     "Ace of the Diamond: 2nd Season"
+    ]
+   },
+   "websites": {
+    "official": "www.diaace.com/",
+    "mal": "myanimelist.net/anime/30230",
+    "aniList": "anilist.co/anime/21085",
+    "kitsu": "kitsu.io/anime/10741",
+    "anidb": "anidb.net/anime/11115",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4bA8gBM",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/ace-of-the-diamond",
+      "name": "Crunchyroll"
+     }
+    ]
+   }
+  }
+ ],
+ "q:Jujutsu Kaisen": [
+  {
+   "title": "Jujutsu Kaisen",
+   "route": "jujutsu-kaisen",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-03-25T17:45:00Z",
+   "episodes": 24,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u546a\u8853\u5efb\u6226",
+    "abbreviation": "JJK",
+    "synonyms": [
+     "Sorcery Fight"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp",
+    "mal": "myanimelist.net/anime/40748/Jujutsu_Kaisen_TV",
+    "aniList": "anilist.co/anime/113415/Jujutsu-Kaisen/",
+    "kitsu": "kitsu.io/anime/jujutsu-kaisen",
+    "animePlanet": "anime-planet.com/anime/jujutsu-kaisen",
+    "anidb": "anidb.net/anime/15275",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4hQTV4j",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/jujutsu-kaisen",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3SiNyzA",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/jujutsu-kaisen-382ec8bf-3650-4cde-94db-ecd18665f9e0",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLxSscENEp7JisDU6GAJuyNpVwDvCm-f3J",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81278456",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/37738",
+      "name": "BiliBili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen 2",
+   "route": "jujutsu-kaisen-2",
+   "dubPremier": "2023-07-20T00:00:00Z",
+   "dubTime": "2023-12-29T21:30:00Z",
+   "episodes": 23,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "2024-01-04T00:00:00Z",
+   "names": {
+    "native": "\u546a\u8853\u5efb\u6226 \u7b2c2\u671f",
+    "abbreviation": "JJK 2",
+    "synonyms": [
+     "Jujutsu Kaisen Season 2",
+     "Sorcery Fight 2",
+     "Jujutsu Kaisen (TV) 2nd Season",
+     "Jujutsu Kaisen 2nd Season",
+     "Jujutsu Kaisen (2023)"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp/",
+    "mal": "myanimelist.net/anime/51009/Jujutsu_Kaisen_TV_2nd_Season",
+    "aniList": "anilist.co/anime/145064/Jujutsu-Kaisen-2nd-Season/",
+    "kitsu": "kitsu.io/anime/jujutsu-kaisen-2",
+    "animePlanet": "www.anime-planet.com/anime/jujutsu-kaisen-2nd-season",
+    "anidb": "anidb.net/anime/17196",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4gCdtsg",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GRDV0019R/jujutsu-kaisen",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4c971cE",
+      "name": "Amazon"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLxSscENEp7JjIe81K3Qd0l7PVaIiPi64r",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81278456",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2084055",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen 0",
+   "route": "jujutsu-kaisen-0",
+   "dubPremier": "2022-09-21T00:00:00Z",
+   "dubTime": "2022-09-21T09:00:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u546a\u8853\u5efb\u6226 0",
+    "abbreviation": "JJK 0",
+    "synonyms": [
+     "Jujutsu Kaisen 0 Movie",
+     "\u5492\u672f\u56de\u62180",
+     "Sorcery Fight 0",
+     "Gekijouban Jujutsu Kaisen 0"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen-movie.jp/",
+    "mal": "myanimelist.net/anime/48561/Jujutsu_Kaisen_0_Movie",
+    "aniList": "anilist.co/anime/131573/Jujutsu-Kaisen-0/",
+    "kitsu": "kitsu.io/anime/jujutsu-kaisen-movie-0",
+    "animePlanet": "www.anime-planet.com/anime/jujutsu-kaisen-0",
+    "anidb": "anidb.net/anime/16169",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4b2whQ3",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GRDV0019R/jujutsu-kaisen",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3U2KRCI",
+      "name": "Amazon"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81602834",
+      "name": "Netflix"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen PV",
+   "route": "jujutsu-kaisen-pv",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 3,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Jujutsu Kaisen PV",
+    "english": "Sorcery Fight PV",
+    "native": "\u546a\u8853\u5efb\u6226PV",
+    "abbreviation": "JJK PV",
+    "synonyms": [
+     "Jujutsu Kaisen Official PV",
+     "Sorcery Fight Official PV"
+    ]
+   },
+   "websites": {
+    "mal": "myanimelist.net/anime/38777",
+    "aniList": "anilist.co/anime/147463",
+    "kitsu": "kitsu.io/anime/43748",
+    "animePlanet": "anime-planet.com/anime/jujutsu-kaisen-2018",
+    "streams": [
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/watch?v=5fsn68FEEbE",
+      "name": "YouTube"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen: Shimetsu Kaiyuu - Kouhen",
+   "route": "jujutsu-kaisen-shimetsu-kaiyuu-kouhen",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2026-03-28T00:00:00Z",
+   "episodes": null,
+   "status": "Upcoming",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Jujutsu Kaisen: Shimetsu Kaiyuu - Kouhen",
+    "english": "JUJUTSU KAISEN Season 4: The Culling Game Part 2",
+    "native": "\u546a\u8853\u5efb\u6226 \u6b7b\u6ec5\u56de\u6e38 \u5f8c\u7de8",
+    "synonyms": [
+     "Jujutsu Kaisen 4th Season"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp/",
+    "mal": "myanimelist.net/anime/63824/Jujutsu_Kaisen__Shimetsu_Kaiyuu_-_Kouhen",
+    "aniList": "anilist.co/anime/209895/Jujutsu-Kaisen-Shimetsu-Kaiyuu--Kouhen/",
+    "kitsu": "kitsu.app/anime/Jujutsu-Kaisen-4",
+    "anidb": "anidb.net/anime/19975"
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen Shimetsu Kaiyuu - Zenpen",
+   "route": "jujutsu-kaisen-shimetsu-kaiyuu",
+   "dubPremier": "2026-01-22T00:00:00Z",
+   "dubTime": "2026-03-12T15:30:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "2026-03-12T00:00:00Z",
+   "names": {
+    "romaji": "Jujutsu Kaisen Shimetsu Kaiyuu - Zenpen",
+    "english": "JUJUTSU KAISEN Season 3: The Culling Game Part 1",
+    "native": "\u546a\u8853\u5efb\u6226 \u6b7b\u6ec5\u56de\u6e38 \u524d\u7de8",
+    "abbreviation": "JJK3 Part 1",
+    "synonyms": [
+     "Jujutsu Kaisen: The Culling Game Part 1",
+     "Jujutsu Kaisen Season 3 Part 1",
+     "Jujutsu Kaisen 3rd Season Part 1"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp/",
+    "mal": "myanimelist.net/anime/57658/Jujutsu_Kaisen__Shimetsu_Kaiyuu",
+    "aniList": "anilist.co/anime/172463/Jujutsu-Kaisen-Shimetsu-Kaiyuu/",
+    "kitsu": "kitsu.io/anime/Jujutsu-Kaisen-Shimetsu-Kaiyuu",
+    "animePlanet": "www.anime-planet.com/anime/jujutsu-kaisen-shimetsu-kaiyuu",
+    "anidb": "anidb.net/anime/18363",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4puckqQ",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GRDV0019R",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4bG3XVk",
+      "name": "Amazon"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLxSscENEp7JhRHMXloduRBZmrGlDW5gmC",
+      "name": "YouTube"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2288197",
+      "name": "BiliBili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen: Kaigyoku\u30fbGyokusetsu",
+   "route": "jujutsu-kaisen-kaigyoku-gyokusetsu",
+   "dubPremier": "2026-06-05T00:00:00Z",
+   "dubTime": "2026-06-05T00:01:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Jujutsu Kaisen: Kaigyoku\u30fbGyokusetsu",
+    "english": "JUJUTSU KAISEN: Hidden Inventory / Premature Death \u2013 The Movie",
+    "native": "\u5287\u5834\u7248\u7dcf\u96c6\u7de8 \u546a\u8853\u5efb\u6226 \u61d0\u7389\u30fb\u7389\u6298",
+    "synonyms": [
+     "Jujutsu Kaisen: Kaigyoku/Gyokusetsu"
+    ]
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp/kaigyokugyokusetsu/",
+    "mal": "myanimelist.net/anime/59654",
+    "aniList": "anilist.co/anime/192809",
+    "kitsu": "kitsu.app/anime/Jujutsu_Kaisen-Kaigyoku-Gyokusetsu",
+    "animePlanet": "anime-planet.com/anime/jujutsu-kaisen-kaigyoku-gyokusetsu",
+    "anidb": "anidb.net/anime/18835",
+    "streams": [
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GRDV0019R/jujutsu-kaisen",
+      "name": "Crunchyroll"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Jujutsu Kaisen: Shibuya Jihen Tokubetsu Henshuu-ban x Shimetsu Kaiyuu Senkou Jouei",
+   "route": "jujutsu-kaisen-shibuya-jihen-tokubetsu-henshuu-ban-x-shimetsu-kaiyuu-senkou-jouei",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Jujutsu Kaisen: Shibuya Jihen Tokubetsu Henshuu-ban x Shimetsu Kaiyuu Senkou Jouei",
+    "english": "JUJUTSU KAISEN: Execution -Shibuya Incident x The Culling Game Begins-",
+    "native": "\u546a\u8853\u5efb\u6226\u300e\u6e0b\u8c37\u4e8b\u5909 \u7279\u5225\u7de8\u96c6\u7248\u300f\u00d7\u300e\u6b7b\u6ec5\u56de\u6e38 \u5148\u884c\u4e0a\u6620\u300f"
+   },
+   "websites": {
+    "official": "jujutsukaisen.jp/",
+    "mal": "myanimelist.net/anime/62392",
+    "aniList": "anilist.co/anime/204066",
+    "kitsu": "kitsu.io/anime/jujutsu-kaisen-shibuya-jihen-tokubetsu-henshu-ban-x-shimetsu-kaiyu-senkou-jouei",
+    "animePlanet": "anime-planet.com/anime/jujutsu-kaisen-execution-shibuya-incident-x-the-culling-game-begins"
+   }
+  }
+ ],
+ "q:One Punch Man": [
+  {
+   "title": "One Punch Man",
+   "route": "one-punch-man",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-04-01T16:06:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3",
+    "abbreviation": "OPM",
+    "synonyms": [
+     "One Punch Man 1"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/30276/One_Punch_Man",
+    "aniList": "anilist.co/anime/21087/One-Punch-Man/",
+    "kitsu": "kitsu.io/anime/one-punch-man",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man",
+    "anidb": "anidb.net/anime/11123",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/41aGKWp",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/one-punch-man",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3S8Mez4",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/one-punch-man",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl2XdtLhB9NG2Ch050jWFm9G",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/80117291",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/36279",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "One Punch Man 3",
+   "route": "one-punch-man-3",
+   "dubPremier": "2025-11-30T00:00:00Z",
+   "dubTime": "2025-12-28T15:15:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3\uff13",
+    "abbreviation": "OPM 3",
+    "synonyms": [
+     "One Punch Man Season 3",
+     "One Punch Man Third Season"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/52807/One_Punch_Man_3",
+    "aniList": "anilist.co/anime/153800/One-Punch-Man-3/",
+    "kitsu": "kitsu.io/anime/one-punch-man-3",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man-3",
+    "anidb": "anidb.net/anime/17576",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4q5Oqnl",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/G63K98PZ6",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3S8MfTE",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/one-punch-man-54a25fcf-a472-4d40-9968-13e2957e5abf",
+      "name": "Hulu (Sub)"
+     },
+     {
+      "platform": "hulu",
+      "url": "hulu.com/series/54a25fc",
+      "name": "Hulu (Dub)"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl3oUZb_EHQopJ631it09D00",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/80117291",
+      "name": "Netflix"
+     },
+     {
+      "platform": "disney",
+      "url": "www.disneyplus.com/en-ca/browse/entity-d00ee2ba-ca47-49d8-a543-d88c44c15bbb",
+      "name": "Disney+"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2246170",
+      "name": "BiliBili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "One Punch Man 2",
+   "route": "one-punch-man-season-2",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-04-01T17:35:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 2",
+    "abbreviation": "OPM 2",
+    "synonyms": [
+     "One Punch Man Season 2",
+     "One Punch Man Second Season"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net",
+    "mal": "myanimelist.net/anime/34134/One_Punch_Man_2nd_Season",
+    "aniList": "anilist.co/anime/97668/One-Punch-Man-2",
+    "kitsu": "kitsu.io/anime/one-punch-man-2",
+    "animePlanet": "anime-planet.com/anime/one-punch-man-2",
+    "anidb": "anidb.net/anime/12430",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4aVoljs",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/one-punch-man",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4wT8ex1",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/one-punch-man-54a25fcf-a472-4d40-9968-13e2957e5abf",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl2XdtLhB9NG2Ch050jWFm9G",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/80117291",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/36381",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "One Punch Man: Road to Hero",
+   "route": "one-punch-man-road-to-hero",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2026-07-13T16:06:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 OVA\u300c\u30ed\u30fc\u30c9\u30fb\u30c8\u30a5\u30fb\u30d2\u30fc\u30ed\u30fc\u300d",
+    "synonyms": [
+     "One Punch Man OVA 1"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/31704/One_Punch_Man__Road_to_Hero",
+    "aniList": "anilist.co/anime/21386/One-Punch-Man-Road-to-Hero/",
+    "kitsu": "kitsu.io/anime/one-punch-man-ova",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man-road-to-hero",
+    "anidb": "anidb.net/anime/11637"
+   }
+  },
+  {
+   "title": "One Punch Man Specials",
+   "route": "one-punch-man-specials",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2026-07-13T16:06:00Z",
+   "episodes": 6,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "english": "One Punch Man Specials",
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3",
+    "abbreviation": "OPM OVA",
+    "synonyms": [
+     "One Punch Man OVA",
+     "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 OVA"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/31772/One_Punch_Man_Specials",
+    "aniList": "anilist.co/anime/21416/One-Punch-Man-OVA/",
+    "kitsu": "kitsu.io/anime/one-punch-man-specials",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man-specials"
+   }
+  },
+  {
+   "title": "One Punch Man 3 Part 2",
+   "route": "one-punch-man-3-part-2",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": null,
+   "status": "Upcoming",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 3\u671f \u7b2c2\u30af\u30fc\u30eb",
+    "abbreviation": "OPM 3 Part 2",
+    "synonyms": [
+     "One Punch Man Third Season Part Two",
+     "One-Punch Man Season 3 Part 2",
+     "One Punch Man (2027)"
+    ]
+   },
+   "websites": {
+    "official": "onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/63193/One_Punch_Man_3_Part_2",
+    "aniList": "anilist.co/anime/204747/One-Punch-Man-3-Part-2/",
+    "kitsu": "kitsu.app/anime/one-punch-man-3-part-2",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man-3-part-ii",
+    "anidb": "anidb.net/anime/19799"
+   }
+  },
+  {
+   "title": "Go! Saitama",
+   "route": "go-saitama",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "synonyms": [
+     "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 \u77ed\u7de8\u30a2\u30cb\u30e1\u5287\u5834",
+     "One Punch Man Short"
+    ]
+   },
+   "websites": {
+    "official": "twitter.com/NEBU_KURO/status/1440944255011225601",
+    "mal": "myanimelist.net/anime/49895",
+    "aniList": "anilist.co/anime/139586",
+    "kitsu": "kitsu.io/anime/45238"
+   }
+  },
+  {
+   "title": "One Punch Man Season 2 Specials",
+   "route": "one-punch-man-season-2-specials",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 6,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "english": "One Punch Man Season 2 Specials",
+    "native": "\u30ef\u30f3\u30d1\u30f3\u30de\u30f3 SEASON 2 OVA 2",
+    "abbreviation": "OPM 2 OVA",
+    "synonyms": [
+     "One Punch Man Season 2 OVA"
+    ]
+   },
+   "websites": {
+    "official": "www.onepunchman-anime.net/",
+    "mal": "myanimelist.net/anime/39705/",
+    "aniList": "anilist.co/anime/108945/One-Punch-Man-2-Specials/",
+    "kitsu": "kitsu.io/anime/one-punch-man-2nd-season-specials",
+    "animePlanet": "www.anime-planet.com/anime/one-punch-man-2-specials"
+   }
+  }
+ ],
+ "q:Spy x Family": [
+  {
+   "title": "SPY\u00d7FAMILY",
+   "route": "spy-x-family",
+   "dubPremier": "2022-04-16T00:00:00Z",
+   "dubTime": "2022-04-14T21:30:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "abbreviation": "SxF",
+    "synonyms": [
+     "Spy x Family"
+    ]
+   },
+   "websites": {
+    "official": "spy-family.net/",
+    "mal": "myanimelist.net/anime/50265/Spy_x_Family",
+    "aniList": "anilist.co/anime/140960/SPYFAMILY/",
+    "kitsu": "kitsu.io/anime/spy-x-family",
+    "animePlanet": "www.anime-planet.com/anime/spy-x-family",
+    "anidb": "anidb.net/anime/16947",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3Qfyw95",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/spy-x-family",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4wrP408",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81511410",
+      "name": "Netflix"
+     },
+     {
+      "platform": "disney",
+      "url": "www.disneyplus.com/series/spyfamily/fet1h9jqmrAM",
+      "name": "Disney+"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/1048837",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "SPY\u00d7FAMILY Part 2",
+   "route": "spy-x-family-part-2",
+   "dubPremier": "2022-10-15T00:00:00Z",
+   "dubTime": "2022-12-25T22:30:00Z",
+   "episodes": 13,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "native": "SPY\u00d7FAMILY 2\u30af\u30fc\u30eb",
+    "abbreviation": "SxF Part 2",
+    "synonyms": [
+     "SPY x FAMILY: Part II",
+     "SxF 2",
+     "Spy x Family 2",
+     "Spy x Family Part 2"
+    ]
+   },
+   "websites": {
+    "official": "spy-family.net/",
+    "mal": "myanimelist.net/anime/50602/Spy_x_Family_Part_2",
+    "aniList": "anilist.co/anime/142838/SPYFAMILY-Part-2/",
+    "kitsu": "kitsu.io/anime/spy-x-family-part-2",
+    "animePlanet": "www.anime-planet.com/anime/spy-x-family-part-ii",
+    "anidb": "anidb.net/anime/17061",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3X0Wf0B",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/spy-x-family",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4hGuuFX",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/spy-x-family-65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+      "name": "YouTube"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81511410",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/1048837",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "SPY\u00d7FAMILY Season 3",
+   "route": "spy-x-family-season-3",
+   "dubPremier": "2025-10-18T00:00:00Z",
+   "dubTime": "2025-11-03T20:30:00Z",
+   "episodes": 13,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "2026-01-10T00:00:00Z",
+   "names": {
+    "abbreviation": "SxF 3",
+    "synonyms": [
+     "Spy x Family Season 3",
+     "Spy x Family 3",
+     "SPY\u00d7FAMILY 3"
+    ]
+   },
+   "websites": {
+    "official": "spy-family.net/",
+    "mal": "myanimelist.net/anime/59027/Spy_x_Family_Season_3",
+    "aniList": "anilist.co/anime/177937/SPYFAMILY-Season-3/",
+    "kitsu": "kitsu.io/anime/spy-x-family-season-3",
+    "animePlanet": "www.anime-planet.com/anime/spy-x-family-season-3",
+    "anidb": "anidb.net/anime/18677",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4pW2aAU",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4g9thWx",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+      "name": "YouTube"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2246006",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "SPY\u00d7FAMILY Season 2",
+   "route": "spy-x-family-season-2",
+   "dubPremier": "2023-10-21T00:00:00Z",
+   "dubTime": "2023-12-29T20:00:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "2024-01-06T00:00:00Z",
+   "names": {
+    "abbreviation": "SxF 2",
+    "synonyms": [
+     "SPY\u00d7FAMILY 2",
+     "Spy x Family 2",
+     "Spy x Family Season 2"
+    ]
+   },
+   "websites": {
+    "official": "spy-family.net/",
+    "mal": "myanimelist.net/anime/53887/Spy_x_Family_Season_2",
+    "aniList": "anilist.co/anime/158927/SPYFAMILY-Season-2/",
+    "kitsu": "kitsu.io/anime/spy-x-family-season-2",
+    "animePlanet": "www.anime-planet.com/anime/spy-x-family-2nd-season",
+    "anidb": "anidb.net/anime/17784",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3X0Wf0B",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4qlwntQ",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+      "name": "Hulu"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl29jJI3xLiviArPPoyC7EQp",
+      "name": "YouTube"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2090049",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "SPY\u00d7FAMILY CODE: White",
+   "route": "spy-x-family-the-movie",
+   "dubPremier": "2024-09-06T00:00:00Z",
+   "dubTime": "2024-09-04T00:01:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "abbreviation": "SxF CODE: White",
+    "synonyms": [
+     "Gekijouban Spy x Family Code: White",
+     "\u5287\u5834\u7248 \u30b9\u30d1\u30a4\u30d5\u30a1\u30df\u30ea\u30fc",
+     "SxF Movie",
+     "SPY\u00d7FAMILY Movie"
+    ]
+   },
+   "websites": {
+    "official": "spy-family.net/",
+    "mal": "myanimelist.net/anime/53888/Spy_x_Family_The_Movie",
+    "aniList": "anilist.co/anime/158928/SPYFAMILY-THE-MOVIE/",
+    "kitsu": "kitsu.io/anime/spy-x-family-the-movie",
+    "animePlanet": "www.anime-planet.com/anime/spy-x-family-the-movie",
+    "anidb": "anidb.net/anime/17785",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3JINEMG",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/watch/G2XUNX9N2/code-white",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3SykEvu",
+      "name": "Amazon"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81924850",
+      "name": "Netflix"
+     }
+    ]
+   }
+  }
+ ],
+ "q:Kimetsu no Yaiba": [
+  {
+   "title": "Kimetsu no Yaiba",
+   "route": "kimetsu-no-yaiba",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-03-19T16:00:00Z",
+   "episodes": 26,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba",
+    "english": "Demon Slayer",
+    "native": "\u9b3c\u6ec5\u306e\u5203",
+    "abbreviation": "KnY",
+    "synonyms": [
+     "Kimetsu no Yaiba: Kyoudai no Kizuna",
+     "Demon Slayer: Kimetsu no Yaiba: Bonds of Siblings",
+     "\u9b3c\u6ec5\u306e\u5203-\u5144\u59b9\u306e\u7d46-",
+     "Demon Slayer: Kimetsu no Yaiba",
+     "Blade of Demon Destruction"
+    ]
+   },
+   "websites": {
+    "official": "demonslayer-anime.com",
+    "mal": "myanimelist.net/anime/38000/Kimetsu_no_Yaiba",
+    "aniList": "anilist.co/anime/101922/Kimetsu-no-Yaiba",
+    "kitsu": "kitsu.io/anime/kimetsu-no-yaiba",
+    "animePlanet": "anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba",
+    "anidb": "anidb.net/anime/14107",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3Ew0hYm",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/demon-slayer-kimetsu-no-yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4xxJ5YQ",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/demon-slayer-kimetsu-no-yaiba-2c3e4b00-30d9-434d-bccc-cf346e40e868",
+      "name": "Hulu"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81091393",
+      "name": "Netflix"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Katanakaji no Sato-hen",
+   "route": "kimetsu-no-yaiba-katanakaji-no-sato-hen",
+   "dubPremier": "2023-05-28T00:00:00Z",
+   "dubTime": "2023-05-29T20:30:00Z",
+   "episodes": 11,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Katanakaji no Sato-hen",
+    "english": "Demon Slayer: Swordsmith Village Arc",
+    "native": "\u9b3c\u6ec5\u306e\u5203 \u5200\u935b\u51b6\u306e\u91cc\u7de8",
+    "abbreviation": "KnY 4",
+    "synonyms": [
+     "Kimetsu no Yaiba 4",
+     "Demon Slayer 4",
+     "Blade of Demon Destruction 4",
+     "Kimetsu no Yaiba Season 4",
+     "Demon Slayer Season 4"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/katanakajinosatohen/",
+    "mal": "myanimelist.net/anime/51019/Kimetsu_no_Yaiba__Katanakaji_no_Sato-hen",
+    "aniList": "anilist.co/anime/145139/Kimetsu-no-Yaiba-Katanakaji-no-Satohen/",
+    "kitsu": "kitsu.io/anime/kimetsu-no-yaiba-katanakaji-no-satohen",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-swordsmith-village-arc",
+    "anidb": "anidb.net/anime/17198",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4aVUjMC",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GY5P48XEY/demon-slayer-kimetsu-no-yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4q5SFzL",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/demon-slayer-kimetsu-no-yaiba-swordsmith-village-arc-a92c9b0f-1aa2-42f4-9b73-29d0d51e27ba",
+      "name": "Hulu"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81091393",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2079053",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Yuukaku-hen",
+   "route": "kimetsu-no-yaiba-yuukaku-hen",
+   "dubPremier": "2022-02-13T00:00:00Z",
+   "dubTime": "2022-04-14T15:00:00Z",
+   "episodes": 11,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Yuukaku-hen",
+    "english": "Demon Slayer: Entertainment District Arc",
+    "native": "\u9b3c\u6ec5\u306e\u5203 \u904a\u90ed\u7de8",
+    "abbreviation": "KnY 3",
+    "synonyms": [
+     "Demon Slayer Season 3",
+     "Kimetsu no Yaiba Season 3",
+     "Blade of Demon Destruction 3",
+     "Demon Slayer 3",
+     "Kimetsu no Yaiba 3"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/yukakuhen/",
+    "mal": "myanimelist.net/anime/47778/Kimetsu_no_Yaiba__Yuukaku-hen",
+    "aniList": "anilist.co/anime/142329/Kimetsu-no-Yaiba-Yuukakuhen/",
+    "kitsu": "kitsu.io/anime/kimetsu-no-yaiba-yuukaku-hen",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-yuukaku-hen",
+    "anidb": "anidb.net/anime/16054",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3WYfc3Q",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "crunchyroll.com/series/GY5P48XEY/Demon-Slayer-Kimetsu-no-Yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4zaohYO",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/2c3e4b00-30d9-434d-bccc-cf346e40e868",
+      "name": "Hulu"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/us/title/81091393",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/1023002",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Hashira Geiko-hen",
+   "route": "kimetsu-no-yaiba-hashira-geiko-hen",
+   "dubPremier": "2024-06-30T00:00:00Z",
+   "dubTime": "2024-06-26T20:30:00Z",
+   "episodes": 8,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Hashira Geiko-hen",
+    "english": "Demon Slayer: Hashira Training Arc",
+    "native": "\u9b3c\u6ec5\u306e\u5203 \u67f1\u7a3d\u53e4\u7de8",
+    "abbreviation": "KnY 5",
+    "synonyms": [
+     "Demon Slayer Season 5",
+     "Kimetsu no Yaiba Season 5",
+     "Blade of Demon Destruction 5",
+     "Demon Slayer 5",
+     "Kimetsu no Yaiba 5",
+     "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/hashirageikohen/",
+    "mal": "myanimelist.net/anime/55701/Kimetsu_no_Yaiba__Hashira_Geiko-hen",
+    "aniList": "anilist.co/anime/166240/Kimetsu-no-Yaiba-Hashira-Geikohen/",
+    "kitsu": "kitsu.io/anime/Kimetsu-no-Yaiba-Hashira-Geikohen",
+    "animePlanet": "www.anime-planet.com/anime/kimetsu-no-yaiba-hashira-geiko-hen",
+    "anidb": "anidb.net/anime/18067",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3CQg7wC",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/GY5P48XEY/demon-slayer-kimetsu-no-yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3TS281q",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/f5331794-7c00-41f0-8646-e94c0b09c1a1",
+      "name": "Hulu"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81091393",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2104174",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Mugen Ressha-hen (TV)",
+   "route": "kimetsu-no-yaiba-mugen-ressha-hen-tv",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-03-19T16:45:00Z",
+   "episodes": 7,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen (TV)",
+    "english": "Demon Slayer: Mugen Train Arc (TV)",
+    "native": "\u9b3c\u6ec5\u306e\u5203 \u7121\u9650\u5217\u8eca\u7de8 (TV)",
+    "abbreviation": "KnY 2",
+    "synonyms": [
+     "Kimetsu no Yaiba 2",
+     "Demon Slayer 2",
+     "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc",
+     "Kimetsu no Yaiba: Mugen Ressha-hen"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/mugenresshahen_tv/",
+    "mal": "myanimelist.net/anime/49926/Kimetsu_no_Yaiba__Mugen_Ressha-hen",
+    "aniList": "anilist.co/anime/129874/Kimetsu-no-Yaiba-Mugen-Resshahen-TV/",
+    "kitsu": "kitsu.io/anime/kimetsu-no-yaiba-mugen-ressha-hen",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-mugen-train",
+    "anidb": "anidb.net/anime/16803",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3EDniJe",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "crunchyroll.com/series/GY5P48XEY/Demon-Slayer-Kimetsu-no-Yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/4fRmkJy",
+      "name": "Amazon"
+     },
+     {
+      "platform": "hulu",
+      "url": "www.hulu.com/series/2c3e4b00-30d9-434d-bccc-cf346e40e868",
+      "name": "Hulu"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/us/title/81091393",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/1023002",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Mugen Ressha-hen",
+   "route": "kimetsu-no-yaiba-mugen-ressha-hen",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2023-03-19T00:01:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Mugen Ressha-hen",
+    "english": "Demon Slayer: Mugen Train",
+    "native": "\u5287\u5834\u7248 \u9b3c\u6ec5\u306e\u5203 \u7121\u9650\u5217\u8eca\u7de8",
+    "abbreviation": "KnY 2 Movie",
+    "synonyms": [
+     "Kimetsu no Yaiba Season 2",
+     "Demon Slayer Season 2",
+     "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/",
+    "mal": "myanimelist.net/anime/40456/Kimetsu_no_Yaiba_Movie__Mugen_Ressha-hen",
+    "aniList": "anilist.co/anime/112151/Kimetsu-no-Yaiba-Mugen-Resshahen/",
+    "kitsu": "kitsu.io/anime/kimetsu-no-yaiba-movie-mugen-ressha-hen",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-movie-mugen-train",
+    "anidb": "anidb.net/anime/15113",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/4uoG2Bw",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/demon-slayer-kimetsu-no-yaiba",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "amazon",
+      "url": "amzn.to/3S44GJk",
+      "name": "Amazon"
+     },
+     {
+      "platform": "netflix",
+      "url": "www.netflix.com/title/81410810",
+      "name": "Netflix"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/37817/",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba: Mugenjou-hen Movie 1 - Akaza Sairai",
+   "route": "kimetsu-no-yaiba-movie-mugen-jou-hen",
+   "dubPremier": "2026-07-28T00:00:00Z",
+   "dubTime": "2026-07-29T15:01:00Z",
+   "episodes": 1,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba: Mugenjou-hen Movie 1 - Akaza Sairai",
+    "english": "Demon Slayer: Infinity Castle - Part 1: Akaza Returns",
+    "native": "\u5287\u5834\u7248 \u9b3c\u6ec5\u306e\u5203 \u7121\u9650\u57ce\u7de8 \u7b2c\u4e00\u7ae0 \u7317\u7aa9\u5ea7\u518d\u6765",
+    "synonyms": [
+     "Kimetsu no Yaiba Movie 1: Mugenjou-hen - Akaza Sairai",
+     "Demon Slayer: Kimetsu no Yaiba - The Movie: Infinity Castle - Part 1: Akaza Returns"
+    ]
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/mugenjyohen_movie/",
+    "mal": "myanimelist.net/anime/59192/Kimetsu_no_Yaiba_Movie__Mugen_Jou-hen",
+    "aniList": "anilist.co/anime/178788/Kimetsu-no-Yaiba-Mugenjouhen/",
+    "kitsu": "kitsu.io/anime/Kimetsu-no-Yaiba-Mugenjou-hen",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-movie-infinity-castle",
+    "anidb": "anidb.net/anime/18699",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/3ToLMND",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/G8DHV7809",
+      "name": "Crunchyroll"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Kimetsu no Yaiba Movie 2: Mugenjou-hen",
+   "route": "kimetsu-no-yaiba-movie-2-mugenjou-hen",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "0001-01-01T00:00:00Z",
+   "episodes": 1,
+   "status": "Upcoming",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Kimetsu no Yaiba Movie 2: Mugenjou-hen",
+    "english": "Demon Slayer: Kimetsu no Yaiba - The Movie 2: Infinity Castle",
+    "native": "\u5287\u5834\u7248\u300c\u9b3c\u6ec5\u306e\u5203\u300d\u7121\u9650\u57ce\u7de8 \u7b2c\u4e8c\u7ae0"
+   },
+   "websites": {
+    "official": "kimetsu.com/anime/mugenjyohen_movie/",
+    "mal": "myanimelist.net/anime/62546/Kimetsu_no_Yaiba_Movie_2__Mugenjou-hen",
+    "aniList": "anilist.co/anime/195200/Kimetsu-no-Yaiba-Mugenjouhen-Movie-2/",
+    "kitsu": "kitsu.app/anime/Kimetsu-no-Yaiba-Mugenjou-hen-Part-2",
+    "animePlanet": "www.anime-planet.com/anime/demon-slayer-kimetsu-no-yaiba-movie-infinity-castle-part-2",
+    "anidb": "anidb.net/anime/18699"
+   }
+  }
+ ],
+ "id:171031": [
+  {
+   "title": "Isekai Yururi Kikou: Kosodateshinagara Boukensha Shimasu",
+   "route": "isekai-yururi-kikou-kosodateshinagara-boukensha-shimasu",
+   "dubPremier": "0001-01-01T00:00:00Z",
+   "dubTime": "2024-07-08T17:30:00Z",
+   "episodes": 12,
+   "status": "Finished",
+   "dubEpisodeOverride": {
+    "overrideDate": "0001-01-01T00:00:00Z",
+    "overrideEpisode": 0,
+    "episodesAired": 0
+   },
+   "dubDelayedUntil": "0001-01-01T00:00:00Z",
+   "names": {
+    "romaji": "Isekai Yururi Kikou: Kosodateshinagara Boukensha Shimasu",
+    "english": "A Journey Through Another World: Raising Kids While Adventuring",
+    "native": "\u7570\u4e16\u754c\u3086\u308b\u308a\u7d00\u884c \uff5e\u5b50\u80b2\u3066\u3057\u306a\u304c\u3089\u5192\u967a\u8005\u3057\u307e\u3059\uff5e"
+   },
+   "websites": {
+    "official": "isekai-yururi-anime.jp/",
+    "mal": "myanimelist.net/anime/57380/Isekai_Yururi_Kikou__Kosodateshinagara_Boukensha_Shimasu",
+    "aniList": "anilist.co/anime/171031/Isekai-Yururi-Kikou-Kosodate-Shinagara-Boukensha-Shimasu/",
+    "kitsu": "kitsu.io/anime/isekai-yururi-kikou-kosodate-shinagara-boukensha-shimasu",
+    "animePlanet": "www.anime-planet.com/anime/a-journey-through-another-world-raising-kids-while-adventuring",
+    "anidb": "anidb.net/anime/18295",
+    "streams": [
+     {
+      "platform": "apple",
+      "url": "apple.co/498DBuI",
+      "name": "Apple TV"
+     },
+     {
+      "platform": "crunchyroll",
+      "url": "www.crunchyroll.com/series/G79H23ZVX/a-journey-through-another-world-raising-kids-while-adventuring",
+      "name": "Crunchyroll"
+     },
+     {
+      "platform": "youtube",
+      "url": "www.youtube.com/playlist?list=PLwLSw1_eDZl3YlF-AmAQWIFW1BV-Q84tW",
+      "name": "YouTube"
+     },
+     {
+      "platform": "bilibili",
+      "url": "www.bilibili.tv/en/media/2112079",
+      "name": "Bilibili TV"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -2186,6 +2186,117 @@
   }
  },
  {
+  "id": 140960,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "SPRING",
+  "seasonYear": 2022,
+  "popularity": 572023,
+  "startDate": {
+   "year": 2022,
+   "month": 4,
+   "day": 9
+  },
+  "title": {
+   "english": "SPY x FAMILY",
+   "romaji": "SPY×FAMILY",
+   "native": "SPY×FAMILY"
+  },
+  "synonyms": [
+   "SxF",
+   "스파이 패밀리",
+   "间谍过家家",
+   "Семья шпиона",
+   "سباي إكس فاميلي",
+   "Gia Đình Điệp Viên"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.netflix.com/title/81511410",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.crunchyroll.com/spy-x-family",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/media/1048837/",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/yngqr3tli9/",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.disneyplus.com/series/spyfamily/fet1h9jqmrAM",
+    "site": "Disney Plus",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLpm1VVK4UL145WmZpHC4VMbgjCAShnb1M",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 108556,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "SPY x FAMILY",
+       "romaji": "SPY×FAMILY"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 142838,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2022,
+      "title": {
+       "english": "SPY x FAMILY Cour 2",
+       "romaji": "SPY×FAMILY Part 2"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
   "id": 141534,
   "format": "SPECIAL",
   "status": "FINISHED",
@@ -2629,6 +2740,123 @@
       "title": {
        "english": null,
        "romaji": "Big Mac® to, Susume!"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 142838,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2022,
+  "popularity": 329966,
+  "startDate": {
+   "year": 2022,
+   "month": 10,
+   "day": 1
+  },
+  "title": {
+   "english": "SPY x FAMILY Cour 2",
+   "romaji": "SPY×FAMILY Part 2",
+   "native": "SPY×FAMILY 第2クール"
+  },
+  "synonyms": [
+   "SxF",
+   "스파이 패밀리",
+   "间谍过家家",
+   "スパイファミリー 2クール"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/spy-x-family-65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/1048837",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.netflix.com/title/81511410",
+    "site": "Netflix",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/spy×family-2022-yngqr3tli9",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLpm1VVK4UL17Akf9iHRx28-f8N_e_Cnmz",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 108556,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "SPY x FAMILY",
+       "romaji": "SPY×FAMILY"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 140960,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2022,
+      "title": {
+       "english": "SPY x FAMILY",
+       "romaji": "SPY×FAMILY"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 158927,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2023,
+      "title": {
+       "english": "SPY x FAMILY Season 2",
+       "romaji": "SPY×FAMILY Season 2"
       }
      }
     }
@@ -3087,6 +3315,126 @@
   }
  },
  {
+  "id": 158927,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2023,
+  "popularity": 238995,
+  "startDate": {
+   "year": 2023,
+   "month": 10,
+   "day": 7
+  },
+  "title": {
+   "english": "SPY x FAMILY Season 2",
+   "romaji": "SPY×FAMILY Season 2",
+   "native": "SPY×FAMILY Season 2"
+  },
+  "synonyms": [
+   "SxF 2",
+   "스파이 패밀리",
+   "Семья шпиона",
+   "スパイファミリー 2",
+   "Spy x Family – Sezon 2"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/2090049",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl29jJI3xLiviArPPoyC7EQp",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/1xqlt0fhwdd",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 142838,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2022,
+      "title": {
+       "english": "SPY x FAMILY Cour 2",
+       "romaji": "SPY×FAMILY Part 2"
+      }
+     }
+    },
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 108556,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "SPY x FAMILY",
+       "romaji": "SPY×FAMILY"
+      }
+     }
+    },
+    {
+     "relationType": "SIDE_STORY",
+     "node": {
+      "id": 158928,
+      "format": "MOVIE",
+      "status": "FINISHED",
+      "episodes": 1,
+      "seasonYear": 2023,
+      "title": {
+       "english": "SPY x FAMILY CODE: White",
+       "romaji": "SPY×FAMILY CODE: White"
+      }
+     }
+    },
+    {
+     "relationType": "SEQUEL",
+     "node": {
+      "id": 177937,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 13,
+      "seasonYear": 2025,
+      "title": {
+       "english": "SPY x FAMILY Season 3",
+       "romaji": "SPY×FAMILY Season 3"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
   "id": 166240,
   "format": "TV",
   "status": "FINISHED",
@@ -3300,6 +3648,98 @@
       "title": {
        "english": "Mushoku Tensei: Jobless Reincarnation Season 3",
        "romaji": "Mushoku Tensei III: Isekai Ittara Honki Dasu"
+      }
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": 177937,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "duration": 24,
+  "season": "FALL",
+  "seasonYear": 2025,
+  "popularity": 133677,
+  "startDate": {
+   "year": 2025,
+   "month": 10,
+   "day": 4
+  },
+  "title": {
+   "english": "SPY x FAMILY Season 3",
+   "romaji": "SPY×FAMILY Season 3",
+   "native": "SPY×FAMILY Season 3"
+  },
+  "synonyms": [
+   "SxF 3",
+   "スパイファミリー 3",
+   "SPY×FAMILY ซีซั่น 3",
+   "SPY×FAMILY 間諜家家酒 Season 3",
+   "間諜家家酒 Season 3"
+  ],
+  "nextAiringEpisode": null,
+  "externalLinks": [
+   {
+    "url": "https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
+    "site": "Crunchyroll",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.hulu.com/series/65d158d4-443f-44c7-bd2c-eae39f6c60e9",
+    "site": "Hulu",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.bilibili.tv/en/media/2246006",
+    "site": "Bilibili TV",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.youtube.com/playlist?list=PLwLSw1_eDZl1wGMYg5oB3uEns0CZNl6sI",
+    "site": "YouTube",
+    "type": "STREAMING",
+    "language": null
+   },
+   {
+    "url": "https://www.iq.com/album/1c33lict9th",
+    "site": "iQ",
+    "type": "STREAMING",
+    "language": null
+   }
+  ],
+  "relations": {
+   "edges": [
+    {
+     "relationType": "SOURCE",
+     "node": {
+      "id": 108556,
+      "format": "MANGA",
+      "status": "RELEASING",
+      "episodes": null,
+      "seasonYear": null,
+      "title": {
+       "english": "SPY x FAMILY",
+       "romaji": "SPY×FAMILY"
+      }
+     }
+    },
+    {
+     "relationType": "PREQUEL",
+     "node": {
+      "id": 158927,
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 12,
+      "seasonYear": 2023,
+      "title": {
+       "english": "SPY x FAMILY Season 2",
+       "romaji": "SPY×FAMILY Season 2"
       }
      }
     }

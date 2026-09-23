@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -121,20 +122,96 @@ class FakeDubInfo:
         return []
 
 
-class FakeSchedule:
-    enabled = False
+class FakeScheduleSource:
+    """
+    AnimeSchedule.net stub — REAL captured fixtures se EN dub data deta hai
+    (network nahi lagta). empty=True par bilkul khaali (fallback-path tests).
+    """
 
-    async def next_episode(self, query):
+    def __init__(self, empty: bool = False):
+        import json
+
+        from sources.anischedule import AnimeScheduleSource
+
+        self.empty = empty
+        self._by_id: dict[int, object] = {}
+        self._q_rows: dict[str, list[dict]] = {}
+        if not empty:
+            rows = json.loads((Path(__file__).parent / "anischedule_fixtures.json").read_text())
+
+            def _register(aid: int, r: dict) -> None:
+                if aid not in self._by_id:
+                    self._by_id[aid] = AnimeScheduleSource._parse(aid, r)
+
+            for name, row in rows.items():
+                if isinstance(row, list):
+                    # q-search fixture set (list of rows) — in entries ka ID-lookup bhi hota hai
+                    if name.startswith("q:"):
+                        self._q_rows[name[2:]] = row
+                        for r in row:
+                            web = (r.get("websites") or {}).get("aniList") or ""
+                            m = re.search(r"/anime/(\d+)", web)
+                            if m:
+                                _register(int(m.group(1)), r)
+                    continue
+                if not isinstance(row, dict) or "_missing" in row or "_http" in row:
+                    continue
+                if name.startswith("id:"):
+                    # galat/stale ID map (asli API behaviour emulate)
+                    _register(int(name[3:]), row)
+                    continue
+                web = (row.get("websites") or {}).get("aniList") or ""
+                try:
+                    aid = int(web.split("/anime/")[1].split("/")[0].split("-")[0])
+                except (IndexError, ValueError):
+                    continue
+                _register(aid, row)
+        self.requests_made = 0
+
+    @property
+    def enabled(self) -> bool:
+        return True
+
+    def cached_count(self) -> int:
+        return len(self._by_id)
+
+    async def lookup_many(self, anilist_ids):
+        self.requests_made += 1
+        return {i: self._by_id.get(i) for i in anilist_ids}
+
+    async def search_dub(self, titles, season_no=None):
+        """Real source ka same matching logic, fixtures par (offline)."""
+        import re as _re
+
+        from sources.anischedule import AnimeScheduleSource, pick_candidate
+
+        for t in [t for t in titles if t][:2]:
+            key = t.strip().lower()
+            rows = None
+            for qkey, rws in self._q_rows.items():
+                if _re.search(r"\b" + _re.escape(qkey.split()[0]) + r"\b", key):
+                    rows = rws
+                    break
+            if rows is None:
+                continue
+            row = pick_candidate(rows, titles, season_no)
+            if row is not None:
+                info = AnimeScheduleSource._parse(0, row)
+                if info.has_dub_data:
+                    return info
         return None
 
+    async def aclose(self):
+        pass
 
-def make_aggregator(yt=None, cache=None, aninidhi=None) -> Aggregator:
+
+def make_aggregator(yt=None, cache=None, aninidhi=None, sched=None) -> Aggregator:
     return Aggregator(
         anilist=FakeAniList(),
         aninidhi=aninidhi or AniNidhiSource(),
         yt=yt or FakeYouTube(),
         dinfo=FakeDubInfo(),
-        sched=FakeSchedule(),
+        sched=sched if sched is not None else FakeScheduleSource(),
         cache=cache,
     )
 
@@ -228,7 +305,10 @@ def test_04_card_format_multi_season():
     assert "• Season 1" not in card, "purana '•' season header ab nahi hona chahiye"
     assert "📅 Next episode:" in card
     assert "• Japanese audio: 27 Sep 2026, 04:30 PM IST" in card
-    assert "• English dub: To be announced" in card
+    # v1.4: EN dub ab AnimeSchedule (real) se — S3 premier 19 Jul -> weekly -> 10/14
+    assert "• English dub: 27 Sep 2026 (estimated)" in card
+    assert "English dub: 10 episodes" in card, "S3 ka EN dub count weekly math se"
+    assert "English dub: 12 episodes" in card, "S2 EN dub complete (Finished)"
     assert "⏱ Last checked:\n22 Sep 2026, 05:30 PM IST" in card
     assert card.rstrip().endswith(f"🤖 {config.VERSION}")
     assert config.VERSION.startswith("v")
@@ -254,8 +334,9 @@ def test_04c_card_format_single_season():
     assert "Released: 12/12 episodes" in card
     assert "Hindi dub: 4 episodes" in card
     assert "Japanese audio: 12 episodes" in card
-    assert "English dub: Unknown" in card
-    assert "• Japanese audio: All episodes released" in card
+    # v1.4: EN dub AnimeSchedule se — premier 4 Jul 2026, 12 eps, Finished -> complete
+    assert "English dub: 12 episodes" in card
+    assert "• English dub: All episodes released" in card
 
 
 # ===========================================================================
@@ -644,6 +725,75 @@ def test_12c_youtube_can_raise_hindi_count():
     assert data.hi_platforms == ["Crunchyroll", "Muse India"], data.hi_platforms
 
 
+def test_12d_no_schedule_data_falls_back_to_unknown():
+    """AnimeSchedule me entry na ho (Bleach jaisa) -> EN Unknown/'To be announced' (guess nahi)."""
+    agg = make_aggregator(sched=FakeScheduleSource(empty=True))
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    card = formatter.format_card(data)
+    assert "English dub: Unknown" in card
+    assert "• English dub: To be announced" in card
+
+
+def test_12e_english_dub_name_search_fallback():
+    """
+    EN fallback: Spy x Family S1 ka AniList-ID AnimeSchedule me NAHI hai (404),
+    par name-search me dub data hai (premier 2022-04-16, 12 eps) -> milna chahiye.
+    """
+    import json
+
+    from sources.anischedule import AnimeScheduleSource, en_dub_progress, pick_candidate
+
+    fx = json.loads((Path(__file__).parent / "anischedule_fixtures.json").read_text())
+    rows = fx["q:Spy x Family"]
+    # S1: titles "SPY x Family" style; candidate base entry chunna chahiye
+    row = pick_candidate(rows, ["SPY x Family", "Spy x Family"], 1)
+    assert row is not None and row["route"] == "spy-x-family", row and row.get("route")
+    info = AnimeScheduleSource._parse(40960, row)
+    prog = en_dub_progress(info, TODAY)
+    assert prog.count == 12 and prog.complete
+
+    # S3 bhi: "SPY x Family Season 3" -> 13 eps
+    row3 = pick_candidate(rows, ["SPY x Family Season 3"], 3)
+    assert row3 is not None and row3["route"] == "spy-x-family-season-3"
+    prog3 = en_dub_progress(AnimeScheduleSource._parse(190529, row3), TODAY)
+    assert prog3.count == 13
+
+    # season mismatch guard: S1 titles ke saath S3 entry nahi milni chahiye
+    assert pick_candidate(rows, ["SPY x Family"], 3) is None or \
+           pick_candidate(rows, ["SPY x Family"], 3)["route"] != "spy-x-family"
+
+
+def test_12f_english_dub_wired_into_card():
+    """Poora card: Spy x Family S1 (cours split 12+13) ka EN combine = 25, S3 = 13."""
+    agg = make_aggregator()
+    data = run(agg.build_card_by_query("spy x family", force=True))[1]
+    card = formatter.format_card(data)
+    assert "English dub: 25 episodes" in card, "S1 = Part1(12) + Part2(13) combine"
+    assert "English dub: 13 episodes" in card
+    assert data.en == 13, "current season (S3) ka EN count top-level par"
+    assert "• English dub: All episodes released" in card
+
+
+def test_12g_schedule_lacks_dub_stays_unknown():
+    """Source me hi dub data nahi (JJK S1 / OPM S1 sentinel) -> Unknown (guess nahi)."""
+    import json
+
+    from sources.anischedule import AnimeScheduleSource, en_dub_progress, pick_candidate
+
+    fx = json.loads((Path(__file__).parent / "anischedule_fixtures.json").read_text())
+    # Kimetsu S1: entry hai, dubPremier sentinel
+    rows = fx["q:Kimetsu no Yaiba"]
+    row = pick_candidate(rows, ["Demon Slayer: Kimetsu no Yaiba"], 1)
+    assert row is not None and row["route"] == "kimetsu-no-yaiba"
+    info = AnimeScheduleSource._parse(101922, row)
+    assert info.has_dub_data is False
+    assert en_dub_progress(info, TODAY).count is None
+    # dandadan S1: bhi sentinel
+    dd = pick_candidate(fx["q:Dan Da Dan"], ["Dan Da Dan", "Dandadan"], 1)
+    assert dd is not None and dd["route"] == "dandadan"
+    assert en_dub_progress(AnimeScheduleSource._parse(171031, dd), TODAY).count is None
+
+
 def test_13_database_follow_flow():
     db = Database(":memory:")
     db.touch_user(1, "ram")
@@ -715,15 +865,37 @@ def test_17_title_variants_for_aninidhi():
     assert any(r.display_platform == "Netflix" for r in recs)
 
 
-def test_18_optional_sources_disabled_by_default():
-    """dubinfo / anischedule configured nahi -> turant skip, koi latency nahi."""
-    from sources.anischedule import AniScheduleSource
+def test_18_anischedule_english_dub_math():
+    """AnimeSchedule EN dub: parsing + weekly math (sab OFFLINE, real fixtures)."""
+    import json
+
+    from sources.anischedule import AnimeScheduleSource, en_dub_progress
+
+    rows = json.loads((Path(__file__).parent / "anischedule_fixtures.json").read_text())
+    bt = AnimeScheduleSource._parse(187538, rows["black_torch"])
+    assert bt.has_dub_data and bt.dub_premier == date(2026, 7, 4)
+    prog = en_dub_progress(bt, TODAY)
+    assert prog.count == 12 and prog.complete, "4 Jul + weekly -> 22 Sep tak 12/12"
+
+    ms3 = AnimeScheduleSource._parse(178789, rows["mushoku_s3"])
+    prog3 = en_dub_progress(ms3, TODAY)
+    assert prog3.count == 10, prog3.count
+    assert prog3.next_date == date(2026, 9, 27) and prog3.estimated
+
+    op = AnimeScheduleSource._parse(21, rows["one_piece"])
+    progop = en_dub_progress(op, TODAY)
+    assert progop.count is None, "One Piece ongoing, total unknown -> count Unknown (guess nahi)"
+    assert progop.next_dt is not None and progop.estimated, "weekly pattern se next"
+
+    bleach = AnimeScheduleSource._parse(269, rows["bleach"])
+    assert bleach.has_dub_data is False
+    assert en_dub_progress(bleach, TODAY).count is None
+
+    # dubinfo (self-hosted, optional) disabled-by-default bhi abhi hai
     from sources.dubinfo import DubInfoSource
 
     assert DubInfoSource(base_url="").enabled is False
     assert run(DubInfoSource(base_url="").lookup(["anything"])) == []
-    assert AniScheduleSource(token="").enabled is False
-    assert run(AniScheduleSource(token="").next_episode("anything")) is None
 
 
 def test_19_ist_formatting():

@@ -35,7 +35,7 @@ from database import Database                                      # noqa: E402
 from sources.aggregator import Aggregator                          # noqa: E402
 from telegram import CallbackQuery, Chat, Message, Update, User    # noqa: E402
 
-from test_offline import FakeAniList, FakeDubInfo, FakeSchedule, FakeYouTube  # noqa: E402
+from test_offline import FakeAniList, FakeDubInfo, FakeScheduleSource, FakeYouTube  # noqa: E402
 
 USER_ID = 4242
 
@@ -107,7 +107,7 @@ def make_env():
     db = Database(":memory:")
     database.set_db(db)
     agg = Aggregator(anilist=FakeAniList(), yt=FakeYouTube(), dinfo=FakeDubInfo(),
-                     sched=FakeSchedule(), cache=db)
+                     sched=FakeScheduleSource(), cache=db)
     bot = FakeBot()
     return db, agg, bot
 
@@ -165,6 +165,37 @@ def test_search_sends_card_with_buttons():
     labels = [b.text for row in kb.inline_keyboard for b in row]
     assert texts.BTN_FOLLOW in labels and texts.BTN_REFRESH in labels
     assert any("Watch" in l for l in labels)
+
+
+def test_anime_command_same_result_as_search():
+    """/anime Naruto == /search Naruto — ek hi handler, wahi card."""
+    _db, agg, _b = make_env()
+
+    up_s, bot_s = make_update("/search black torch")
+    run(handlers.cmd_search(up_s, FakeContext(bot_s, agg, args=["black", "torch"])))
+    card_search = bot_s.edited[-1]["text"]
+
+    up_a, bot_a = make_update("/anime black torch")
+    run(handlers.cmd_search(up_a, FakeContext(bot_a, agg, args=["black", "torch"])))
+    card_anime = bot_a.edited[-1]["text"]
+
+    assert card_anime == card_search
+    assert "🎬 BLACK TORCH" in card_anime
+    assert "Hindi dub: 4 episodes" in card_anime
+    assert "🤖" in card_anime  # version footer bhi same
+
+
+def test_anime_command_usage_message_when_name_missing():
+    """/anime (bina naam) -> 'Usage: /anime <anime name>'"""
+    _db, agg, _b = make_env()
+    up, bot = make_update("/anime")
+    run(handlers.cmd_search(up, FakeContext(bot, agg, args=[])))
+    assert "Usage: /anime" in bot.sent[-1]["text"]
+
+    # /search wala apna message hi rakhta hai
+    up2, bot2 = make_update("/search")
+    run(handlers.cmd_search(up2, FakeContext(bot2, agg, args=[])))
+    assert bot2.sent[-1]["text"] == texts.NO_QUERY
 
 
 def test_search_pick_list_when_ambiguous():
