@@ -221,6 +221,11 @@ def test_04_card_format_multi_season():
     assert "Subtitles: English" in card
     assert "Season 3: 14 episodes planned" in card
     assert "🎞 Season details:" in card
+    # v1.2+: har season ka apna block — 📀 header + blocks ke beech blank line
+    assert "📀 Season 1 (2021)" in card
+    assert "\n\n📀 Season 2 (2023)" in card, "seasons ke beech gap hona chahiye"
+    assert "\n\n📀 Season 3 (ongoing)" in card, "airing season ka tag (ongoing) hona chahiye"
+    assert "• Season 1" not in card, "purana '•' season header ab nahi hona chahiye"
     assert "📅 Next episode:" in card
     assert "• Japanese audio: 27 Sep 2026, 04:30 PM IST" in card
     assert "• English dub: To be announced" in card

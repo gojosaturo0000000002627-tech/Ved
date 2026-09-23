@@ -15,6 +15,7 @@ import os
 import sys
 from pathlib import Path
 
+import httpx
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -114,7 +115,23 @@ def test_live_youtube_muse_india_feed_parse():
                 cid = await yt.channel_id_for(
                     {"name": "Muse India", "channel_id": "UCYYhAzgWuxPauRXdPpLAX3Q"}
                 )
-                videos = await yt.feed(cid) if cid else []
+                try:
+                    videos = await yt.feed(cid) if cid else []
+                except httpx.HTTPStatusError as exc:
+                    # 404/500 agar doosre healthy channels par BHI mil rahe hain
+                    # to ye YouTube ka is-IP soft-block hai (scraping ke baad hota
+                    # hai) — channel gone nahi. Aise me skip, fail nahi.
+                    if exc.response.status_code in (404, 500):
+                        blocked = 0
+                        for probe in ("UC0wNSTMWIL3qaorLx0jie6A", "UCGbshtvS9t-8CW11W7TooQg"):
+                            try:
+                                await yt.feed(probe)
+                            except httpx.HTTPStatusError as perr:
+                                if perr.response.status_code in (404, 500):
+                                    blocked += 1
+                        if blocked >= 2:
+                            pytest.skip("YouTube RSS is IP par block hai (env-level, code theek)")
+                    raise
                 hits = await yt.scan(
                     ["Campfire Cooking", "God of High School", "JoJo", "BLACK TORCH"],
                     season=None,
