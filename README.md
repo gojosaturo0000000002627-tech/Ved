@@ -16,6 +16,10 @@ episodes ke notifications bhi milte hain.
   aur garbage-guard (1-word fallback strictly forbidden)
 - **Hindi dub status** — [AniNidhi](https://pypi.org/project/aninidhi/) (488+ real
   records) + YouTube official channels (Muse India, Ani-One) se cross-check
+- **English dub status** — AnimeSchedule.net API se per-season EN dub count +
+  next dub date. Do routes: AniList-ID exact match, aur naam-search fallback
+  (ID record me na ho to). Cours-split seasons ka EN count combine hota hai
+  (SPY×FAMILY S1 = 12+13 = 25). Total unknown ho to count Unknown — guess nahi
 - **Seasons** — PREQUEL/SEQUEL chain (batched BFS), cours merging (Mushoku Tensei
   ke 5 AniList entries → 3 seasons), **current-season rule** (S1 search karo, S3 ka
   data dikhe)
@@ -107,7 +111,7 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 
 1. Bot ko Telegram par `/start` bhejo
 2. `/version` — live version confirm (`v1`)
-3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.2`)
+3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.5`)
 4. Card par **✅ Follow** → language chuno → **✅ Confirm**
 5. `/stats` (admin) ya `https://<service>.onrender.com/stats` — follows/users/poll
 
@@ -130,6 +134,7 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 |---|---|---|
 | [AniList GraphQL](https://docs.anilist.co) | metadata, episodes, airing time, seasons, streaming links | nahi (90 req/min) |
 | [AniNidhi](https://pypi.org/project/aninidhi/) | **Hindi dub** platform + start date + status | nahi |
+| [AnimeSchedule.net API v3](https://animeschedule.net/api/v3/documentation) | **English dub** — premier date, weekly time, per-season count (AniList-ID exact match) | nahi (token sirf timetables ke liye) |
 | YouTube RSS | official channels par hue Hindi dub episodes | nahi |
 | anime-dub-info (self-host) | optional extra dub data | nahi |
 | AnimeSchedule API | optional airing corroboration | token |

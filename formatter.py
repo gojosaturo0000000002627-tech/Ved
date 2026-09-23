@@ -157,7 +157,8 @@ def format_card(data: CardData) -> str:
             hi += f" ({', '.join(data.hi_platforms)})"
         lines.append(f"Hindi dub: {hi}")
         lines.append("Japanese audio: Available ✅")
-        lines.append(f"English dub: {UNKNOWN}")
+        en_movie = "Available ✅" if data.en_available else UNKNOWN
+        lines.append(f"English dub: {en_movie}")
         if data.extras:
             lines.append("")
             lines.append("🎥 Related:")

@@ -15,8 +15,8 @@ from pathlib import Path
 # VERSION — har card ke footer me aur /version par yahi dikhega.
 # Deploy ke baad turant verify karne ka sabse aasaan tareeka.
 # ---------------------------------------------------------------------------
-VERSION = "v1.3"
-VERSION_LONG = "1.3.0"
+VERSION = "v1.5"
+VERSION_LONG = "1.5.0"
 
 # ---------------------------------------------------------------------------
 # Time — India ke liye IST fix hai (UTC+5:30, koi DST nahi).
@@ -111,8 +111,11 @@ ANILIST_URL: str = os.environ.get("ANILIST_URL", "https://graphql.anilist.co")
 # Optional: self-hosted anime-dub-info API. Khali = disabled.
 DUBINFO_URL: str = os.environ.get("DUBINFO_URL", "").strip().rstrip("/")
 # Optional: AnimeSchedule API (token chahiye). Khali = disabled.
+# AnimeSchedule.net API v3 — /anime?anilist-ids= PUBLIC hai (ENGLISH DUB data,
+# no token). Token sirf timetables jaise extra endpoints ke liye chahiye.
+# NOTE: sahi host animeschedule.net hai — purana api.anime-schedule.net NXDOMAIN.
 ANISCHEDULE_TOKEN: str = os.environ.get("ANISCHEDULE_TOKEN", "").strip()
-ANISCHEDULE_URL: str = os.environ.get("ANISCHEDULE_URL", "https://api.anime-schedule.net/v4")
+ANISCHEDULE_URL: str = os.environ.get("ANISCHEDULE_URL", "https://animeschedule.net/api/v3")
 
 # YouTube channels — handle ya direct channel_id dono chalega.
 # NOTE: @MuseIndia 404 deta hai (galat handle) — isliye negative cache zaroori hai.

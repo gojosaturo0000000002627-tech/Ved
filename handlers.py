@@ -213,6 +213,11 @@ async def cmd_version(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """
+    /search aur /anime DONO isi ek handler se chalte hain (CommandHandler aliases) —
+    search logic, card format, buttons, error handling sab bilkul same.
+    Sirf "naam missing" wale case me usage message command ke hisaab se jaata hai.
+    """
     user = update.effective_user
     if user:
         _db().touch_user(user.id, user.username)
@@ -223,7 +228,12 @@ async def cmd_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         parts = raw.split(maxsplit=1)
         query = parts[1].strip() if len(parts) > 1 else ""
     if not query:
-        await update.effective_message.reply_text(texts.NO_QUERY, parse_mode=ParseMode.HTML)
+        invoked = "search"
+        if update.effective_message:
+            head = (update.effective_message.text or "").split()[0] if (update.effective_message.text or "").split() else ""
+            invoked = head.lstrip("/").split("@")[0].lower() or "search"
+        usage = texts.ANIME_USAGE if invoked == "anime" else texts.NO_QUERY
+        await update.effective_message.reply_text(usage, parse_mode=ParseMode.HTML)
         return
     msg = await update.effective_message.reply_text(texts.SEARCHING_DETAIL)
     await _search_and_reply(update, context, query, progress_msg_id=msg.message_id)
