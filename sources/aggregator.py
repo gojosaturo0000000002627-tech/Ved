@@ -128,6 +128,7 @@ class CardData:
     movie_minutes: int | None = None
     movie_date: date | None = None
     movie_hindi: str = "Unknown"
+    en_available: bool | None = None     # movie card: EN dub release ho chuka (AnimeSchedule)
     last_checked: datetime = field(default_factory=config.now_utc)
     anilist_url: str = ""
     watch_url: str | None = None
@@ -364,7 +365,19 @@ class Aggregator:
         dub_groups = await dub_task
         optional = await extra_task
 
+        # ENGLISH DUB: AnimeSchedule (AniList-ID exact match) — chain ke baad,
+        # kyunki ids seasons se aate hain. 6h cache; pehli baar ~0.5s.
+        sched_task = asyncio.create_task(
+            self.schedule.lookup_many([e.id for e in seasons_raw] + [base.id])
+        )
+
         data = self._assemble(base, seasons_raw, extras_raw, dub_groups, optional, query)
+        try:
+            sched_map = await asyncio.wait_for(sched_task, timeout=config.OPTIONAL_SOURCE_TIMEOUT)
+        except Exception as exc:
+            log.info("anischedule skip: %s", exc)
+            sched_map = {}
+        await self._apply_schedule(data, sched_map, base)
 
         # YouTube cross-check (real uploads = real evidence)
         try:
@@ -486,20 +499,16 @@ class Aggregator:
             return {}
 
     async def _optional_sources(self, base: anilist_mod.MediaEntry) -> dict:
-        """dubinfo + anischedule — dono optional, dono timeout ke saath."""
-        out: dict = {"dubinfo": [], "schedule": None}
-        if not self.dubinfo.enabled and not self.schedule.enabled:
+        """dubinfo (optional self-hosted API) — timeout ke saath."""
+        out: dict = {"dubinfo": []}
+        if not self.dubinfo.enabled:
             return out
-        tasks = []
-        if self.dubinfo.enabled:
-            tasks.append(("dubinfo", asyncio.create_task(self.dubinfo.lookup(base.titles()))))
-        if self.schedule.enabled:
-            tasks.append(("schedule", asyncio.create_task(self.schedule.next_episode(base.best_title))))
-        for name, task in tasks:
-            try:
-                out[name] = await asyncio.wait_for(task, timeout=config.OPTIONAL_SOURCE_TIMEOUT)
-            except Exception as exc:
-                log.info("%s fail: %s", name, exc)
+        try:
+            out["dubinfo"] = await asyncio.wait_for(
+                self.dubinfo.lookup(base.titles()), timeout=config.OPTIONAL_SOURCE_TIMEOUT
+            )
+        except Exception as exc:
+            log.info("dubinfo fail: %s", exc)
         return out
 
     # -- assembly ------------------------------------------------------------
@@ -579,10 +588,9 @@ class Aggregator:
             base.status, ongoing=any_ongoing, released=any_released, not_yet=any_nyr and not any_released
         )
 
-        # next episode texts
+        # next episode texts (EN baad me _apply_schedule bharata hai)
         data.next_jp_text = self._jp_next_text(current)
         data.next_hi_text = self._hi_next_text(current, today)
-        data.next_en_text = self._en_next_text(optional)
 
         # optional dubinfo: English/Hindi counts (agar real data mile)
         self._apply_dubinfo(data, optional, current)
@@ -836,13 +844,6 @@ class Aggregator:
             return f"{config.date_ist_short(current.hi_start)} (estimated)"
         return "To be announced"
 
-    @staticmethod
-    def _en_next_text(optional: dict) -> str:
-        sched = optional.get("schedule") if optional else None
-        # AnimeSchedule ka data Japanese schedule hai, English dub ka nahi -> honest answer
-        del sched
-        return "To be announced"
-
     def _apply_dubinfo(self, data: CardData, optional: dict, current: SeasonInfo | None) -> None:
         rows = optional.get("dubinfo") or []
         if not rows or current is None:
@@ -864,6 +865,83 @@ class Aggregator:
                 if r.next_episode:
                     data.next_hi_date = r.next_episode
                     data.next_hi_text = f"{config.date_ist_short(r.next_episode)} (estimated)"
+
+    async def _apply_schedule(self, data: CardData, sched_map: dict, base: "anilist_mod.MediaEntry") -> None:
+        """
+        AnimeSchedule.net se ENGLISH DUB (dono routes):
+          1. AniList-ID exact match (fast path)
+          2. Na mile (404 / data nahi) -> NAME-SEARCH fallback
+             (SPY×FAMILY S1 jaisi entries ID-record me nahi, par q-search me hain)
+        Sirf REAL data — na mile to kuch nahi badalta (Unknown/To be announced).
+        """
+        today = config.now_utc().date()
+        if data.kind != "series":
+            base_info = sched_map.get(data.anime_id)
+            if base_info is None and self.schedule.enabled:
+                base_info = await self.schedule.search_dub(_main_titles(base), None)
+            if base_info is not None and base_info.has_dub_data:
+                data.en_available = True
+            return
+
+        missing = []
+        for s_info in data.seasons:
+            info = next((sched_map[i] for i in s_info.entry_ids if sched_map.get(i)), None)
+            if info is None:
+                missing.append(s_info)
+
+        # fallback: jo seasons ID se nahi mile, unke titles se (parallel, sem se cap)
+        if missing and self.schedule.enabled:
+            async def _fb(s_info):
+                titles = s_info.titles or []
+                if not titles:
+                    first = self.anilist.cached_entry(s_info.entry_ids[0]) if s_info.entry_ids else None
+                    titles = _main_titles(first) if first else []
+                return s_info, await self.schedule.search_dub(titles, s_info.number)
+
+            got = await asyncio.gather(*(_fb(si) for si in missing), return_exceptions=True)
+            for res in got:
+                if isinstance(res, Exception):
+                    continue
+                s_info, info = res
+                if info is not None:
+                    sched_map[("search", s_info.number)] = info
+
+        for s_info in data.seasons:
+            # cours-split shows (Spy x Family S1 = 12 + 13): har entry ka apna dub
+            # premier hota hai -> counts COMBINE hote hain (total se cap)
+            infos = [sched_map[i] for i in s_info.entry_ids if sched_map.get(i)]
+            if not infos:
+                infos = [sched_map[("search", s_info.number)]] if sched_map.get(("search", s_info.number)) else []
+            if not infos:
+                continue
+            progs = [(info, anischedule.en_dub_progress(info, today)) for info in infos]
+            known = [(i, p_) for i, p_ in progs if p_.count is not None]
+            if known:
+                combined = sum(p_.count for _i, p_ in known)
+                if s_info.planned is not None:
+                    combined = min(combined, s_info.planned)
+                s_info.en_count = combined if s_info.en_count is None else max(s_info.en_count, combined)
+            if data.current_number is not None and s_info.number == data.current_number:
+                if s_info.en_count is not None:
+                    data.en = s_info.en_count
+                # next date: jis part ka dub abhi chal raha hai (incomplete), warna completed
+                incomplete = [p_ for _i, p_ in progs if not p_.complete and (p_.next_date or p_.next_dt)]
+                prog_pick = incomplete[0] if incomplete else (known[0][1] if known else progs[0][1])
+                data.next_en_text = self._en_next_from(prog_pick)
+
+    @staticmethod
+    def _en_next_from(prog) -> str:
+        if prog.complete:
+            return "All episodes released"
+        if prog.delayed and prog.next_date:
+            return f"{config.date_ist_short(prog.next_date)} (delayed)"
+        if prog.announced and prog.next_date:
+            return f"{config.date_ist_short(prog.next_date)} (announced)"
+        if prog.next_dt:
+            return f"{config.ts_ist(prog.next_dt)} (estimated)"
+        if prog.next_date:
+            return f"{config.date_ist_short(prog.next_date)} (estimated)"
+        return "To be announced"
 
     def _apply_youtube(self, data: CardData) -> None:
         """
