@@ -15,8 +15,8 @@ from pathlib import Path
 # VERSION — har card ke footer me aur /version par yahi dikhega.
 # Deploy ke baad turant verify karne ka sabse aasaan tareeka.
 # ---------------------------------------------------------------------------
-VERSION = "v1.1"
-VERSION_LONG = "1.1.0"
+VERSION = "v1.2"
+VERSION_LONG = "1.2.0"
 
 # ---------------------------------------------------------------------------
 # Time — India ke liye IST fix hai (UTC+5:30, koi DST nahi).

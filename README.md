@@ -107,7 +107,7 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 
 1. Bot ko Telegram par `/start` bhejo
 2. `/version` — live version confirm (`v1`)
-3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.1`)
+3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.2`)
 4. Card par **✅ Follow** → language chuno → **✅ Confirm**
 5. `/stats` (admin) ya `https://<service>.onrender.com/stats` — follows/users/poll
 

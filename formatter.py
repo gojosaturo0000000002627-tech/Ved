@@ -57,6 +57,11 @@ def _platform_lines(names: list[str]) -> list[str]:
 
 
 def _season_head(s: SeasonInfo) -> str:
+    """
+    Season ka header line. 📀 emoji isliye hai taaki season blocks aankh se
+    turant alag dikhen (detail lines sab 'Released:/Hindi dub:...' se shuru
+    hote hain — pehle sirf '•' hone se seasons ek blob lagte the).
+    """
     if s.ongoing:
         tag = "(ongoing)"
     elif s.not_yet_released:
@@ -65,7 +70,7 @@ def _season_head(s: SeasonInfo) -> str:
         tag = f"({s.year})"
     else:
         tag = ""
-    return f"• {s.label} {tag}".rstrip()
+    return f"📀 {s.label} {tag}".rstrip()
 
 
 def _season_body(s: SeasonInfo) -> list[str]:
@@ -175,7 +180,9 @@ def format_card(data: CardData) -> str:
 
         if len(data.seasons) > 1:
             lines.append("🎞 Season details:")
-            for s in data.seasons:
+            for i, s in enumerate(data.seasons):
+                if i > 0:
+                    lines.append("")          # har season ke beech visual gap
                 lines.append(_season_head(s))
                 lines.extend(_season_body(s))
         else:
