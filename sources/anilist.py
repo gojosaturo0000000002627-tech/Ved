@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -23,6 +24,10 @@ import httpx
 import config
 
 log = logging.getLogger("anilist")
+
+
+class AniListRateLimited(ConnectionError):
+    """AniList ne 429 diya (Render jaise shared IP par common). Retries bhi fail ho gaye."""
 
 # --- GraphQL: search / get / many sab ek hi shape me, cache key alag ---------
 SEARCH_QUERY = """
@@ -173,6 +178,8 @@ class AniListClient:
         self._search_cache: dict[str, tuple[float, list[MediaEntry]]] = {}
         self._client: httpx.AsyncClient | None = None
         self.requests_made = 0
+        self._throttle_lock = asyncio.Lock()
+        self._last_request_at: float = 0.0
 
     # -- lifecycle -----------------------------------------------------------
     async def client(self) -> httpx.AsyncClient:
@@ -198,30 +205,49 @@ class AniListClient:
         self._search_cache.clear()
 
     # -- core POST -----------------------------------------------------------
+    async def _throttle(self) -> None:
+        """Har AniList request ke beech minimum gap — shared IP par decent bano."""
+        async with self._throttle_lock:
+            wait = config.ANILIST_MIN_INTERVAL - (time.monotonic() - self._last_request_at)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_request_at = time.monotonic()
+
     async def _post(self, query: str, variables: dict, retries: int = 3) -> dict:
         full_query = query + FRAGMENT
         last_err: Exception | None = None
-        for attempt in range(retries):
+        for attempt in range(1, retries + 1):
             try:
+                await self._throttle()
                 c = await self.client()
                 self.requests_made += 1
                 resp = await c.post(self.url, json={"query": full_query, "variables": variables})
-                if resp.status_code == 429:
-                    # rate limit: Retry-After ya default 65s (AniList 90 req/min)
-                    wait = float(resp.headers.get("Retry-After", "65") or 65)
-                    remaining = resp.headers.get("X-RateLimit-Remaining")
-                    log.warning("AniList 429 (remaining=%s), %.1fs ruk rahe hain", remaining, wait)
-                    await asyncio.sleep(min(wait, 70))
-                    continue
+            except (httpx.HTTPError, asyncio.TimeoutError) as exc:
+                last_err = exc
+                log.warning("AniList attempt %d/%d fail: %s", attempt, retries, exc)
+                await asyncio.sleep(0.6 * attempt)
+                continue
+            if resp.status_code == 429:
+                raw = float(resp.headers.get("Retry-After", "60") or 60)
+                remaining = resp.headers.get("X-RateLimit-Remaining")
+                # card timeout (~40s) ke andar fit hone wala wait — warna bekaar hai
+                wait = max(1.0, min(raw, config.ANILIST_RATELIMIT_MAX_WAIT))
+                log.warning("AniList 429 (remaining=%s), %.1fs wait (raw %.0fs)", remaining, wait, raw)
+                if attempt >= retries:
+                    raise AniListRateLimited(f"AniList rate-limit (Retry-After {raw:.0f}s)")
+                await asyncio.sleep(wait + random.uniform(0, 1.5))
+                continue
+            try:
                 resp.raise_for_status()
                 payload = resp.json()
-                if payload.get("errors"):
-                    raise RuntimeError(f"AniList GraphQL error: {payload['errors'][:1]}")
-                return payload.get("data") or {}
-            except (httpx.HTTPError, asyncio.TimeoutError, RuntimeError) as exc:
+            except (httpx.HTTPError, ValueError) as exc:
                 last_err = exc
-                log.warning("AniList attempt %d/%d fail: %s", attempt + 1, retries, exc)
-                await asyncio.sleep(0.6 * (attempt + 1))
+                log.warning("AniList attempt %d/%d fail: %s", attempt, retries, exc)
+                await asyncio.sleep(0.6 * attempt)
+                continue
+            if payload.get("errors"):
+                raise RuntimeError(f"AniList GraphQL error: {payload['errors'][:1]}")
+            return payload.get("data") or {}
         raise ConnectionError(f"AniList se data nahi mil paya: {last_err}")
 
     # -- public API ----------------------------------------------------------

@@ -117,6 +117,7 @@ class CardData:
     hindi_found: bool = False
     hi_platforms: list[str] = field(default_factory=list)
     streaming_platforms: list[str] = field(default_factory=list)
+    streaming_links: list[dict] = field(default_factory=list)   # [{site, url}]
     audio_langs: list[str] = field(default_factory=list)
     sub_langs: list[str] = field(default_factory=list)
     next_jp_dt: datetime | None = None
@@ -543,6 +544,9 @@ class Aggregator:
             # extras me khud ko mat dikhao
             data.extras = [self._extra_info(e, dub_groups) for e in extra_entries if e.id != base.id]
             data.streaming_platforms = platforms.dedupe_preserve([s["site"] for s in base.streaming])
+            data.streaming_links = [
+                {"site": platforms.display(s["site"]), "url": s.get("url")} for s in base.streaming
+            ]
             data.audio_langs, data.sub_langs = self._languages(data, base)
             data.watch_platform, data.watch_url = self._watch(base, data)
             return data
@@ -588,6 +592,9 @@ class Aggregator:
         for e in [base]:
             all_links.extend(e.streaming)
         data.streaming_platforms = platforms.dedupe_preserve([s["site"] for s in all_links])
+        data.streaming_links = [
+            {"site": platforms.display(s["site"]), "url": s.get("url")} for s in all_links if s.get("url")
+        ]
         data.audio_langs, data.sub_langs = self._languages(data, base)
         data.watch_platform, data.watch_url = self._watch(base, data)
         return data
