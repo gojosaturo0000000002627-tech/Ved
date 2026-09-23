@@ -231,6 +231,7 @@ def test_04_card_format_multi_season():
     assert "• English dub: To be announced" in card
     assert "⏱ Last checked:\n22 Sep 2026, 05:30 PM IST" in card
     assert card.rstrip().endswith(f"🤖 {config.VERSION}")
+    assert config.VERSION.startswith("v")
 
 
 def test_04b_card_format_movie_suzume():
