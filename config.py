@@ -15,8 +15,8 @@ from pathlib import Path
 # VERSION — har card ke footer me aur /version par yahi dikhega.
 # Deploy ke baad turant verify karne ka sabse aasaan tareeka.
 # ---------------------------------------------------------------------------
-VERSION = "v1.5"
-VERSION_LONG = "1.5.0"
+VERSION = "v1.5.1"
+VERSION_LONG = "1.5.1"
 
 # ---------------------------------------------------------------------------
 # Time — India ke liye IST fix hai (UTC+5:30, koi DST nahi).
@@ -124,6 +124,9 @@ _DEFAULT_YT = [
     {"name": "Muse Asia", "handle": "MuseAsia"},
     {"name": "Ani-One Asia", "handle": "AniOneAsia"},
     {"name": "Ani-One India", "handle": "AniOneIndia"},
+    # Crunchyroll India — Hindi/Tamil/Telugu dub announcements + episodes ki sabse
+    # badi jagah (Konosuba, Alya jaise sab CR India dubs yahi post karte hain)
+    {"name": "Crunchyroll India", "handle": "crunchyroll_in", "channel_id": "UC1dpwMXjjPe87utZQRrEr3Q"},
 ]
 
 

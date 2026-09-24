@@ -23,7 +23,7 @@ Tip: card par ✅ Follow daba do, naya episode aate hi main message kar dunga �
 HELP = """<b>Kaise use karein:</b>
 
 /search &lt;naam&gt; — anime dhundho aur uska Hindi dub status dekho
-/anime &lt;naam&gt; — /search ka hi doosra naam
+/anime &lt;naam&gt; — bilkul wahi search (/search ka alias)
 /myfollows — follow kiye hue anime + unki language settings
 /setep jp|en|hi &lt;count&gt; &lt;naam&gt; — galat episode count manually theek karo
 /version — live version confirm karo
@@ -42,6 +42,8 @@ SEARCHING = "Dhund raha hoon... 🔍"
 SEARCHING_DETAIL = "Dhund raha hoon... 🔍 (AniList + Hindi dub database)"
 REFRESHING = "Refresh kar raha hoon... 🔄"
 NO_QUERY = "Naam bhi to batao 🙂 — jaise <code>/search demon slayer</code>"
+# /anime ke liye alag, exact usage line (requirement: "Usage: /anime <anime name>")
+ANIME_USAGE = "Usage: /anime &lt;anime name&gt;\nJaise: <code>/anime Naruto</code>"
 
 PICK_LIST_HEADER = "Ye mile — ek chun lo:"
 PICK_LIST_FOOTER = "Aur specific naam likhoge to seedha card mil jaayega 👍"

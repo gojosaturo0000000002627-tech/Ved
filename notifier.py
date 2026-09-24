@@ -87,11 +87,18 @@ class Notifier:
     async def _process_row(self, row: dict, data: CardData) -> list[dict]:
         sent: list[dict] = []
         counts = {"jp": data.jp, "en": data.en, "hi": data.hi}
-        new_counts = {
-            "jp": counts["jp"],
-            "en": counts["en"],
-            "hi": counts["hi"],
-        }
+        new_counts = {"jp": counts["jp"], "en": counts["en"], "hi": counts["hi"]}
+        cur_season = data.current_number
+        stored_season = row.get("season_no")
+        first_pass = not row.get("seen")
+        # NAYA SEASON shuru — count 1 se restart hota hai (S3 EP1 < S2 EP12),
+        # isliye seedha compare karna galat hai. Season change = khud ek news.
+        season_changed = (
+            not first_pass
+            and cur_season is not None
+            and stored_season is not None
+            and int(stored_season) != int(cur_season)
+        )
         for lang in row["langs"]:
             if lang not in ("jp", "en", "hi"):
                 continue
@@ -99,22 +106,51 @@ class Notifier:
             old = row.get(f"{lang}_count")
             if new is None:
                 continue  # data nahi hai -> guess nahi karenge
-            if old is None:
-                # pehli baar baseline set ho raha hai, notification nahi
-                continue
-            if new <= old:
-                continue
-            episode = new
+            if first_pass:
+                continue  # pehli baar baseline set ho raha hai, notification nahi
             platform, url = self._platform_for(lang, data)
-            text = formatter.format_notification(
-                title=data.title,
-                episode=episode,
-                lang_label=LANG_LABEL[lang],
-                platform=platform,
-                count=new,
-                total=data.planned_total,
-                when=config.now_ist(),
-            )
+            if season_changed:
+                # Naye season ka pehla sighted episode (koi bhi lang) = news.
+                # Ek hi baar aayega — pass ke end me season_no update ho jaata hai.
+                episode = new
+                text = formatter.format_season_notification(
+                    title=data.title,
+                    season=cur_season,
+                    episode=episode,
+                    lang_label=LANG_LABEL[lang],
+                    platform=platform,
+                    count=new,
+                    total=data.planned_total,
+                    when=config.now_ist(),
+                )
+            elif old is None:
+                if lang == "jp":
+                    # JP baseline (follow JP start hone se pehle hua) — news nahi
+                    continue
+                # NAYA DUB AVAILABLE (None -> N) — "Konosuba S3 Hindi dub aa gaya" jaisa
+                # case. Ye chupchap skip karna hi wo bug tha jisse update miss hoti thi.
+                episode = new
+                text = formatter.format_dub_start_notification(
+                    title=data.title,
+                    lang_label=LANG_LABEL[lang],
+                    platform=platform,
+                    count=new,
+                    total=data.planned_total,
+                    when=config.now_ist(),
+                )
+            elif new <= old:
+                continue
+            else:
+                episode = new
+                text = formatter.format_notification(
+                    title=data.title,
+                    episode=episode,
+                    lang_label=LANG_LABEL[lang],
+                    platform=platform,
+                    count=new,
+                    total=data.planned_total,
+                    when=config.now_ist(),
+                )
             ok = await self._send(row["user_id"], text, platform, url)
             if ok:
                 sent.append(
@@ -136,6 +172,7 @@ class Notifier:
             total_eps=data.planned_total,
             watch_url=data.watch_url,
             platform=(data.hi_platforms or [data.watch_platform] or [None])[0],
+            season_no=cur_season,
         )
         return sent
 

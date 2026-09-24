@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS follows (
     total_eps   INTEGER,
     watch_url   TEXT,
     platform    TEXT,
+    seen        INTEGER NOT NULL DEFAULT 1,   -- 0 = pehla poll pending (baseline lena hai)
+    season_no   INTEGER,                      -- counts kis season ke hain
     updated_at  INTEGER NOT NULL,
     PRIMARY KEY (user_id, anime_id)
 );
@@ -84,6 +86,19 @@ class Database:
         with self._lock, self._conn:
             self._conn.executescript("PRAGMA journal_mode=WAL;")
             self._conn.executescript(SCHEMA)
+            self._migrate()
+
+    def _migrate(self) -> None:
+        """Purane DB me naye columns — duplicate column error ko chupchaap ignore karo."""
+        for stmt in (
+            "ALTER TABLE follows ADD COLUMN seen INTEGER NOT NULL DEFAULT 1",
+            "ALTER TABLE follows ADD COLUMN season_no INTEGER",
+        ):
+            try:
+                self._conn.execute(stmt)
+            except sqlite3.OperationalError as exc:
+                if "duplicate column" not in str(exc).lower():
+                    log.warning("migrate skip: %s", exc)
 
     def close(self) -> None:
         with self._lock:
@@ -118,20 +133,24 @@ class Database:
         total_eps: int | None = None,
         watch_url: str | None = None,
         platform: str | None = None,
+        season_no: int | None = None,
     ) -> None:
         langs = [l for l in langs if l in LANGS] or ["hi"]
+        # Counts follow-time par mil gaye = baseline set. Sab NULL = pehla poll baseline lega.
+        seen = 1 if (jp_count is not None or en_count is not None or hi_count is not None) else 0
         with self._lock, self._conn:
             self._conn.execute(
                 """INSERT INTO follows(user_id, anime_id, title, langs, jp_count, en_count, hi_count,
-                                       total_eps, watch_url, platform, updated_at)
-                   VALUES(?,?,?,?,?,?,?,?,?,?,?)
+                                       total_eps, watch_url, platform, seen, season_no, updated_at)
+                   VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
                    ON CONFLICT(user_id, anime_id) DO UPDATE SET
                      title=excluded.title, langs=excluded.langs,
                      jp_count=excluded.jp_count, en_count=excluded.en_count, hi_count=excluded.hi_count,
                      total_eps=excluded.total_eps, watch_url=excluded.watch_url,
-                     platform=excluded.platform, updated_at=excluded.updated_at""",
+                     platform=excluded.platform, seen=excluded.seen,
+                     season_no=excluded.season_no, updated_at=excluded.updated_at""",
                 (user_id, anime_id, title, json.dumps(langs), jp_count, en_count, hi_count,
-                 total_eps, watch_url, platform, int(time.time())),
+                 total_eps, watch_url, platform, seen, season_no, int(time.time())),
             )
 
     def remove_follow(self, user_id: int, anime_id: int) -> bool:
@@ -186,14 +205,17 @@ class Database:
         total_eps: int | None = None,
         watch_url: str | None = None,
         platform: str | None = None,
+        season_no: int | None = None,
     ) -> None:
         with self._lock, self._conn:
             self._conn.execute(
                 """UPDATE follows SET jp_count=?, en_count=?, hi_count=?, total_eps=?,
                           watch_url=COALESCE(?, watch_url), platform=COALESCE(?, platform),
+                          seen=1, season_no=COALESCE(?, season_no),
                           updated_at=?
                    WHERE user_id=? AND anime_id=?""",
-                (jp_count, en_count, hi_count, total_eps, watch_url, platform, int(time.time()), user_id, anime_id),
+                (jp_count, en_count, hi_count, total_eps, watch_url, platform,
+                 season_no, int(time.time()), user_id, anime_id),
             )
 
     @staticmethod
@@ -213,6 +235,8 @@ class Database:
             "total_eps": row["total_eps"],
             "watch_url": row["watch_url"],
             "platform": row["platform"],
+            "seen": bool(row["seen"]),
+            "season_no": row["season_no"],
             "updated_at": int(row["updated_at"] or 0),
         }
 

@@ -24,7 +24,9 @@ episodes ke notifications bhi milte hain.
   ke 5 AniList entries → 3 seasons), **current-season rule** (S1 search karo, S3 ka
   data dikhe)
 - **Follow + notifications** — JP/EN/HI multi-select, har 20 min poll, naya episode
-  = exact-format notification + ▶️ Watch button
+  = exact-format notification + ▶️ Watch button. Naya Hindi/English dub pehli baar
+  available ho, ya naya season shuru ho, to "Dub Shuru! 🎉" / "Season Shuru! 🆕"
+  notification jati hai (v1.5.1 — pehle ye transitions chupchap miss ho jate the)
 - **Speed** — card 1–3s me: AniList entry cache 15 min, card cache 30 min (SQLite),
   AniNidhi 6h cache, YouTube handle permanent cache + failures 1h negative cache
 - **Overrides** — `/setep jp|en|hi <count> <name>` + `overrides.json` (highest priority)
@@ -111,7 +113,7 @@ Render free tier 15 min idle ke baad service sleep kar deta hai. Isliye
 
 1. Bot ko Telegram par `/start` bhejo
 2. `/version` — live version confirm (`v1`)
-3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.5`)
+3. `/search grand blue` — card ke footer me bhi version tag dikhega (jaise `🤖 v1.5.1`)
 4. Card par **✅ Follow** → language chuno → **✅ Confirm**
 5. `/stats` (admin) ya `https://<service>.onrender.com/stats` — follows/users/poll
 

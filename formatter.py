@@ -42,8 +42,8 @@ def _hindi_line(count: int | None, complete_month: str | None, platforms_list: l
         if (status or "").lower() == "finished":
             return "Available ✅ (complete)"      # dub poora hai, count ka record nahi
         return UNKNOWN
-    if complete_month:
-        return f"{count} episodes ({complete_month} me complete)"
+    if (status or "").lower() == "finished":
+        return f"{count} episodes (complete ✅)"   # source khud complete bol raha hai
     return f"{count} episodes"
 
 
@@ -244,6 +244,70 @@ def format_notification(
         f"🔔 <b>{html.escape(title)}</b> — Naya Episode!",
         "",
         f"📌 Episode <b>{episode}</b> ({lang_label}) aa chuka hai 🎉",
+        f"📺 Platform: {html.escape(str(platform)) if platform else UNKNOWN}",
+        f"📈 {lang_label}: {progress} episodes",
+        f"⏱ {config.ts_ist(when or config.now_ist())}",
+    ]
+    return "\n".join(lines)
+
+
+def format_dub_start_notification(
+    title: str,
+    lang_label: str,
+    platform: str | None,
+    count: int,
+    total: int | None,
+    when: datetime | None = None,
+) -> str:
+    """
+    Naya dub available hua (pehle 'No dub' tha, ab episodes aa gaye) —
+    Konosuba S3 Hindi dub jaisa case. Exact format (HTML):
+
+    🔔 <b>{title}</b> — {lang_label} Shuru! 🎉
+
+    📌 {lang_label} ke naye episodes aa gaye hain — Episode <b>{N}</b> tak available
+    📺 Platform: {...}
+    📈 {lang_label}: {N}/{total} episodes
+    ⏱ {IST timestamp}
+    """
+    progress = f"{count}/{total}" if total else str(count)
+    lines = [
+        f"🔔 <b>{html.escape(title)}</b> — {lang_label} Shuru! 🎉",
+        "",
+        f"📌 {lang_label} ke naye episodes aa gaye hain — Episode <b>{count}</b> tak available",
+        f"📺 Platform: {html.escape(str(platform)) if platform else UNKNOWN}",
+        f"📈 {lang_label}: {progress} episodes",
+        f"⏱ {config.ts_ist(when or config.now_ist())}",
+    ]
+    return "\n".join(lines)
+
+
+def format_season_notification(
+    title: str,
+    season: int,
+    episode: int,
+    lang_label: str,
+    platform: str | None,
+    count: int,
+    total: int | None,
+    when: datetime | None = None,
+) -> str:
+    """
+    Naya season shuru hua (counts reset) — pehla sighted episode.
+    Exact format (HTML):
+
+    🆕 <b>{title}</b> — Season {S} Shuru!
+
+    📌 Season <b>{S}</b> ka Episode <b>{N}</b> ({lang_label}) aa chuka hai 🎉
+    📺 Platform: {...}
+    📈 {lang_label}: {N}/{total} episodes
+    ⏱ {IST timestamp}
+    """
+    progress = f"{count}/{total}" if total else str(count)
+    lines = [
+        f"🆕 <b>{html.escape(title)}</b> — Season {season} Shuru!",
+        "",
+        f"📌 Season <b>{season}</b> ka Episode <b>{episode}</b> ({lang_label}) aa chuka hai 🎉",
         f"📺 Platform: {html.escape(str(platform)) if platform else UNKNOWN}",
         f"📈 {lang_label}: {progress} episodes",
         f"⏱ {config.ts_ist(when or config.now_ist())}",
