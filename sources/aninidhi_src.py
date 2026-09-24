@@ -273,10 +273,11 @@ def weekly_progress(
     out.episodes = n
     out.complete = complete
     if complete:
-        # completion month = start + 7*(total-1) — real start date se derived
-        if planned_total:
-            end = start + timedelta(days=7 * (planned_total - 1))
-            out.complete_month = end.strftime("%b %Y")
+        # Dub ABHI complete hai (status Finished ya weekly count planned tak pahunch
+        # gaya) — completion ka future-month projection galat hota hai (Konosuba S1
+        # case: Finished tha par 'Oct 2026 me complete' dikha raha tha). Isliye
+        # complete_month set nahi karte; card '(complete ✅)' dikhata hai.
+        out.complete_month = None
         out.next_date = None
     else:
         nxt = start + timedelta(days=7 * n)
