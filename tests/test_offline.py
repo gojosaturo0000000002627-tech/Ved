@@ -550,6 +550,91 @@ def test_08b_no_notification_without_increase():
     assert sent == [], "count na badhe to notification nahi"
 
 
+def test_08c_new_dub_available_notifies():
+    """KONOSUBA case: follow ke waqt dub nahi tha (hi_count=NULL). Naya dub
+    aane par None->N transition PAR 'Dub Shuru' notification JAANI CHAHIYE —
+    yehi chhup-jana wo bug tha jisse user ko update miss hui."""
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    db.add_follow(4242, data.anime_id, data.title, ["hi"])          # sab counts NULL
+    # purana follower (migration jaisa): baseline kabhi set hua, dub data kabhi nahi mila
+    with db._lock, db._conn:
+        db._conn.execute(
+            "UPDATE follows SET seen=1, hi_count=NULL WHERE user_id=? AND anime_id=?",
+            (4242, data.anime_id),
+        )
+
+    class FakeBot:
+        def __init__(self):
+            self.sent = []
+
+        async def send_message(self, chat_id, text, parse_mode=None, reply_markup=None):
+            self.sent.append({"chat_id": chat_id, "text": text})
+
+    bot = FakeBot()
+    notifier = Notifier(aggregator=agg, db=db, bot=bot)
+    sent = run(notifier.run_once())
+    assert len(sent) == 1, sent
+    assert sent[0]["lang"] == "hi"
+    assert "— Hindi dub Shuru! 🎉" in bot.sent[0]["text"], bot.sent[0]["text"]
+    assert "ke naye episodes aa gaye hain — Episode <b>4</b> tak available" in bot.sent[0]["text"]
+    assert "📈 Hindi dub: 4/12 episodes" in bot.sent[0]["text"]
+    # dobara pass -> dubara notification nahi (ab count stored hai)
+    sent2 = run(notifier.run_once())
+    assert sent2 == [], f"repeat notification: {sent2}"
+    row = db.get_follow(4242, data.anime_id)
+    assert row["hi_count"] == 4 and row["seen"]
+
+
+def test_08d_first_poll_is_silent_baseline():
+    """Bilkula naya follow (seen=0): pehla pass sirf baseline set kare — koi notification nahi."""
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    db.add_follow(4242, data.anime_id, data.title, ["hi", "jp", "en"])   # sab NULL, seen=0
+    notifier = Notifier(aggregator=agg, db=db, bot=None)
+    sent = run(notifier.run_once())
+    assert sent == [], f"pehle pass par notification: {sent}"
+    row = db.get_follow(4242, data.anime_id)
+    assert row["seen"] and row["hi_count"] == 4 and row["jp_count"] == data.jp
+
+
+def test_08e_new_season_start_notifies():
+    """Naya season: counts 1 se restart hote hain (1 < 12) — fir bhi 'Season Shuru'
+    notification aani chahiye, aur sirf EK baar."""
+    db = Database(":memory:")
+    agg = make_aggregator(cache=db)
+    data = run(agg.build_card_by_query("black torch", force=True))[1]
+    cur = data.current_number
+    db.add_follow(4242, data.anime_id, data.title, ["jp"], jp_count=12, total_eps=12)
+    with db._lock, db._conn:
+        # stored season purana hai (jaise S2 ke counts the) — ab current badal gaya
+        db._conn.execute(
+            "UPDATE follows SET seen=1, season_no=? WHERE user_id=? AND anime_id=?",
+            (cur + 1, 4242, data.anime_id),
+        )
+    class FakeBot:
+        def __init__(self):
+            self.sent = []
+
+        async def send_message(self, chat_id, text, parse_mode=None, reply_markup=None):
+            self.sent.append({"chat_id": chat_id, "text": text})
+
+    bot = FakeBot()
+    notifier = Notifier(aggregator=agg, db=db, bot=bot)
+    sent = run(notifier.run_once())
+    assert len(sent) == 1, sent
+    assert sent[0]["lang"] == "jp"
+    text = bot.sent[0]["text"]
+    assert f"Season {cur} Shuru" in text, text
+    assert "aa chuka hai" in text
+    # agla pass -> season stored, count same -> kuch nahi
+    sent2 = run(notifier.run_once())
+    assert sent2 == [], f"repeat: {sent2}"
+    assert db.get_follow(4242, data.anime_id)["season_no"] == cur
+
+
 # ===========================================================================
 # 9. /setep override — sabse high priority
 # ===========================================================================
@@ -619,10 +704,11 @@ def test_11_weekly_math_and_past_guard():
     prog0 = weekly_progress(date(2026, 10, 1), "Airing", 12, TODAY)
     assert prog0.episodes == 0 and prog0.next_date == date(2026, 10, 1)
 
-    # complete
+    # complete — status Finished ka matlab dub ABHI poora hai; future-month
+    # projection galat thi (Konosuba bug), isliye complete_month kabhi nahi
     done = weekly_progress(date(2026, 4, 2), "Finished", 12, TODAY)
     assert done.episodes == 12 and done.complete and done.next_date is None
-    assert done.complete_month == "Jun 2026"
+    assert done.complete_month is None
 
     # planned cap
     capped = weekly_progress(date(2020, 1, 1), "Airing", 12, TODAY)
@@ -655,9 +741,23 @@ def test_11b_past_date_guard_on_card():
     assert agg._hi_next_text(nodub, TODAY) == "No official Hindi dub found"
 
     done = SeasonInfo(number=1, label="Season 1", planned=12, released=12,
-                      hi_count=12, hi_platforms=["Crunchyroll"], hi_status="Finished",
-                      hi_complete_month="Jun 2026")
+                      hi_count=12, hi_platforms=["Crunchyroll"], hi_status="Finished")
     assert agg._hi_next_text(done, TODAY) == "All episodes released"
+
+
+def test_11c_finished_hindi_line_no_future_month():
+    """Konosuba bug: AniNidhi Finished -> '(complete ✅)', future month kabhi nahi."""
+    from formatter import _hindi_line
+
+    # S1 jaisa case: 10/10, status Finished -> pehle '10 episodes (Oct 2026 me
+    # complete)' dikhta tha jo galat tha
+    assert _hindi_line(10, None, ["Crunchyroll"], "Finished") == "10 episodes (complete ✅)"
+    # chal raha dub — plain count
+    assert _hindi_line(4, None, ["Crunchyroll"], "Airing") == "4 episodes"
+    # count ka record nahi par dub complete
+    assert _hindi_line(None, None, ["Crunchyroll"], "Finished") == "Available ✅ (complete)"
+    # dub hai par kuch nahi pata -> Unknown (guess nahi)
+    assert _hindi_line(None, None, ["Crunchyroll"], "Airing") == "Unknown"
 
 
 def test_12_youtube_episode_extraction():
